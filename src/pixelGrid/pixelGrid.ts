@@ -80,41 +80,43 @@ const Pixel = (sizeX: number) => {
   };
 };
 
-const Draw = (app: Application, sizeX: number) => {
-  const pixel = Pixel(sizeX);
+const Draw = (app: Application, size: PointData) => {
+  const graphic = new Graphics();
+
+  app.canvas.addEventListener("mousedown", (e) => {
+    const positionX = Math.floor(e.clientX / DEFAULT_PIXEL_SIZE);
+    const positionY = Math.floor(e.clientY / DEFAULT_PIXEL_SIZE);
+
+    const gridPositionX = positionX * DEFAULT_PIXEL_SIZE;
+    const gridPositionY = positionY * DEFAULT_PIXEL_SIZE;
+
+    graphic
+      .rect(
+        gridPositionX,
+        gridPositionY,
+        DEFAULT_PIXEL_SIZE,
+        DEFAULT_PIXEL_SIZE,
+      )
+      .fill(COLORS.HALF_TRANSPARENT);
+  });
 
   const grid = () => {
     if (_graphicGrid.size !== 0) {
       return;
     }
 
-    _pixelGrid.forEach((value, key) => {
-      const gridPosition = pixel.getPositionFromKey(key);
-      const canvasPosition = {
-        x: gridPosition.x * DEFAULT_PIXEL_SIZE,
-        y: gridPosition.y * DEFAULT_PIXEL_SIZE,
-      };
+    for (let x = 0; x < size.x; x++) {
+      for (let y = 0; y < size.y; y++) {
+        const _x = x * DEFAULT_PIXEL_SIZE;
+        const _y = y * DEFAULT_PIXEL_SIZE;
+        graphic
+          .rect(_x, _y, DEFAULT_PIXEL_SIZE, DEFAULT_PIXEL_SIZE)
+          .fill(COLORS.TRANSPARENT)
+          .stroke({ width: 1, color: COLORS.HALF_TRANSPARENT });
 
-      const graphic = new Graphics()
-        .rect(
-          canvasPosition.x,
-          canvasPosition.y,
-          DEFAULT_PIXEL_SIZE,
-          DEFAULT_PIXEL_SIZE,
-        )
-        .fill(value)
-        .stroke({ width: 1, color: COLORS.HALF_TRANSPARENT });
-
-      graphic.eventMode = "static";
-
-      graphic.on("mousedown", () => {
-        graphic.fill("purple");
-      });
-
-      app.stage.addChild(graphic);
-
-      _graphicGrid.set(key, graphic);
-    });
+        app.stage.addChild(graphic);
+      }
+    }
   };
 
   return {
@@ -123,12 +125,12 @@ const Draw = (app: Application, sizeX: number) => {
 };
 
 export const GridManager = (size: PointData) => {
-  if (_pixelGrid.size === 0) {
-    _pixelGrid = createGrid(size);
-  }
+  // if (_pixelGrid.size === 0) {
+  //   _pixelGrid = createGrid(size);
+  // }
 
   return {
-    ...Pixel(size.x),
-    draw: (app: Application) => Draw(app, size.x),
+    // ...Pixel(size.x),
+    draw: (app: Application) => Draw(app, size),
   };
 };

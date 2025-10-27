@@ -1,17 +1,13 @@
 import "./App.css";
-import { initializeCanvas } from "./canvas";
+import { init } from "./canvas";
 import { onMount } from "solid-js";
 
 function App() {
   onMount(() => {
-    initializeCanvas();
+    init();
   });
 
-  return (
-    <>
-      <div id="canvas"></div>
-    </>
-  );
+  return <canvas id="main-canvas" width={800} height={600} />;
 }
 
 export default App;
