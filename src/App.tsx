@@ -7,7 +7,7 @@ function App() {
     init();
   });
 
-  return <canvas id="main-canvas" width={800} height={600} />;
+  return <canvas id="main-canvas" width={800} height={800} />;
 }
 
 export default App;

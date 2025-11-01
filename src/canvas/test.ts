@@ -101,6 +101,8 @@ const createShaderModule = (device: GPUDevice) => {
     struct VertexOutput {
         @builtin(position) position: vec4f,  // clip-space position
         @location(0) @interpolate(flat) isHovering: i32, // flat integer
+        @location(1) gridCell: vec2f,
+        @location(2) grid: vec2f,
     };
 
     @vertex
@@ -114,12 +116,13 @@ const createShaderModule = (device: GPUDevice) => {
       let gridPos = (pos + 1) / grid - 1;
       let cPos = gridPos + cell / grid * 2;
 
-
       var out: VertexOutput;
 
-      var _isHovering: bool = all(cellPos == cell);
+      var inverseCellPos = vec2f(cellPos.x, grid.y - 1 - cellPos.y);
 
-      out.position = vec4f(cPos , 0,1);
+      var _isHovering: bool = all(inverseCellPos == cell);
+
+      out.position = vec4f(cPos , 0, 1);
 
       if(_isHovering == true) {
         out.isHovering = 1;
@@ -127,13 +130,35 @@ const createShaderModule = (device: GPUDevice) => {
         out.isHovering = 0;
       }
 
+      out.gridCell = cellPos;
+      out.grid = grid;
+
       return out;
     }
 
     @fragment
-    fn fragmentMain(@location(0) @interpolate(flat) isHovering: i32) -> @location(0) vec4f {
+    fn fragmentMain(
+    @builtin(position) fragCoord : vec4f,
+    @location(0) @interpolate(flat) isHovering: i32,
+    @location(1) gridCell: vec2f,
+    @location(2) grid: vec2f,
+    ) -> @location(0) vec4f {
+
+     let cellWith = 800 / grid.x;
+     let cellHeight = 800 / grid.y;
+     let posX = gridCell.x * cellWith;
+     let posY = gridCell.y * cellHeight;
+
       if (isHovering == 1) {
-            return vec4f(1.0, 0.0, 0.0, 1.0);
+        if(
+          (fragCoord.y > posY && fragCoord.y < posY + 5) |
+          (fragCoord.x > posX && fragCoord.x < posX + 5) |
+          (fragCoord.y > posY + cellHeight - 5 && fragCoord.y < posY + cellHeight) |
+          (fragCoord.x > posX + cellWith -5 && fragCoord.x < posX + cellWith)
+          ) {
+            return vec4f(1.0, 1.0, 1.0, 1.0);
+          }
+          return vec4f(0.0, 0.0, 1.0, 1.0);
         } else {
             return vec4f(0.0, 0.0, 1.0, 1.0);
         }

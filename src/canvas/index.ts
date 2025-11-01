@@ -27,9 +27,7 @@ export const init = async () => {
 
     cellPosition.x = Math.floor(mousePosRelativeToCanvas.x / cellSize.x);
 
-    cellPosition.y = Math.floor(
-      (canvasBounds.height - mousePosRelativeToCanvas.y) / cellSize.y,
-    );
+    cellPosition.y = Math.floor(mousePosRelativeToCanvas.y / cellSize.y);
   });
 
   const loop = () => {
