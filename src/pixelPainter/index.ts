@@ -1,11 +1,9 @@
-import { initGrid } from "./test";
+import { pixelPainter } from "./pixelPainter";
 
 export const init = async () => {
-  const draw = await initGrid();
-
-  let gridSize: number = 32;
-
+  const gridSize: number = 32;
   const cellPosition = { x: 0, y: 0 };
+  const { drawFrame, paintPixel } = await pixelPainter(gridSize);
 
   const canvas = document.getElementById("main-canvas");
   if (!canvas) {
@@ -14,24 +12,27 @@ export const init = async () => {
 
   const canvasBounds = canvas.getBoundingClientRect();
 
-  window.addEventListener("mousemove", (e) => {
-    const cellSize = {
-      x: canvasBounds.width / gridSize,
-      y: canvasBounds.height / gridSize,
-    };
+  const cellSize = {
+    x: canvasBounds.width / gridSize,
+    y: canvasBounds.height / gridSize,
+  };
 
+  window.addEventListener("mousemove", (e) => {
     const mousePosRelativeToCanvas = {
       x: e.clientX - canvasBounds.left,
       y: e.clientY - canvasBounds.top,
     };
 
     cellPosition.x = Math.floor(mousePosRelativeToCanvas.x / cellSize.x);
-
     cellPosition.y = Math.floor(mousePosRelativeToCanvas.y / cellSize.y);
   });
 
+  window.addEventListener("mousedown", () => {
+    paintPixel(cellPosition);
+  });
+
   const loop = () => {
-    draw(gridSize, cellPosition);
+    drawFrame(cellPosition);
     requestAnimationFrame(loop);
   };
 

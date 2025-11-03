@@ -44,10 +44,10 @@ const webGPUSetup = async () => {
 const createVertexBuffer = (device: GPUDevice) => {
   const vertices = new Float32Array([
     // Triangle 1 (Blue)
-    -0.8, -0.8, 0.8, -0.8, 0.8, 0.8,
+    -1.0, -1.0, 1.0, -1.0, 1.0, 1.0,
 
     // Triangle 2 (Red)
-    -0.8, -0.8, 0.8, 0.8, -0.8, 0.8,
+    -1.0, -1.0, 1.0, 1.0, -1.0, 1.0,
   ]);
 
   // The GPU cannot draw vertices with data from a JavaScript array.
@@ -96,6 +96,7 @@ const createShaderModule = (device: GPUDevice) => {
     code: `
     @group(0) @binding(0) var<uniform> grid: vec2f;
     @group(1) @binding(0) var<uniform> cellPos: vec2f;
+    @group(2) @binding(0) var<storage, read> colors: array<u32>;
 
     // Export to fragment
     struct VertexOutput {
@@ -103,7 +104,15 @@ const createShaderModule = (device: GPUDevice) => {
         @location(0) @interpolate(flat) isHovering: i32, // flat integer
         @location(1) gridCell: vec2f,
         @location(2) grid: vec2f,
+        @location(3) ownPos: vec2f,
     };
+
+    fn unpack_rgb(color: u32) -> vec4<f32> {
+        let r = f32((color >> 16u) & 0xFFu) / 255.0;
+        let g = f32((color >> 8u)  & 0xFFu) / 255.0;
+        let b = f32(color & 0xFFu) / 255.0;
+        return vec4<f32>(r, g, b, 1.0);
+    }
 
     @vertex
     fn vertexMain(@location(0) pos: vec2f, @builtin(instance_index) instance: u32) -> VertexOutput {
@@ -119,6 +128,7 @@ const createShaderModule = (device: GPUDevice) => {
       var out: VertexOutput;
 
       var inverseCellPos = vec2f(cellPos.x, grid.y - 1 - cellPos.y);
+      var inverseOwnCell = vec2f(cell.x, grid.y - 1 - cell.y);
 
       var _isHovering: bool = all(inverseCellPos == cell);
 
@@ -132,6 +142,7 @@ const createShaderModule = (device: GPUDevice) => {
 
       out.gridCell = cellPos;
       out.grid = grid;
+      out.ownPos = inverseOwnCell;
 
       return out;
     }
@@ -142,12 +153,18 @@ const createShaderModule = (device: GPUDevice) => {
     @location(0) @interpolate(flat) isHovering: i32,
     @location(1) gridCell: vec2f,
     @location(2) grid: vec2f,
-    ) -> @location(0) vec4f {
+    @location(3) ownPos: vec2f,
+    ) -> @location(0)vec4f {
 
      let cellWith = 800 / grid.x;
      let cellHeight = 800 / grid.y;
      let posX = gridCell.x * cellWith;
      let posY = gridCell.y * cellHeight;
+     let ownPosX = ownPos.x * cellWith;
+     let ownPosY = ownPos.y * cellHeight;
+
+     let colorIndex= u32(ownPos.x + ownPos.y * grid.x);
+     let color = colors[colorIndex];
 
       if (isHovering == 1) {
         if(
@@ -158,10 +175,18 @@ const createShaderModule = (device: GPUDevice) => {
           ) {
             return vec4f(1.0, 1.0, 1.0, 1.0);
           }
-          return vec4f(0.0, 0.0, 1.0, 1.0);
-        } else {
-            return vec4f(0.0, 0.0, 1.0, 1.0);
+       }
+
+        let rgb = unpack_rgb(color);
+
+        if(
+          fragCoord.y > ownPosY && fragCoord.y < ownPosY + cellHeight &&
+          fragCoord.x > ownPosX && fragCoord.x < ownPosX + cellWith
+        ) {
+           return rgb;
         }
+
+        return vec4f(0.0, 0.0 , 0.0, 0.0);
     }
     `,
   });
@@ -232,6 +257,34 @@ const createGridBufferBindGroup = (
   return bindGroup;
 };
 
+const createColorBufferBindGroup = (
+  device: GPUDevice,
+  buffer: Uint32Array<ArrayBuffer>,
+  pipeline: GPURenderPipeline,
+) => {
+  // Create a uniform buffer that describes the mousePosition.
+  //A uniform is a value from a buffer that is the same for every invocation.
+
+  const storageBuffer = device.createBuffer({
+    label: "Colors Storage",
+    size: buffer.byteLength,
+    usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+  });
+
+  device.queue.writeBuffer(storageBuffer, 0, buffer);
+
+  const groupLayout = pipeline.getBindGroupLayout(2);
+
+  const bindGroup = device.createBindGroup({
+    label: "Cell color",
+    // layout that describes which types of resources this bind group contains
+    layout: groupLayout,
+    entries: [{ binding: 0, resource: { buffer: storageBuffer } }],
+  });
+
+  return bindGroup;
+};
+
 const createMousePositionBufferBindGroup = (
   device: GPUDevice,
   pipeline: GPURenderPipeline,
@@ -252,7 +305,7 @@ const createMousePositionBufferBindGroup = (
   const bindGroup = device.createBindGroup({
     label: "Cell renderer bind group",
     // layout that describes which types of resources this bind group contains
-    layout: pipeline.getBindGroupLayout(0),
+    layout: pipeline.getBindGroupLayout(1),
     entries: [
       {
         // binding, which corresponds with the @binding() value you entered in the shader. In this case, 0
@@ -266,8 +319,10 @@ const createMousePositionBufferBindGroup = (
   return bindGroup;
 };
 
-export const initGrid = async () => {
+export const pixelPainter = async (gridSize: number) => {
   const { device, canvasFormat, context } = await webGPUSetup();
+
+  const colorBuffer = new Uint32Array(gridSize * gridSize);
 
   const { vertices, vertexBuffer, vertexBufferLayout } =
     createVertexBuffer(device);
@@ -281,7 +336,7 @@ export const initGrid = async () => {
     canvasFormat,
   );
 
-  const drawFrame = (gridSize: number, cellPos: { x: number; y: number }) => {
+  const drawFrame = (cellPos: { x: number; y: number }) => {
     // Provides an interface for recording GPU commands.
     const encoder = device.createCommandEncoder({
       label: "Grid encoder",
@@ -292,6 +347,12 @@ export const initGrid = async () => {
       device,
       cellPipeline,
       cellPos,
+    );
+
+    const colorBindGroup = createColorBufferBindGroup(
+      device,
+      colorBuffer,
+      cellPipeline,
     );
 
     //Render passes are when all drawing operations in WebGPU happen.
@@ -318,6 +379,7 @@ export const initGrid = async () => {
 
     pass.setBindGroup(0, bindGroup);
     pass.setBindGroup(1, bindMousePosition);
+    pass.setBindGroup(2, colorBindGroup);
 
     pass.draw(vertices.length / 2, gridSize * gridSize); // 6 vertices and draw several times
 
@@ -331,5 +393,13 @@ export const initGrid = async () => {
     //
   };
 
-  return drawFrame;
+  const paintPixel = (cellPos: { x: number; y: number }) => {
+    const arrayIndex = cellPos.x + cellPos.y * gridSize;
+    colorBuffer[arrayIndex] = 0xff0000;
+  };
+
+  return {
+    drawFrame,
+    paintPixel,
+  };
 };

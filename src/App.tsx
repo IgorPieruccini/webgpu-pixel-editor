@@ -1,5 +1,5 @@
 import "./App.css";
-import { init } from "./canvas";
+import { init } from "./pixelPainter";
 import { onMount } from "solid-js";
 
 function App() {
