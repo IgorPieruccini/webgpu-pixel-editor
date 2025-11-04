@@ -69,9 +69,9 @@ fn fragmentMain(
     let cellWidth = canvasSize.x / gridSize.x;
     let cellHeight = canvasSize.y / gridSize.y;
     let posX = (mouseCellPos.x * cellWidth) + pan.x;
-    let posY = (mouseCellPos.y * cellHeight) + pan.y;
+    let posY = (mouseCellPos.y * cellHeight) - pan.y;
     let ownPosX = (cellPos.x * cellWidth) + pan.x;
-    let ownPosY = (cellPos.y * cellHeight) + pan.y;
+    let ownPosY = (cellPos.y * cellHeight) - pan.y;
 
     let colorIndex = u32(cellPos.x + cellPos.y * gridSize.x);
     let color = colors[colorIndex];

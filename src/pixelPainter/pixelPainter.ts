@@ -165,7 +165,10 @@ export const pixelPainter = async (
 
   const { createBind } = bind(device, cellPipeline);
 
-  const drawFrame = (cellPos: { x: number; y: number }) => {
+  const drawFrame = (
+    cellPos: { x: number; y: number },
+    pan: { x: number; y: number },
+  ) => {
     // Provides an interface for recording GPU commands.
     const encoder = device.createCommandEncoder({
       label: "Grid encoder",
@@ -184,8 +187,8 @@ export const pixelPainter = async (
       canvasSize.x,
       canvasSize.y,
       // pan viewport
-      0,
-      0,
+      pan.x,
+      pan.y,
     ]);
 
     binds.push(createBind("bindValues", bindValues, 0));

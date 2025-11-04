@@ -3,6 +3,9 @@ import { pixelPainter } from "./pixelPainter";
 export const init = async () => {
   const gridSize: number = 32;
   const cellPosition = { x: 0, y: 0 };
+  const pan = { x: 0, y: 0 };
+  let pressingSpace = false;
+  const mousePosRelativeToCanvas = { x: 0, y: 0 };
 
   const canvas = document.getElementById("main-canvas");
   if (!canvas) {
@@ -26,21 +29,36 @@ export const init = async () => {
   };
 
   window.addEventListener("mousemove", (e) => {
-    const mousePosRelativeToCanvas = {
-      x: e.clientX - viewport.left,
-      y: e.clientY - viewport.top,
-    };
+    mousePosRelativeToCanvas.x = e.clientX - viewport.left - pan.x;
+    mousePosRelativeToCanvas.y = e.clientY - viewport.top + pan.y;
 
     cellPosition.x = Math.floor(mousePosRelativeToCanvas.x / cellSize.x);
     cellPosition.y = Math.floor(mousePosRelativeToCanvas.y / cellSize.y);
+
+    if (pressingSpace) {
+      pan.x += e.movementX;
+      pan.y -= e.movementY;
+    }
   });
 
   window.addEventListener("mousedown", () => {
     paintPixel(cellPosition);
   });
 
+  window.addEventListener("keydown", (e) => {
+    if (e.code === "Space" && !pressingSpace) {
+      pressingSpace = true;
+    }
+  });
+
+  window.addEventListener("keyup", (e) => {
+    if (e.code === "Space") {
+      pressingSpace = false;
+    }
+  });
+
   const loop = () => {
-    drawFrame(cellPosition);
+    drawFrame(cellPosition, pan);
     requestAnimationFrame(loop);
   };
 
