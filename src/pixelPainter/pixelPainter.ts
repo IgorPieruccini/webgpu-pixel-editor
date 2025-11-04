@@ -49,10 +49,9 @@ const webGPUSetup = async () => {
 
 const createVertexBuffer = (device: GPUDevice) => {
   const vertices = new Float32Array([
-    // Triangle 1 (Blue)
+    // Triangle 1
     -1.0, -1.0, 1.0, -1.0, 1.0, 1.0,
-
-    // Triangle 2 (Red)
+    // Triangle 2
     -1.0, -1.0, 1.0, 1.0, -1.0, 1.0,
   ]);
 
@@ -174,18 +173,23 @@ export const pixelPainter = async (
 
     const binds: GPUBindGroup[] = [];
 
-    binds.push(createBind("grid", new Float32Array([gridSize, gridSize]), 0));
-    binds.push(
-      createBind("mouse_position", new Float32Array([cellPos.x, cellPos.y]), 1),
-    );
-    binds.push(createBind("colors", colorBuffer, 2));
-    binds.push(
-      createBind(
-        "canvas_size",
-        new Float32Array([canvasSize.x, canvasSize.y]),
-        3,
-      ),
-    );
+    const bindValues = new Float32Array([
+      // gridSize
+      gridSize,
+      gridSize,
+      // mouseCellPos,
+      cellPos.x,
+      cellPos.y,
+      // canvasSize
+      canvasSize.x,
+      canvasSize.y,
+      // pan viewport
+      0,
+      0,
+    ]);
+
+    binds.push(createBind("bindValues", bindValues, 0));
+    binds.push(createBind("colors", colorBuffer, 1));
 
     //Render passes are when all drawing operations in WebGPU happen.
     const pass = encoder.beginRenderPass({

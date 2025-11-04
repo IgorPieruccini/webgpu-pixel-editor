@@ -9,22 +9,26 @@ export const init = async () => {
     throw new Error("Canvas element not found");
   }
 
-  const canvasBounds = canvas.getBoundingClientRect();
+  //@ts-expect-error - fix it
+  const viewport = window.viewport.segments[0];
+
+  canvas.setAttribute("width", `${viewport.width}px`);
+  canvas.setAttribute("height", `${viewport.height}px`);
 
   const { drawFrame, paintPixel } = await pixelPainter(gridSize, {
-    x: canvasBounds.width,
-    y: canvasBounds.height,
+    x: viewport.width,
+    y: viewport.height,
   });
 
   const cellSize = {
-    x: canvasBounds.width / gridSize,
-    y: canvasBounds.height / gridSize,
+    x: viewport.width / gridSize,
+    y: viewport.height / gridSize,
   };
 
   window.addEventListener("mousemove", (e) => {
     const mousePosRelativeToCanvas = {
-      x: e.clientX - canvasBounds.left,
-      y: e.clientY - canvasBounds.top,
+      x: e.clientX - viewport.left,
+      y: e.clientY - viewport.top,
     };
 
     cellPosition.x = Math.floor(mousePosRelativeToCanvas.x / cellSize.x);
