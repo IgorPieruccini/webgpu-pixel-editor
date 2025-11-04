@@ -3,7 +3,6 @@ import { pixelPainter } from "./pixelPainter";
 export const init = async () => {
   const gridSize: number = 32;
   const cellPosition = { x: 0, y: 0 };
-  const { drawFrame, paintPixel } = await pixelPainter(gridSize);
 
   const canvas = document.getElementById("main-canvas");
   if (!canvas) {
@@ -11,6 +10,11 @@ export const init = async () => {
   }
 
   const canvasBounds = canvas.getBoundingClientRect();
+
+  const { drawFrame, paintPixel } = await pixelPainter(gridSize, {
+    x: canvasBounds.width,
+    y: canvasBounds.height,
+  });
 
   const cellSize = {
     x: canvasBounds.width / gridSize,

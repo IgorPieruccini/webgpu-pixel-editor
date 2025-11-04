@@ -164,6 +164,32 @@ const createGridBufferBindGroup = (
   return bindGroup;
 };
 
+const createCanvasSizeBufferGroup = (
+  device: GPUDevice,
+  canvasSize: { x: number; y: number },
+  pipeline: GPURenderPipeline,
+) => {
+  const arraySize = new Float32Array([canvasSize.x, canvasSize.y]);
+
+  const storageBuffer = device.createBuffer({
+    label: "canvas size",
+    size: arraySize.byteLength,
+    usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+  });
+
+  device.queue.writeBuffer(storageBuffer, 0, arraySize);
+
+  const groupLayout = pipeline.getBindGroupLayout(3);
+
+  const bindGroup = device.createBindGroup({
+    label: "canvas size bind group",
+    layout: groupLayout,
+    entries: [{ binding: 0, resource: { buffer: storageBuffer } }],
+  });
+
+  return bindGroup;
+};
+
 const createColorBufferBindGroup = (
   device: GPUDevice,
   buffer: Uint32Array<ArrayBuffer>,
@@ -226,7 +252,10 @@ const createMousePositionBufferBindGroup = (
   return bindGroup;
 };
 
-export const pixelPainter = async (gridSize: number) => {
+export const pixelPainter = async (
+  gridSize: number,
+  canvasSize: { x: number; y: number },
+) => {
   const { device, canvasFormat, context } = await webGPUSetup();
 
   const colorBuffer = new Uint32Array(gridSize * gridSize);
@@ -262,6 +291,12 @@ export const pixelPainter = async (gridSize: number) => {
       cellPipeline,
     );
 
+    const canvasSizeBindGroup = createCanvasSizeBufferGroup(
+      device,
+      canvasSize,
+      cellPipeline,
+    );
+
     //Render passes are when all drawing operations in WebGPU happen.
     const pass = encoder.beginRenderPass({
       colorAttachments: [
@@ -287,6 +322,7 @@ export const pixelPainter = async (gridSize: number) => {
     pass.setBindGroup(0, bindGroup);
     pass.setBindGroup(1, bindMousePosition);
     pass.setBindGroup(2, colorBindGroup);
+    pass.setBindGroup(3, canvasSizeBindGroup);
 
     pass.draw(vertices.length / 2, gridSize * gridSize); // 6 vertices and draw several times
 

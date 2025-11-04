@@ -1,6 +1,7 @@
 @group(0) @binding(0) var<storage, read> grid: vec2f;
 @group(1) @binding(0) var<storage, read> mouseCellPos: vec2f;
 @group(2) @binding(0) var<storage, read> colors: array<u32>;
+@group(3) @binding(0) var<storage, read> canvasSize: vec2f;
 
 // Export to fragment
 struct VertexOutput {
@@ -49,8 +50,8 @@ fn fragmentMain(
     @location(1) cellPos: vec2f,
 ) -> @location(0)vec4f {
 
-    let cellWidth = 800 / grid.x;
-    let cellHeight = 800 / grid.y;
+    let cellWidth = canvasSize.x / grid.x;
+    let cellHeight = canvasSize.y / grid.y;
     let posX = mouseCellPos.x * cellWidth;
     let posY = mouseCellPos.y * cellHeight;
     let ownPosX = cellPos.x * cellWidth;
