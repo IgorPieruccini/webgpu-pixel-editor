@@ -1,5 +1,8 @@
+import { localDataBase } from "../storage";
 import gridShader from "./shaders/grid.wgsl";
 import { bind } from "./utils";
+
+const TEMP_PROJECT_NAME = "project_name";
 
 const webGPUSetup = async () => {
   const navigator = window.navigator;
@@ -137,7 +140,17 @@ export const pixelPainter = async (
 ) => {
   const { device, canvasFormat, context } = await webGPUSetup();
 
-  const colorBuffer = new Uint32Array(gridSize * gridSize);
+  let colorBuffer: Uint32Array<ArrayBuffer>;
+  const db = await localDataBase();
+
+  try {
+    colorBuffer = await db.load(TEMP_PROJECT_NAME);
+    if (!colorBuffer) {
+      colorBuffer = new Uint32Array(gridSize * gridSize);
+    }
+  } catch {
+    throw "Error initializing DB";
+  }
 
   const { vertices, vertexBuffer, vertexBufferLayout } =
     createVertexBuffer(device);
@@ -211,6 +224,7 @@ export const pixelPainter = async (
   const paintPixel = (cellPos: { x: number; y: number }) => {
     const arrayIndex = cellPos.x + cellPos.y * gridSize;
     colorBuffer[arrayIndex] = 0xff0000;
+    db.save(TEMP_PROJECT_NAME, colorBuffer);
   };
 
   return {
