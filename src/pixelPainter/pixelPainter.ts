@@ -142,7 +142,7 @@ const createGridBufferBindGroup = (
   const uniformBuffer = device.createBuffer({
     label: "Grid Uniforms",
     size: uniformArray.byteLength,
-    usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+    usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
   });
 
   device.queue.writeBuffer(uniformBuffer, 0, uniformArray);
@@ -204,7 +204,7 @@ const createMousePositionBufferBindGroup = (
   const uniformBuffer = device.createBuffer({
     label: "Grid Uniforms",
     size: uniformArray.byteLength,
-    usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+    usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
   });
 
   device.queue.writeBuffer(uniformBuffer, 0, uniformArray);
