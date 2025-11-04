@@ -1,4 +1,5 @@
 import gridShader from "./shaders/grid.wgsl";
+import { bind } from "./utils";
 
 const webGPUSetup = async () => {
   const navigator = window.navigator;
@@ -130,128 +131,6 @@ const createPipeline = (
   return cellPipeline;
 };
 
-const createGridBufferBindGroup = (
-  device: GPUDevice,
-  pipeline: GPURenderPipeline,
-  gridSize: number,
-) => {
-  // Create a uniform buffer that describes the grid.
-  //A uniform is a value from a buffer that is the same for every invocation.
-  const uniformArray = new Float32Array([gridSize, gridSize]);
-
-  const uniformBuffer = device.createBuffer({
-    label: "Grid Uniforms",
-    size: uniformArray.byteLength,
-    usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
-  });
-
-  device.queue.writeBuffer(uniformBuffer, 0, uniformArray);
-
-  const bindGroup = device.createBindGroup({
-    label: "Cell renderer bind group",
-    // layout that describes which types of resources this bind group contains
-    layout: pipeline.getBindGroupLayout(0),
-    entries: [
-      {
-        // binding, which corresponds with the @binding() value you entered in the shader. In this case, 0
-        binding: 0,
-        // which is the actual resource that you want to expose to the variable at the specified binding index. In this case, your uniform buffer.
-        resource: { buffer: uniformBuffer },
-      },
-    ],
-  });
-
-  return bindGroup;
-};
-
-const createCanvasSizeBufferGroup = (
-  device: GPUDevice,
-  canvasSize: { x: number; y: number },
-  pipeline: GPURenderPipeline,
-) => {
-  const arraySize = new Float32Array([canvasSize.x, canvasSize.y]);
-
-  const storageBuffer = device.createBuffer({
-    label: "canvas size",
-    size: arraySize.byteLength,
-    usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
-  });
-
-  device.queue.writeBuffer(storageBuffer, 0, arraySize);
-
-  const groupLayout = pipeline.getBindGroupLayout(3);
-
-  const bindGroup = device.createBindGroup({
-    label: "canvas size bind group",
-    layout: groupLayout,
-    entries: [{ binding: 0, resource: { buffer: storageBuffer } }],
-  });
-
-  return bindGroup;
-};
-
-const createColorBufferBindGroup = (
-  device: GPUDevice,
-  buffer: Uint32Array<ArrayBuffer>,
-  pipeline: GPURenderPipeline,
-) => {
-  // Create a uniform buffer that describes the mousePosition.
-  //A uniform is a value from a buffer that is the same for every invocation.
-
-  const storageBuffer = device.createBuffer({
-    label: "Colors Storage",
-    size: buffer.byteLength,
-    usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
-  });
-
-  device.queue.writeBuffer(storageBuffer, 0, buffer);
-
-  const groupLayout = pipeline.getBindGroupLayout(2);
-
-  const bindGroup = device.createBindGroup({
-    label: "Cell color",
-    // layout that describes which types of resources this bind group contains
-    layout: groupLayout,
-    entries: [{ binding: 0, resource: { buffer: storageBuffer } }],
-  });
-
-  return bindGroup;
-};
-
-const createMousePositionBufferBindGroup = (
-  device: GPUDevice,
-  pipeline: GPURenderPipeline,
-  cellPos: { x: number; y: number },
-) => {
-  // Create a uniform buffer that describes the mousePosition.
-  //A uniform is a value from a buffer that is the same for every invocation.
-  const uniformArray = new Float32Array([cellPos.x, cellPos.y]);
-
-  const uniformBuffer = device.createBuffer({
-    label: "Grid Uniforms",
-    size: uniformArray.byteLength,
-    usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
-  });
-
-  device.queue.writeBuffer(uniformBuffer, 0, uniformArray);
-
-  const bindGroup = device.createBindGroup({
-    label: "Cell renderer bind group",
-    // layout that describes which types of resources this bind group contains
-    layout: pipeline.getBindGroupLayout(1),
-    entries: [
-      {
-        // binding, which corresponds with the @binding() value you entered in the shader. In this case, 0
-        binding: 0,
-        // which is the actual resource that you want to expose to the variable at the specified binding index. In this case, your uniform buffer.
-        resource: { buffer: uniformBuffer },
-      },
-    ],
-  });
-
-  return bindGroup;
-};
-
 export const pixelPainter = async (
   gridSize: number,
   canvasSize: { x: number; y: number },
@@ -272,29 +151,27 @@ export const pixelPainter = async (
     canvasFormat,
   );
 
+  const { createBind } = bind(device, cellPipeline);
+
   const drawFrame = (cellPos: { x: number; y: number }) => {
     // Provides an interface for recording GPU commands.
     const encoder = device.createCommandEncoder({
       label: "Grid encoder",
     });
 
-    const bindGroup = createGridBufferBindGroup(device, cellPipeline, gridSize);
-    const bindMousePosition = createMousePositionBufferBindGroup(
-      device,
-      cellPipeline,
-      cellPos,
-    );
+    const binds: GPUBindGroup[] = [];
 
-    const colorBindGroup = createColorBufferBindGroup(
-      device,
-      colorBuffer,
-      cellPipeline,
+    binds.push(createBind("grid", new Float32Array([gridSize, gridSize]), 0));
+    binds.push(
+      createBind("mouse_position", new Float32Array([cellPos.x, cellPos.y]), 1),
     );
-
-    const canvasSizeBindGroup = createCanvasSizeBufferGroup(
-      device,
-      canvasSize,
-      cellPipeline,
+    binds.push(createBind("colors", colorBuffer, 2));
+    binds.push(
+      createBind(
+        "canvas_size",
+        new Float32Array([canvasSize.x, canvasSize.y]),
+        3,
+      ),
     );
 
     //Render passes are when all drawing operations in WebGPU happen.
@@ -319,10 +196,9 @@ export const pixelPainter = async (
     pass.setPipeline(cellPipeline);
     pass.setVertexBuffer(0, vertexBuffer);
 
-    pass.setBindGroup(0, bindGroup);
-    pass.setBindGroup(1, bindMousePosition);
-    pass.setBindGroup(2, colorBindGroup);
-    pass.setBindGroup(3, canvasSizeBindGroup);
+    binds.forEach((bind, i) => {
+      pass.setBindGroup(i, bind);
+    });
 
     pass.draw(vertices.length / 2, gridSize * gridSize); // 6 vertices and draw several times
 
@@ -330,10 +206,6 @@ export const pixelPainter = async (
 
     const commandBuffer = encoder.finish();
     device.queue.submit([commandBuffer]);
-
-    // Finish the command buffer and immediately submit it.
-    // device.queue.submit([encoder.finish()]);
-    //
   };
 
   const paintPixel = (cellPos: { x: number; y: number }) => {
