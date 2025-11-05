@@ -1,9 +1,12 @@
 import { pixelPainter } from "./pixelPainter";
 
+const ZOOM_SENSITIVITY = 1.02;
+
 export const init = async () => {
-  const gridSize: number = 32;
+  const gridSize: number = 8;
   const cellPosition = { x: 0, y: 0 };
   const pan = { x: 0, y: 0 };
+  let zoom = 1;
   let pressingSpace = false;
   const mousePosRelativeToCanvas = { x: 0, y: 0 };
 
@@ -57,8 +60,25 @@ export const init = async () => {
     }
   });
 
+  const wheelHandler = (e: WheelEvent) => {
+    e.preventDefault();
+    // const worldX = (e.offsetX - pan.x) / zoom;
+    // const worldY = (e.offsetY - pan.y) / zoom;
+
+    if (e.deltaY > 0) {
+      zoom /= ZOOM_SENSITIVITY;
+    } else {
+      zoom *= ZOOM_SENSITIVITY;
+    }
+
+    // pan.x = e.offsetX - worldX * zoom;
+    // pan.y = e.offsetY - worldY * zoom;
+  };
+
+  window.addEventListener("wheel", wheelHandler, { passive: false });
+
   const loop = () => {
-    drawFrame(cellPosition, pan);
+    drawFrame(cellPosition, pan, zoom);
     requestAnimationFrame(loop);
   };
 

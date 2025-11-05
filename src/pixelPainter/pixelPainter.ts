@@ -168,6 +168,7 @@ export const pixelPainter = async (
   const drawFrame = (
     cellPos: { x: number; y: number },
     pan: { x: number; y: number },
+    zoom: number,
   ) => {
     // Provides an interface for recording GPU commands.
     const encoder = device.createCommandEncoder({
@@ -189,6 +190,7 @@ export const pixelPainter = async (
       // pan viewport
       pan.x,
       pan.y,
+      zoom,
     ]);
 
     binds.push(createBind("bindValues", bindValues, 0));
