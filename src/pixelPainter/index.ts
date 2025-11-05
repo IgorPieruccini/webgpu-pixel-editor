@@ -8,7 +8,6 @@ export const init = async () => {
   const pan = { x: 0, y: 0 };
   let zoom = 1;
   let pressingSpace = false;
-  const mousePosRelativeToCanvas = { x: 0, y: 0 };
 
   const canvas = document.getElementById("main-canvas");
   if (!canvas) {
@@ -26,17 +25,17 @@ export const init = async () => {
     y: viewport.height,
   });
 
-  const cellSize = {
-    x: viewport.width / gridSize,
-    y: viewport.height / gridSize,
-  };
-
   window.addEventListener("mousemove", (e) => {
-    mousePosRelativeToCanvas.x = e.clientX - viewport.left - pan.x;
-    mousePosRelativeToCanvas.y = e.clientY - viewport.top + pan.y;
+    const cell = pickCell(
+      { x: e.clientX, y: e.clientY },
+      { x: viewport.width, y: viewport.height },
+      zoom,
+      pan,
+      gridSize,
+    );
 
-    cellPosition.x = Math.floor(mousePosRelativeToCanvas.x / cellSize.x);
-    cellPosition.y = Math.floor(mousePosRelativeToCanvas.y / cellSize.y);
+    cellPosition.x = cell.x;
+    cellPosition.y = cell.y;
 
     if (pressingSpace) {
       pan.x += e.movementX;
@@ -59,6 +58,28 @@ export const init = async () => {
       pressingSpace = false;
     }
   });
+
+  function pickCell(
+    mouse: { x: number; y: number },
+    screenSize: { x: number; y: number },
+    scale: number,
+    offset: { x: number; y: number },
+    gridSize: number,
+  ) {
+    // 1. screen → clip space (-1..1)
+    const mx = ((mouse.x - offset.x) / screenSize.x) * 2 - 1;
+    const my = ((mouse.y + offset.y) / screenSize.y) * -2 + 1; // y flips because screen origin is top-left
+
+    // 2. clip space → world space (undo shader transform)
+    const worldX = mx / scale;
+    const worldY = my / scale;
+
+    // 3. world space (-1..1) → normalized 0..1 → grid index
+    const cellX = Math.floor((worldX + 1) * 0.5 * gridSize);
+    const cellY = Math.floor((worldY + 1) * 0.5 * gridSize);
+
+    return { x: cellX, y: gridSize - 1 - cellY };
+  }
 
   const wheelHandler = (e: WheelEvent) => {
     e.preventDefault();
