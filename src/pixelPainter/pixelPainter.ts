@@ -141,6 +141,7 @@ export const pixelPainter = async (
 
   let colorBuffer: Uint32Array<ArrayBuffer>;
   const db = await localDataBase();
+  let color: number = 0xff00ff;
 
   try {
     colorBuffer = await db.load(TEMP_PROJECT_NAME);
@@ -230,14 +231,33 @@ export const pixelPainter = async (
     device.queue.submit([commandBuffer]);
   };
 
+  const setBrushColor = (_color: number | string) => {
+    console.log("set brush color", typeof _color);
+    if (typeof _color === "string") {
+      color = parseInt(_color.replace("#", ""), 16);
+    }
+
+    if (typeof _color === "number") {
+      color = _color;
+    }
+  };
+
+  const getColorFrom = (pos: { x: number; y: number }) => {
+    const i = pos.x + pos.y * gridSize;
+    const color = colorBuffer[i];
+    return color;
+  };
+
   const paintPixel = (cellPos: { x: number; y: number }) => {
     const arrayIndex = cellPos.x + cellPos.y * gridSize;
-    colorBuffer[arrayIndex] = 0xff0000;
+    colorBuffer[arrayIndex] = color;
     db.save(TEMP_PROJECT_NAME, colorBuffer);
   };
 
   return {
     drawFrame,
     paintPixel,
+    setBrushColor,
+    getColorFrom,
   };
 };

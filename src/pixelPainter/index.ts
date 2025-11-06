@@ -3,7 +3,7 @@ import { pixelPainter } from "./pixelPainter";
 const ZOOM_SENSITIVITY = 1.02;
 
 export const init = async () => {
-  const gridSize: number = 16;
+  const gridSize: number = 32;
   const cellPosition = { x: 0, y: 0 };
   const pan = { x: 0, y: 0 };
   let zoom = 1;
@@ -21,10 +21,14 @@ export const init = async () => {
     height: canvas.clientHeight,
   };
 
-  const { drawFrame, paintPixel } = await pixelPainter(gridSize, {
-    x: viewport.width,
-    y: viewport.height,
-  });
+  const { drawFrame, paintPixel, setBrushColor, getColorFrom } =
+    await pixelPainter(gridSize, {
+      x: viewport.width,
+      y: viewport.height,
+    });
+
+  //@ts-expect-error - TODO: add type for it
+  window.editor.setBrushColor = setBrushColor;
 
   window.addEventListener("mousemove", (e) => {
     let aspectRatio = viewport.width / viewport.height;
@@ -53,6 +57,13 @@ export const init = async () => {
   window.addEventListener("keydown", (e) => {
     if (e.code === "Space" && !pressingSpace) {
       pressingSpace = true;
+    }
+  });
+
+  window.addEventListener("keypress", (e) => {
+    if (e.code === "KeyP") {
+      const color = getColorFrom(cellPosition);
+      setBrushColor(color);
     }
   });
 

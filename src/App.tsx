@@ -8,10 +8,19 @@ function App() {
   });
 
   return (
-    <div>
-      {/*<input type="color" name="color" />
-      <button>test</button>*/}
-      <canvas id="main-canvas" width={800} height={800} />
+    <div id="editor">
+      <canvas id="main-canvas" width={1280} height={1280} />
+      <input
+        type="color"
+        name="color"
+        onInput={(e) => {
+          //@ts-expect-error - type missing
+          window.editor.setBrushColor(e.target.value);
+        }}
+        onCueChange={(color) => {
+          console.log("color", color);
+        }}
+      />
     </div>
   );
 }
