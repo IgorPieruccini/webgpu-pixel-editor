@@ -83,8 +83,9 @@ export const init = async () => {
 
   const wheelHandler = (e: WheelEvent) => {
     e.preventDefault();
-    // const worldX = (e.offsetX - pan.x) / zoom;
-    // const worldY = (e.offsetY - pan.y) / zoom;
+    const mouseX = e.clientX - viewport.left - viewport.width / 2;
+    const mouseY = -(e.clientY - viewport.top - viewport.height / 2);
+    const oldZoom = zoom;
 
     if (e.deltaY > 0) {
       zoom /= ZOOM_SENSITIVITY;
@@ -92,8 +93,11 @@ export const init = async () => {
       zoom *= ZOOM_SENSITIVITY;
     }
 
-    // pan.x = e.offsetX - worldX * zoom;
-    // pan.y = e.offsetY - worldY * zoom;
+    const zoomFactor = zoom / oldZoom;
+
+    // Adjust pan so zoom centers on mouse
+    pan.x = (pan.x - mouseX) * zoomFactor + mouseX;
+    pan.y = (pan.y - mouseY) * zoomFactor + mouseY;
   };
 
   window.addEventListener("wheel", wheelHandler, { passive: false });
