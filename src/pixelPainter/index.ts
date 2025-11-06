@@ -14,11 +14,12 @@ export const init = async () => {
     throw new Error("Canvas element not found");
   }
 
-  //@ts-expect-error - fix it
-  const viewport = window.viewport.segments[0];
-
-  canvas.setAttribute("width", `${viewport.width}px`);
-  canvas.setAttribute("height", `${viewport.height}px`);
+  const viewport = {
+    left: canvas.offsetLeft,
+    top: canvas.offsetTop,
+    width: canvas.clientWidth,
+    height: canvas.clientHeight,
+  };
 
   const { drawFrame, paintPixel } = await pixelPainter(gridSize, {
     x: viewport.width,
