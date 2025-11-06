@@ -7,7 +7,13 @@ function App() {
     init();
   });
 
-  return <canvas id="main-canvas" width={800} height={800} />;
+  return (
+    <div>
+      {/*<input type="color" name="color" />
+      <button>test</button>*/}
+      <canvas id="main-canvas" width={800} height={800} />
+    </div>
+  );
 }
 
 export default App;

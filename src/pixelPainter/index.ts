@@ -3,7 +3,7 @@ import { pixelPainter } from "./pixelPainter";
 const ZOOM_SENSITIVITY = 1.02;
 
 export const init = async () => {
-  const gridSize: number = 8;
+  const gridSize: number = 16;
   const cellPosition = { x: 0, y: 0 };
   const pan = { x: 0, y: 0 };
   let zoom = 1;
@@ -26,6 +26,8 @@ export const init = async () => {
   });
 
   window.addEventListener("mousemove", (e) => {
+    let aspectRatio = viewport.width / viewport.height;
+
     const cell = pickCell(
       { x: e.clientX, y: e.clientY },
       { x: viewport.width, y: viewport.height },
@@ -38,7 +40,7 @@ export const init = async () => {
     cellPosition.y = cell.y;
 
     if (pressingSpace) {
-      pan.x += e.movementX;
+      pan.x += e.movementX * aspectRatio;
       pan.y -= e.movementY;
     }
   });
@@ -66,8 +68,12 @@ export const init = async () => {
     offset: { x: number; y: number },
     gridSize: number,
   ) {
+    const aspectRatio = screenSize.x / screenSize.y;
+    const gap = (-screenSize.x * aspectRatio) / 2 + screenSize.x / 2;
+
     // 1. screen → clip space (-1..1)
-    const mx = ((mouse.x - offset.x) / screenSize.x) * 2 - 1;
+    const mx =
+      ((mouse.x * aspectRatio - offset.x + gap) / screenSize.x) * 2 - 1;
     const my = ((mouse.y + offset.y) / screenSize.y) * -2 + 1; // y flips because screen origin is top-left
 
     // 2. clip space → world space (undo shader transform)
