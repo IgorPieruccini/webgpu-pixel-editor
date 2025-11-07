@@ -23,6 +23,10 @@ It correctly bundles Solid in production mode and optimizes the build for the be
 The build is minified and the filenames include the hashes.<br>
 Your app is ready to be deployed!
 
+### First Pixelart ever created with this editor 😝
+<img width="550" height="549" alt="Screenshot 2025-11-07 at 20 32 11" src="https://github.com/user-attachments/assets/9bbcfa00-0f15-40a3-a0ec-936099321e1d" />
+
+
 ## Deployment
 
 Learn more about deploying your application with the [documentations](https://vite.dev/guide/static-deploy.html)
