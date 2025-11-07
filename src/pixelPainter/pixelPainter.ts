@@ -234,7 +234,6 @@ export const pixelPainter = async (
   };
 
   const setBrushColor = (_color: number | string) => {
-    console.log("set brush color", typeof _color);
     if (typeof _color === "string") {
       color = parseInt(_color.replace("#", ""), 16);
     }

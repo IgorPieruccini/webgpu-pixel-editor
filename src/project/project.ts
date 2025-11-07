@@ -1,5 +1,5 @@
-import { pixelPainter } from "./pixelPainter/pixelPainter";
-import { ZOOM_SENSITIVITY } from "./constants";
+import { pixelPainter } from "../pixelPainter/pixelPainter";
+import { ZOOM_SENSITIVITY } from "../constants";
 
 export const initializeProject = async () => {
   const gridSize: number = 32;
@@ -9,6 +9,7 @@ export const initializeProject = async () => {
   let pressingSpace = false;
 
   const canvas = document.getElementById("main-canvas");
+
   if (!canvas) {
     throw new Error("Canvas element not found");
   }
@@ -25,9 +26,6 @@ export const initializeProject = async () => {
       x: viewport.width,
       y: viewport.height,
     });
-
-  //@ts-expect-error - TODO: add type for it
-  window.editor.setBrushColor = setBrushColor;
 
   canvas.addEventListener("mousemove", (e) => {
     let aspectRatio = viewport.width / viewport.height;
@@ -125,4 +123,8 @@ export const initializeProject = async () => {
   };
 
   loop();
+
+  return {
+    setBrushColor,
+  };
 };
