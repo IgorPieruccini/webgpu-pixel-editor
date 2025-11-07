@@ -3,6 +3,7 @@
 import { localDataBase } from "../storage";
 import gridShader from "./shaders/grid.wgsl";
 import { bind } from "./utils";
+import { createSignal } from "solid-js";
 
 const TEMP_PROJECT_NAME = "project_name_v1";
 
@@ -144,6 +145,7 @@ export const pixelPainter = async (
   let colorBuffer: Uint32Array<ArrayBuffer>;
   const db = await localDataBase();
   let color: number = 0xff00ff;
+  const colorStore = createSignal("#ff00ff");
 
   try {
     colorBuffer = await db.load(TEMP_PROJECT_NAME);
@@ -236,10 +238,12 @@ export const pixelPainter = async (
   const setBrushColor = (_color: number | string) => {
     if (typeof _color === "string") {
       color = parseInt(_color.replace("#", ""), 16);
+      colorStore[1](_color);
     }
 
     if (typeof _color === "number") {
       color = _color;
+      colorStore[1]("#" + color.toString(16).padStart(6, "0"));
     }
   };
 
@@ -260,5 +264,6 @@ export const pixelPainter = async (
     paintPixel,
     setBrushColor,
     getColorFrom,
+    getCurrentColor: colorStore[0],
   };
 };

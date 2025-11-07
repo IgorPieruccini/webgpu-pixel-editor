@@ -7,6 +7,7 @@ export const ColorPicker = () => {
     <input
       type="color"
       name="color"
+      value={project?.().getCurrentColor()}
       onInput={(e) => {
         project?.().setBrushColor(e.target.value);
       }}

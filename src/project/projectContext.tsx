@@ -12,6 +12,7 @@ import type { ProjectType } from "./types";
 
 const initialValue: ProjectType = {
   setBrushColor: () => {},
+  getCurrentColor: () => "",
 };
 
 export const ProjectContext = createContext<Accessor<ProjectType>>();

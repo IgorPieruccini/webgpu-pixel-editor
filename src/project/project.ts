@@ -22,11 +22,16 @@ export const initializeProject = async () => {
     height: canvas.clientHeight,
   };
 
-  const { drawFrame, paintPixel, setBrushColor, getColorFrom } =
-    await pixelPainter(gridSize, {
-      x: viewport.width,
-      y: viewport.height,
-    });
+  const {
+    drawFrame,
+    paintPixel,
+    setBrushColor,
+    getColorFrom,
+    getCurrentColor,
+  } = await pixelPainter(gridSize, {
+    x: viewport.width,
+    y: viewport.height,
+  });
 
   canvas.addEventListener("mousemove", (e) => {
     let aspectRatio = viewport.width / viewport.height;
@@ -136,5 +141,6 @@ export const initializeProject = async () => {
 
   return {
     setBrushColor,
+    getCurrentColor,
   };
 };
