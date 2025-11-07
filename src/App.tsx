@@ -1,10 +1,10 @@
 import "./App.css";
-import { init } from "./pixelPainter";
 import { onMount } from "solid-js";
+import { initializeProject } from "./project";
 
 function App() {
   onMount(() => {
-    init();
+    initializeProject();
   });
 
   return (

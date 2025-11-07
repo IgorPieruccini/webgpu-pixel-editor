@@ -1,3 +1,5 @@
+/// <reference types="@webgpu/types" />
+
 import { localDataBase } from "../storage";
 import gridShader from "./shaders/grid.wgsl";
 import { bind } from "./utils";
