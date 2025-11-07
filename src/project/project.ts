@@ -7,6 +7,7 @@ export const initializeProject = async () => {
   const pan = { x: 0, y: 0 };
   let zoom = 1;
   let pressingSpace = false;
+  let isLeftMouseDown = false;
 
   const canvas = document.getElementById("main-canvas");
 
@@ -45,10 +46,19 @@ export const initializeProject = async () => {
       pan.x += e.movementX * aspectRatio;
       pan.y -= e.movementY;
     }
+
+    if (isLeftMouseDown && !pressingSpace) {
+      paintPixel(cellPosition);
+    }
   });
 
   canvas.addEventListener("mousedown", () => {
     paintPixel(cellPosition);
+    isLeftMouseDown = true;
+  });
+
+  canvas.addEventListener("mouseup", () => {
+    isLeftMouseDown = false;
   });
 
   window.addEventListener("keydown", (e) => {

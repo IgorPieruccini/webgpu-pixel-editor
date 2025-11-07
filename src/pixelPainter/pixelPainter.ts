@@ -4,7 +4,7 @@ import { localDataBase } from "../storage";
 import gridShader from "./shaders/grid.wgsl";
 import { bind } from "./utils";
 
-const TEMP_PROJECT_NAME = "project_name";
+const TEMP_PROJECT_NAME = "project_name_v1";
 
 const webGPUSetup = async () => {
   const navigator = window.navigator;
