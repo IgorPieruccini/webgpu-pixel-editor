@@ -8,6 +8,7 @@ struct VertexOutput {
     @location(0) @interpolate(flat) isHovering: i32,
     @location(1) cellPos: vec2f,
     @location(2) worldPos: vec3f,
+    @location(3) @interpolate(flat) isSelected: i32,
 };
 
 fn unpack_rgb(color: u32) -> vec4<f32> {
@@ -30,6 +31,8 @@ fn vertexMain(@location(0) pos: vec2f, @builtin(instance_index) instance: u32) -
     let pan = vec2f(bindValues[6], bindValues[7]);
     let zoom:f32 = bindValues[8];
     let zoomScale = 1.0 / zoom;
+
+    let selectionRect = vec4f(bindValues[9],  bindValues[10] , bindValues[11], bindValues[12] );
 
     let cellPos = vec2f(i % gridSize.x, floor(i / gridSize.x));
     let gridPos = (pos + 1) / gridSize - 1;
@@ -59,6 +62,18 @@ fn vertexMain(@location(0) pos: vec2f, @builtin(instance_index) instance: u32) -
     out.cellPos = inverseOwnCell;
     out.position = vec4f(corrected, 0, 1);
     out.worldPos = vec3f(pos, 1);
+    out.isSelected = 0;
+
+
+    if(
+    (inverseOwnCell.x >= selectionRect.x || inverseOwnCell.x >= selectionRect.z)
+    && (inverseOwnCell.x <= selectionRect.z || inverseOwnCell.x <= selectionRect.x)
+    && (inverseOwnCell.y >= selectionRect.y || inverseOwnCell.y >= selectionRect.w)
+    && (inverseOwnCell.y <= selectionRect.w || inverseOwnCell.y <= selectionRect.y)
+    ){
+       out.isSelected = 1;
+    }
+
 
     return out;
 }
@@ -68,12 +83,18 @@ fn fragmentMain(
     @builtin(position) fragCoord: vec4f,
     @location(0) @interpolate(flat) isHovering: i32,
     @location(1) cellPos: vec2f,
-    @location(2) worldPos: vec3f
+    @location(2) worldPos: vec3f,
+    @location(3) @interpolate(flat) isSelected: i32
 ) -> @location(0)vec4f {
     let gridSize = vec2f(bindValues[0], bindValues[1]) ;
-
     let colorIndex = u32(cellPos.x + cellPos.y * gridSize.x);
     let color = colors[colorIndex];
+    let rgb = unpack_rgb(color);
+
+    if (isSelected == 1) {
+       let bluesh = vec4f(0.8, 0.8, 0.9, 1.0);
+       return rgb * bluesh;
+    }
 
     if isHovering == 1 {
         if (worldPos.y >= 0.9)
@@ -85,6 +106,6 @@ fn fragmentMain(
         }
     }
 
-        let rgb = unpack_rgb(color);
+
         return rgb;
      }

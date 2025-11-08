@@ -8,6 +8,8 @@ export const initializeProject = async () => {
   let zoom = 1;
   let pressingSpace = false;
   let isLeftMouseDown = false;
+  let selectedCells = { x: -1, y: -1, z: -1, w: -1 };
+  let paintBoxOn = false;
 
   const canvas = document.getElementById("main-canvas");
 
@@ -36,13 +38,7 @@ export const initializeProject = async () => {
   canvas.addEventListener("mousemove", (e) => {
     let aspectRatio = viewport.width / viewport.height;
 
-    const cell = pickCell(
-      { x: e.clientX, y: e.clientY },
-      { x: viewport.width, y: viewport.height },
-      zoom,
-      pan,
-      gridSize,
-    );
+    const cell = pickCell({ x: e.clientX, y: e.clientY });
 
     cellPosition.x = cell.x;
     cellPosition.y = cell.y;
@@ -55,11 +51,25 @@ export const initializeProject = async () => {
     if (isLeftMouseDown && !pressingSpace) {
       paintPixel(cellPosition);
     }
+
+    if (paintBoxOn) {
+      selectedCells.z = cell.x;
+      selectedCells.w = cell.y;
+    }
   });
 
-  canvas.addEventListener("mousedown", () => {
-    paintPixel(cellPosition);
+  canvas.addEventListener("mousedown", (e) => {
+    if (!paintBoxOn) {
+      paintPixel(cellPosition);
+    }
+
     isLeftMouseDown = true;
+
+    if (paintBoxOn) {
+      const cell = pickCell({ x: e.clientX, y: e.clientY });
+      selectedCells.x = cell.x;
+      selectedCells.y = cell.y;
+    }
   });
 
   canvas.addEventListener("mouseup", () => {
@@ -77,6 +87,10 @@ export const initializeProject = async () => {
       const color = getColorFrom(cellPosition);
       setBrushColor(color);
     }
+    if (e.code === "KeyR") {
+      paintBoxOn = !paintBoxOn;
+      selectedCells = { x: -1, y: -1, z: -1, w: -1 };
+    }
   });
 
   window.addEventListener("keyup", (e) => {
@@ -85,24 +99,17 @@ export const initializeProject = async () => {
     }
   });
 
-  function pickCell(
-    mouse: { x: number; y: number },
-    screenSize: { x: number; y: number },
-    scale: number,
-    offset: { x: number; y: number },
-    gridSize: number,
-  ) {
-    const aspectRatio = screenSize.x / screenSize.y;
-    const gap = (-screenSize.x * aspectRatio) / 2 + screenSize.x / 2;
+  function pickCell(mouse: { x: number; y: number }) {
+    const aspectRatio = viewport.width / viewport.height;
+    const gap = (-viewport.width * aspectRatio) / 2 + viewport.width / 2;
 
     // 1. screen → clip space (-1..1)
-    const mx =
-      ((mouse.x * aspectRatio - offset.x + gap) / screenSize.x) * 2 - 1;
-    const my = ((mouse.y + offset.y) / screenSize.y) * -2 + 1; // y flips because screen origin is top-left
+    const mx = ((mouse.x * aspectRatio - pan.x + gap) / viewport.width) * 2 - 1;
+    const my = ((mouse.y + pan.y) / viewport.height) * -2 + 1; // y flips because screen origin is top-left
 
     // 2. clip space → world space (undo shader transform)
-    const worldX = mx / scale;
-    const worldY = my / scale;
+    const worldX = mx / zoom;
+    const worldY = my / zoom;
 
     // 3. world space (-1..1) → normalized 0..1 → grid index
     const cellX = Math.floor((worldX + 1) * 0.5 * gridSize);
@@ -133,7 +140,7 @@ export const initializeProject = async () => {
   canvas.addEventListener("wheel", wheelHandler, { passive: false });
 
   const loop = () => {
-    drawFrame(cellPosition, pan, zoom);
+    drawFrame(cellPosition, pan, zoom, selectedCells);
     requestAnimationFrame(loop);
   };
 
