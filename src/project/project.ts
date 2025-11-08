@@ -48,11 +48,11 @@ export const initializeProject = async () => {
       pan.y -= e.movementY;
     }
 
-    if (isLeftMouseDown && !pressingSpace) {
+    if (isLeftMouseDown && !pressingSpace && !paintBoxOn) {
       paintPixel(cellPosition);
     }
 
-    if (paintBoxOn) {
+    if (paintBoxOn && isLeftMouseDown) {
       selectedCells.z = cell.x;
       selectedCells.w = cell.y;
     }
@@ -74,6 +74,22 @@ export const initializeProject = async () => {
 
   canvas.addEventListener("mouseup", () => {
     isLeftMouseDown = false;
+    const selection = {
+      x: Math.min(selectedCells.x, selectedCells.z),
+      y: Math.min(selectedCells.y, selectedCells.w),
+      z: Math.max(selectedCells.x, selectedCells.z),
+      w: Math.max(selectedCells.y, selectedCells.w),
+    };
+    if (paintBoxOn) {
+      for (let x = selection.x; x <= selection.z; x++) {
+        for (let y = selection.y; y <= selection.w; y++) {
+          paintPixel({
+            x: x,
+            y: y,
+          });
+        }
+      }
+    }
   });
 
   window.addEventListener("keydown", (e) => {
