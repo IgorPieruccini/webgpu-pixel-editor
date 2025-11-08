@@ -92,7 +92,7 @@ fn fragmentMain(
     let rgb = unpack_rgb(color);
 
     if (isSelected == 1) {
-       let bluesh = vec4f(0.8, 0.8, 0.9, 1.0);
+       let bluesh = vec4f(0.95, 0.95, 0.95, 1.0);
        return rgb * bluesh;
     }
 
@@ -107,5 +107,5 @@ fn fragmentMain(
     }
 
 
-        return rgb;
-     }
+    return rgb;
+}

@@ -220,7 +220,7 @@ export const pixelPainter = async (
           loadOp: "clear",
           // value of "store" indicates that once the render pass is finished you want the results of any drawing done during the render pass saved into the texture.
           storeOp: "store",
-          clearValue: { r: 0, g: 0, b: 0.4, a: 1 }, // New line
+          clearValue: { r: 0.13, g: 0.13, b: 0.13, a: 0 },
         },
       ],
     });

@@ -69,18 +69,21 @@ export const initializeProject = async () => {
       const cell = pickCell({ x: e.clientX, y: e.clientY });
       selectedCells.x = cell.x;
       selectedCells.y = cell.y;
+      selectedCells.z = cell.x;
+      selectedCells.w = cell.y;
     }
   });
 
   canvas.addEventListener("mouseup", () => {
     isLeftMouseDown = false;
-    const selection = {
-      x: Math.min(selectedCells.x, selectedCells.z),
-      y: Math.min(selectedCells.y, selectedCells.w),
-      z: Math.max(selectedCells.x, selectedCells.z),
-      w: Math.max(selectedCells.y, selectedCells.w),
-    };
+
     if (paintBoxOn) {
+      const selection = {
+        x: Math.min(selectedCells.x, selectedCells.z),
+        y: Math.min(selectedCells.y, selectedCells.w),
+        z: Math.max(selectedCells.x, selectedCells.z),
+        w: Math.max(selectedCells.y, selectedCells.w),
+      };
       for (let x = selection.x; x <= selection.z; x++) {
         for (let y = selection.y; y <= selection.w; y++) {
           paintPixel({
@@ -89,6 +92,13 @@ export const initializeProject = async () => {
           });
         }
       }
+
+      selectedCells = {
+        x: -1,
+        y: -1,
+        z: -1,
+        w: -1,
+      };
     }
   });
 
