@@ -106,6 +106,27 @@ fn fragmentMain(
         }
     }
 
+    if (color == 0) {
+      if (cellPos.x % 2 == 1) {
+        if (cellPos.y % 2 == 0) {
+         return vec4f(0.9, 0.9, 0.9, 1.0);
+        }
+
+        if (cellPos.y % 2 ==1) {
+         return vec4f(1, 1, 1, 1);
+        }
+      }
+
+      if(cellPos.x % 2 == 0) {
+       if (cellPos.y % 2 == 0) {
+         return vec4f(1, 1, 1, 1);
+       }
+
+       if (cellPos.y % 2 ==1) {
+         return vec4f(0.9, 0.9, 0.9, 1.0);
+       }
+      }
+    }
 
     return rgb;
 }
