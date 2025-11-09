@@ -1,0 +1,10 @@
+#menu {
+    margin-left: 56px;
+    height: 36px;
+
+    button {
+        padding: 0.5em;
+        height: 100%;
+        background-color: transparent;
+    }
+}

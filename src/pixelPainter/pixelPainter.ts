@@ -5,7 +5,7 @@ import gridShader from "./shaders/grid.wgsl";
 import { bind } from "./utils";
 import { createSignal } from "solid-js";
 
-const TEMP_PROJECT_NAME = "project_name_v1";
+const TEMP_PROJECT_NAME = "project_name_v4";
 
 const webGPUSetup = async () => {
   const navigator = window.navigator;
