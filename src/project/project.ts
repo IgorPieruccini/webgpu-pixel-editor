@@ -1,6 +1,7 @@
 import { pixelPainter } from "../pixelPainter/pixelPainter";
 import { ZOOM_SENSITIVITY } from "../constants";
 import { ACTIVATE_TOOL } from "./constant";
+import { createSignal } from "solid-js";
 
 export const initializeProject = async () => {
   const gridSize: number = 64;
@@ -10,7 +11,8 @@ export const initializeProject = async () => {
   let pressingSpace = false;
   let isLeftMouseDown = false;
   let selectedCells = { x: -1, y: -1, z: -1, w: -1 };
-  let activeTool = ACTIVATE_TOOL.PAINT;
+
+  const [activeTool, setActiveTool] = createSignal(ACTIVATE_TOOL.PAINT);
 
   const canvas = document.getElementById("main-canvas");
 
@@ -39,7 +41,10 @@ export const initializeProject = async () => {
   canvas.addEventListener("mousemove", (e) => {
     let aspectRatio = viewport.width / viewport.height;
 
-    const cell = pickCell({ x: e.clientX, y: e.clientY });
+    const cell = pickCell(
+      { x: e.clientX, y: e.clientY },
+      { x: canvas.offsetLeft, y: canvas.offsetTop },
+    );
 
     cellPosition.x = cell.x;
     cellPosition.y = cell.y;
@@ -52,26 +57,30 @@ export const initializeProject = async () => {
     if (
       isLeftMouseDown &&
       !pressingSpace &&
-      activeTool === ACTIVATE_TOOL.PAINT
+      activeTool() === ACTIVATE_TOOL.PAINT
     ) {
       paintPixel(cellPosition);
     }
 
-    if (activeTool === ACTIVATE_TOOL.PAINT_SELECTION && isLeftMouseDown) {
+    if (activeTool() === ACTIVATE_TOOL.PAINT_SELECTION && isLeftMouseDown) {
       selectedCells.z = cell.x;
       selectedCells.w = cell.y;
     }
   });
 
   canvas.addEventListener("mousedown", (e) => {
-    if (activeTool === ACTIVATE_TOOL.PAINT) {
+    if (activeTool() === ACTIVATE_TOOL.PAINT) {
       paintPixel(cellPosition);
     }
 
     isLeftMouseDown = true;
 
-    if (activeTool === ACTIVATE_TOOL.PAINT_SELECTION) {
-      const cell = pickCell({ x: e.clientX, y: e.clientY });
+    if (activeTool() === ACTIVATE_TOOL.PAINT_SELECTION) {
+      const cell = pickCell(
+        { x: e.clientX, y: e.clientY },
+        { x: canvas.offsetLeft, y: canvas.offsetTop },
+      );
+
       selectedCells.x = cell.x;
       selectedCells.y = cell.y;
       selectedCells.z = cell.x;
@@ -82,7 +91,7 @@ export const initializeProject = async () => {
   canvas.addEventListener("mouseup", () => {
     isLeftMouseDown = false;
 
-    if (activeTool === ACTIVATE_TOOL.PAINT_SELECTION) {
+    if (activeTool() === ACTIVATE_TOOL.PAINT_SELECTION) {
       const selection = {
         x: Math.min(selectedCells.x, selectedCells.z),
         y: Math.min(selectedCells.y, selectedCells.w),
@@ -119,10 +128,11 @@ export const initializeProject = async () => {
       setBrushColor(color);
     }
     if (e.code === "KeyR") {
-      activeTool =
-        activeTool === ACTIVATE_TOOL.PAINT
+      setActiveTool(
+        activeTool() === ACTIVATE_TOOL.PAINT
           ? ACTIVATE_TOOL.PAINT_SELECTION
-          : ACTIVATE_TOOL.PAINT;
+          : ACTIVATE_TOOL.PAINT,
+      );
 
       selectedCells = { x: -1, y: -1, z: -1, w: -1 };
     }
@@ -134,13 +144,21 @@ export const initializeProject = async () => {
     }
   });
 
-  function pickCell(mouse: { x: number; y: number }) {
+  function pickCell(
+    mouse: { x: number; y: number },
+    canvasOffset: { x: number; y: number },
+  ) {
     const aspectRatio = viewport.width / viewport.height;
     const gap = (-viewport.width * aspectRatio) / 2 + viewport.width / 2;
 
     // 1. screen → clip space (-1..1)
-    const mx = ((mouse.x * aspectRatio - pan.x + gap) / viewport.width) * 2 - 1;
-    const my = ((mouse.y + pan.y) / viewport.height) * -2 + 1; // y flips because screen origin is top-left
+    const mx =
+      (((mouse.x - canvasOffset.x) * aspectRatio - pan.x + gap) /
+        viewport.width) *
+        2 -
+      1;
+
+    const my = ((mouse.y - canvasOffset.y + pan.y) / viewport.height) * -2 + 1; // y flips because screen origin is top-left
 
     // 2. clip space → world space (undo shader transform)
     const worldX = mx / zoom;
@@ -184,5 +202,7 @@ export const initializeProject = async () => {
   return {
     setBrushColor,
     getCurrentColor,
+    activeTool,
+    setActiveTool,
   };
 };
