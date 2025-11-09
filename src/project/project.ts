@@ -1,15 +1,16 @@
 import { pixelPainter } from "../pixelPainter/pixelPainter";
 import { ZOOM_SENSITIVITY } from "../constants";
+import { ACTIVATE_TOOL } from "./constant";
 
 export const initializeProject = async () => {
-  const gridSize: number = 32;
+  const gridSize: number = 64;
   const cellPosition = { x: 0, y: 0 };
   const pan = { x: 0, y: 0 };
   let zoom = 1;
   let pressingSpace = false;
   let isLeftMouseDown = false;
   let selectedCells = { x: -1, y: -1, z: -1, w: -1 };
-  let paintBoxOn = false;
+  let activeTool = ACTIVATE_TOOL.PAINT;
 
   const canvas = document.getElementById("main-canvas");
 
@@ -48,24 +49,28 @@ export const initializeProject = async () => {
       pan.y -= e.movementY;
     }
 
-    if (isLeftMouseDown && !pressingSpace && !paintBoxOn) {
+    if (
+      isLeftMouseDown &&
+      !pressingSpace &&
+      activeTool === ACTIVATE_TOOL.PAINT
+    ) {
       paintPixel(cellPosition);
     }
 
-    if (paintBoxOn && isLeftMouseDown) {
+    if (activeTool === ACTIVATE_TOOL.PAINT_SELECTION && isLeftMouseDown) {
       selectedCells.z = cell.x;
       selectedCells.w = cell.y;
     }
   });
 
   canvas.addEventListener("mousedown", (e) => {
-    if (!paintBoxOn) {
+    if (activeTool === ACTIVATE_TOOL.PAINT) {
       paintPixel(cellPosition);
     }
 
     isLeftMouseDown = true;
 
-    if (paintBoxOn) {
+    if (activeTool === ACTIVATE_TOOL.PAINT_SELECTION) {
       const cell = pickCell({ x: e.clientX, y: e.clientY });
       selectedCells.x = cell.x;
       selectedCells.y = cell.y;
@@ -77,7 +82,7 @@ export const initializeProject = async () => {
   canvas.addEventListener("mouseup", () => {
     isLeftMouseDown = false;
 
-    if (paintBoxOn) {
+    if (activeTool === ACTIVATE_TOOL.PAINT_SELECTION) {
       const selection = {
         x: Math.min(selectedCells.x, selectedCells.z),
         y: Math.min(selectedCells.y, selectedCells.w),
@@ -114,7 +119,11 @@ export const initializeProject = async () => {
       setBrushColor(color);
     }
     if (e.code === "KeyR") {
-      paintBoxOn = !paintBoxOn;
+      activeTool =
+        activeTool === ACTIVATE_TOOL.PAINT
+          ? ACTIVATE_TOOL.PAINT_SELECTION
+          : ACTIVATE_TOOL.PAINT;
+
       selectedCells = { x: -1, y: -1, z: -1, w: -1 };
     }
   });
