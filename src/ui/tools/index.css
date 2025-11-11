@@ -1,10 +1,15 @@
 #tools {
     margin: 4px 0 4px 0;
+    padding: 0 4px 0 4px;
     display: flex;
     flex-direction: column;
     gap: 4px;
 
-    button {
+    br {
+        background-color: white;
+    }
+
+    .menu-btn {
         width: 56px;
         height: 56px;
         display: flex;
@@ -20,4 +25,15 @@
     .active {
         border: 2px solid white;
     }
+}
+
+#menu-options {
+    position: absolute;
+    left: 62px;
+    top: 0px;
+    background-color: #242424;
+    padding: 8px;
+    min-width: 200px;
+    display: flex;
+    flex-direction: column;
 }
