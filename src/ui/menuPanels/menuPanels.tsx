@@ -7,12 +7,11 @@ import { OPENED_OPTIONS } from "../tools/constants";
 export const MenuPanels = () => {
   const menu = UseMenu();
 
-  menu().openedOption();
   return (
     <>
-      {menu().openedOption() === -1 ? null : (
+      {menu.openedOption() === -1 ? null : (
         <div id="menu-panels">
-          {menu().openedOption() === OPENED_OPTIONS.NEW_PROJECT && (
+          {menu.openedOption() === OPENED_OPTIONS.NEW_PROJECT && (
             <NewProjectPanel />
           )}
         </div>

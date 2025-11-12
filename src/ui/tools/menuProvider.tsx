@@ -18,9 +18,7 @@ const initialValue: MenuContextType = {
   },
 };
 
-const MenuContext = createContext<Accessor<MenuContextType>>(
-  () => initialValue,
-);
+const MenuContext = createContext<MenuContextType>(initialValue);
 
 export type MenuProviderProps = {
   children?: JSX.Element;
@@ -31,10 +29,10 @@ export const MenuProvider = (props: MenuProviderProps) => {
 
   return (
     <MenuContext.Provider
-      value={() => ({
-        openedOption,
+      value={{
+        openedOption: openedOption,
         openOption,
-      })}
+      }}
     >
       {props.children}
     </MenuContext.Provider>
