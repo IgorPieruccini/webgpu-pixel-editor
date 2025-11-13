@@ -3,7 +3,7 @@ import { ZOOM_SENSITIVITY } from "../constants";
 import { ACTIVATE_TOOL } from "./constant";
 import { createSignal } from "solid-js";
 
-export const initializeProject = async () => {
+export const initializeProject = async (name: string) => {
   const gridSize: number = 64;
   const cellPosition = { x: 0, y: 0 };
   const pan = { x: 0, y: 0 };
@@ -33,7 +33,7 @@ export const initializeProject = async () => {
     setBrushColor,
     getColorFrom,
     getCurrentColor,
-  } = await pixelPainter(gridSize, {
+  } = await pixelPainter(name, gridSize, {
     x: viewport.width,
     y: viewport.height,
   });

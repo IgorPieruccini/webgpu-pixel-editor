@@ -1,6 +1,7 @@
 import {
   createContext,
   createSignal,
+  onMount,
   useContext,
   type Accessor,
   type JSX,
@@ -10,7 +11,6 @@ import { initializeProject } from "../project/project";
 import { ProjectContext, projectInitialValue } from "../project/projectContext";
 import type { ProjectType } from "../project/types";
 import { useMenu } from "../ui/tools/menuProvider";
-import { OPENED_OPTIONS } from "../ui/tools/constants";
 
 type ProjectConfigContextType = {
   projectName: Accessor<string>;
@@ -39,16 +39,28 @@ export const ProjectConfigProvider = (props: ProjectConfigProviderProps) => {
   const [project, setProject] = createSignal<ProjectType>(projectInitialValue);
   const menu = useMenu();
 
-  const createNewProject = (name: string) => {
+  const createOrOpenProject = (name: string) => {
     initializeProject(name).then((result) => {
       setProject({ ...result });
     });
     menu.openOption(-1);
+    window.localStorage.setItem("active_project", name);
   };
+
+  onMount(() => {
+    const activeProjectName = window.localStorage.getItem("active_project");
+    if (activeProjectName) {
+      createOrOpenProject(activeProjectName);
+    }
+  });
 
   return (
     <ProjectConfigContext.Provider
-      value={{ projectName, setProjectName, createNewProject }}
+      value={{
+        projectName,
+        setProjectName,
+        createNewProject: createOrOpenProject,
+      }}
     >
       <ProjectContext.Provider value={project}>
         {props.children}
