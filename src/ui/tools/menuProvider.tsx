@@ -39,7 +39,7 @@ export const MenuProvider = (props: MenuProviderProps) => {
   );
 };
 
-export function UseMenu() {
+export function useMenu() {
   const context = useContext(MenuContext);
 
   return context;

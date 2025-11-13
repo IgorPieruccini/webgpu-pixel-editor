@@ -1,9 +1,22 @@
-import { UseMenu } from "../tools/menuProvider";
+import { createSignal } from "solid-js";
+import { useProjectConfig } from "../../projectConfig/projectConfigProvider";
+import { useMenu } from "../tools/menuProvider";
 import "./menuPanels.css";
 import { AiFillCloseSquare } from "solid-icons/ai";
 
 export const NewProjectPanel = () => {
-  const menu = UseMenu();
+  const [projectName, setProjectName] = createSignal("new project");
+  const menu = useMenu();
+  const projectConfig = useProjectConfig();
+
+  const onCreate = () => {
+    projectConfig.setProjectName(projectName());
+    projectConfig.createNewProject(projectName());
+  };
+
+  const onNameUpdate = (name: string) => {
+    setProjectName(name);
+  };
 
   return (
     <div class="menu-panel">
@@ -11,8 +24,12 @@ export const NewProjectPanel = () => {
         <AiFillCloseSquare onClick={() => menu.openOption(-1)} />
       </div>
       <label for="project-name-input">Project Name:</label>
-      <input type="text" id="project-name-input"></input>
-      <button>Create</button>
+      <input
+        onInput={(e) => onNameUpdate(e.target.value)}
+        type="text"
+        id="project-name-input"
+      />
+      <button onClick={onCreate}>Create</button>
     </div>
   );
 };

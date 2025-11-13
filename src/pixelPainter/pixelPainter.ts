@@ -5,8 +5,6 @@ import gridShader from "./shaders/grid.wgsl";
 import { bind } from "./utils";
 import { createSignal } from "solid-js";
 
-const TEMP_PROJECT_NAME = "project_name_v4";
-
 const webGPUSetup = async () => {
   const navigator = window.navigator;
 
@@ -137,6 +135,7 @@ const createPipeline = (
 };
 
 export const pixelPainter = async (
+  projectName: string,
   gridSize: number,
   canvasSize: { x: number; y: number },
 ) => {
@@ -148,7 +147,7 @@ export const pixelPainter = async (
   const colorStore = createSignal("#ff00ff");
 
   try {
-    colorBuffer = await db.load(TEMP_PROJECT_NAME);
+    colorBuffer = await db.load(projectName);
     if (!colorBuffer) {
       colorBuffer = new Uint32Array(gridSize * gridSize);
     }
@@ -261,7 +260,7 @@ export const pixelPainter = async (
   const paintPixel = (cellPos: { x: number; y: number }) => {
     const arrayIndex = cellPos.x + cellPos.y * gridSize;
     colorBuffer[arrayIndex] = color;
-    db.save(TEMP_PROJECT_NAME, colorBuffer);
+    db.save(projectName, colorBuffer);
   };
 
   return {

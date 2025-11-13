@@ -1,11 +1,11 @@
 import { NewProjectPanel } from "./newProjectPanel";
 
 import "./menuPanels.css";
-import { UseMenu } from "../tools/menuProvider";
+import { useMenu } from "../tools/menuProvider";
 import { OPENED_OPTIONS } from "../tools/constants";
 
 export const MenuPanels = () => {
-  const menu = UseMenu();
+  const menu = useMenu();
 
   return (
     <>

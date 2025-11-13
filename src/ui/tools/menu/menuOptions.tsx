@@ -1,9 +1,9 @@
 import { OPENED_OPTIONS } from "../constants";
-import { UseMenu } from "../menuProvider";
+import { useMenu } from "../menuProvider";
 import "./menu.css";
 
 export const MenuOptions = () => {
-  const menu = UseMenu();
+  const menu = useMenu();
   return (
     <div id="menu-options">
       <button
