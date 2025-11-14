@@ -44,6 +44,17 @@ export const ProjectConfigProvider = (props: ProjectConfigProviderProps) => {
     project().createNewPainter(name);
     menu.openOption(-1);
     window.localStorage.setItem("active_project", name);
+    const projectsString = window.localStorage.getItem("projects");
+    const projectsName: Array<string> = projectsString
+      ? JSON.parse(projectsString)
+      : null;
+
+    if (!projectsName?.includes(name)) {
+      window.localStorage.setItem(
+        "projects",
+        JSON.stringify([...(projectsName ?? []), name]),
+      );
+    }
   };
 
   onMount(() => {
