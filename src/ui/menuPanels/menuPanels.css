@@ -20,4 +20,14 @@
         display: flex;
         justify-content: flex-end;
     }
+
+    #new-projects-list {
+        width: 300px;
+        max-height: 200;
+        display: flex;
+        gap: 4px;
+        flex-direction: column;
+        padding: 10px;
+        overflow: auto; /* enables scrolling when content overflows */
+    }
 }
