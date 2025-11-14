@@ -1,5 +1,6 @@
 /// <reference types="@webgpu/types" />
 
+import type { PixelPainterReturnType } from "../project/types";
 import { localDataBase } from "../storage";
 import gridShader from "./shaders/grid.wgsl";
 import { bind } from "./utils";
@@ -138,7 +139,7 @@ export const pixelPainter = async (
   projectName: string,
   gridSize: number,
   canvasSize: { x: number; y: number },
-) => {
+): Promise<PixelPainterReturnType> => {
   const { device, canvasFormat, context } = await webGPUSetup();
 
   let colorBuffer: Uint32Array<ArrayBuffer>;

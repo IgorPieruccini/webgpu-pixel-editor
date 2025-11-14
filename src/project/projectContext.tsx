@@ -7,6 +7,7 @@ export const projectInitialValue: ProjectType = {
   getCurrentColor: () => "",
   activeTool: () => 0,
   setActiveTool: () => {},
+  createNewPainter: async () => {},
 };
 
 export const ProjectContext = createContext<Accessor<ProjectType>>();

@@ -28,7 +28,7 @@ export const localDataBase = async (name: string) => {
     return new Promise((resolve, reject) => {
       const tx = db.transaction(`${name}-layer-0`, "readwrite");
       const store = tx.objectStore(`${name}-layer-0`);
-      const bufferCopy = new Uint32Array(buffer);
+      const bufferCopy = new Uint32Array(buffer).slice();
       store.put(bufferCopy, "PixelArt");
       tx.oncomplete = () => resolve();
       tx.onerror = (e) => reject((e.target as IDBRequest).error);

@@ -37,21 +37,23 @@ type ProjectConfigProviderProps = {
 export const ProjectConfigProvider = (props: ProjectConfigProviderProps) => {
   const [projectName, setProjectName] = createSignal("new-project");
   const [project, setProject] = createSignal<ProjectType>(projectInitialValue);
+
   const menu = useMenu();
 
   const createOrOpenProject = (name: string) => {
-    initializeProject(name).then((result) => {
-      setProject({ ...result });
-    });
+    project().createNewPainter(name);
     menu.openOption(-1);
     window.localStorage.setItem("active_project", name);
   };
 
   onMount(() => {
-    const activeProjectName = window.localStorage.getItem("active_project");
-    if (activeProjectName) {
-      createOrOpenProject(activeProjectName);
-    }
+    initializeProject().then((result) => {
+      setProject(result);
+      const activeProjectName = window.localStorage.getItem("active_project");
+      if (activeProjectName) {
+        createOrOpenProject(activeProjectName);
+      }
+    });
   });
 
   return (

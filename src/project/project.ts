@@ -2,8 +2,9 @@ import { pixelPainter } from "../pixelPainter/pixelPainter";
 import { ZOOM_SENSITIVITY } from "../constants";
 import { ACTIVATE_TOOL } from "./constant";
 import { createSignal } from "solid-js";
+import type { PixelPainterReturnType } from "./types";
 
-export const initializeProject = async (name: string) => {
+export const initializeProject = async () => {
   const gridSize: number = 64;
   const cellPosition = { x: 0, y: 0 };
   const pan = { x: 0, y: 0 };
@@ -27,16 +28,20 @@ export const initializeProject = async (name: string) => {
     height: canvas.clientHeight,
   };
 
-  const {
-    drawFrame,
-    paintPixel,
-    setBrushColor,
-    getColorFrom,
-    getCurrentColor,
-  } = await pixelPainter(name, gridSize, {
-    x: viewport.width,
-    y: viewport.height,
-  });
+  let pixel: PixelPainterReturnType = {
+    drawFrame: () => {},
+    paintPixel: () => {},
+    setBrushColor: () => {},
+    getColorFrom: () => 0,
+    getCurrentColor: () => "",
+  };
+
+  const createNewPainter = async (name: string) => {
+    pixel = await pixelPainter(name, gridSize, {
+      x: viewport.width,
+      y: viewport.height,
+    });
+  };
 
   canvas.addEventListener("mousemove", (e) => {
     let aspectRatio = viewport.width / viewport.height;
@@ -59,7 +64,7 @@ export const initializeProject = async (name: string) => {
       !pressingSpace &&
       activeTool() === ACTIVATE_TOOL.PAINT
     ) {
-      paintPixel(cellPosition);
+      pixel.paintPixel(cellPosition);
     }
 
     if (activeTool() === ACTIVATE_TOOL.PAINT_SELECTION && isLeftMouseDown) {
@@ -70,7 +75,7 @@ export const initializeProject = async (name: string) => {
 
   canvas.addEventListener("mousedown", (e) => {
     if (activeTool() === ACTIVATE_TOOL.PAINT) {
-      paintPixel(cellPosition);
+      pixel.paintPixel(cellPosition);
     }
 
     isLeftMouseDown = true;
@@ -100,7 +105,7 @@ export const initializeProject = async (name: string) => {
       };
       for (let x = selection.x; x <= selection.z; x++) {
         for (let y = selection.y; y <= selection.w; y++) {
-          paintPixel({
+          pixel.paintPixel({
             x: x,
             y: y,
           });
@@ -124,8 +129,8 @@ export const initializeProject = async (name: string) => {
 
   window.addEventListener("keypress", (e) => {
     if (e.code === "KeyP") {
-      const color = getColorFrom(cellPosition);
-      setBrushColor(color);
+      const color = pixel.getColorFrom(cellPosition);
+      pixel.setBrushColor(color);
     }
     if (e.code === "KeyR") {
       setActiveTool(
@@ -193,15 +198,16 @@ export const initializeProject = async (name: string) => {
   canvas.addEventListener("wheel", wheelHandler, { passive: false });
 
   const loop = () => {
-    drawFrame(cellPosition, pan, zoom, selectedCells);
+    pixel?.drawFrame(cellPosition, pan, zoom, selectedCells);
     requestAnimationFrame(loop);
   };
 
   loop();
 
   return {
-    setBrushColor,
-    getCurrentColor,
+    createNewPainter,
+    setBrushColor: pixel.setBrushColor,
+    getCurrentColor: pixel.getCurrentColor,
     activeTool,
     setActiveTool,
   };
