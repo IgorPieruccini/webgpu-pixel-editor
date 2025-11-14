@@ -7,13 +7,14 @@ import {
   type JSX,
   type Setter,
 } from "solid-js";
-import { initializeProject, initialPixelPainter } from "../project/project";
+import { initializeProject } from "../project/project";
 import { ProjectContext, projectInitialValue } from "../project/projectContext";
 import {
   type PixelPainterReturnType,
   type ProjectType,
 } from "../project/types";
 import { useMenu } from "../ui/tools/menuProvider";
+import { INITIAL_PIXEL_PAINTER } from "../project/constant";
 
 type ProjectConfigContextType = {
   projectName: Accessor<string>;
@@ -22,8 +23,8 @@ type ProjectConfigContextType = {
   pixel: Accessor<PixelPainterReturnType>;
 };
 
-const initialValue: ProjectConfigContextType = {
-  pixel: () => initialPixelPainter,
+const initialProjectConfig: ProjectConfigContextType = {
+  pixel: () => INITIAL_PIXEL_PAINTER,
   projectName: () => "new project",
   setProjectName: () => {
     console.warn("not implemented");
@@ -33,7 +34,7 @@ const initialValue: ProjectConfigContextType = {
   },
 };
 
-const ProjectConfigContext = createContext(initialValue);
+const ProjectConfigContext = createContext(initialProjectConfig);
 
 type ProjectConfigProviderProps = {
   children?: JSX.Element;
@@ -42,8 +43,9 @@ type ProjectConfigProviderProps = {
 export const ProjectConfigProvider = (props: ProjectConfigProviderProps) => {
   const [projectName, setProjectName] = createSignal("new-project");
   const [project, setProject] = createSignal<ProjectType>(projectInitialValue);
-  const [pixel, setPixel] =
-    createSignal<PixelPainterReturnType>(initialPixelPainter);
+  const [pixel, setPixel] = createSignal<PixelPainterReturnType>(
+    INITIAL_PIXEL_PAINTER,
+  );
 
   const menu = useMenu();
 

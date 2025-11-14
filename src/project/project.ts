@@ -1,16 +1,8 @@
 import { pixelPainter } from "../pixelPainter/pixelPainter";
 import { ZOOM_SENSITIVITY } from "../constants";
-import { ACTIVATE_TOOL } from "./constant";
+import { ACTIVATE_TOOL, INITIAL_PIXEL_PAINTER } from "./constant";
 import { createSignal } from "solid-js";
 import type { PixelPainterReturnType } from "./types";
-
-export const initialPixelPainter: PixelPainterReturnType = {
-  drawFrame: () => {},
-  paintPixel: () => {},
-  setBrushColor: () => {},
-  getColorFrom: () => 0,
-  getCurrentColor: () => "",
-};
 
 export const initializeProject = async () => {
   const gridSize: number = 64;
@@ -36,7 +28,7 @@ export const initializeProject = async () => {
     height: canvas.clientHeight,
   };
 
-  let pixel: PixelPainterReturnType = initialPixelPainter;
+  let pixel: PixelPainterReturnType = INITIAL_PIXEL_PAINTER;
 
   const createNewPainter = async (
     name: string,
