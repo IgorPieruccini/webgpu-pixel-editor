@@ -4,6 +4,14 @@ import { ACTIVATE_TOOL } from "./constant";
 import { createSignal } from "solid-js";
 import type { PixelPainterReturnType } from "./types";
 
+export const initialPixelPainter: PixelPainterReturnType = {
+  drawFrame: () => {},
+  paintPixel: () => {},
+  setBrushColor: () => {},
+  getColorFrom: () => 0,
+  getCurrentColor: () => "",
+};
+
 export const initializeProject = async () => {
   const gridSize: number = 64;
   const cellPosition = { x: 0, y: 0 };
@@ -28,19 +36,17 @@ export const initializeProject = async () => {
     height: canvas.clientHeight,
   };
 
-  let pixel: PixelPainterReturnType = {
-    drawFrame: () => {},
-    paintPixel: () => {},
-    setBrushColor: () => {},
-    getColorFrom: () => 0,
-    getCurrentColor: () => "",
-  };
+  let pixel: PixelPainterReturnType = initialPixelPainter;
 
-  const createNewPainter = async (name: string) => {
+  const createNewPainter = async (
+    name: string,
+  ): Promise<PixelPainterReturnType> => {
     pixel = await pixelPainter(name, gridSize, {
       x: viewport.width,
       y: viewport.height,
     });
+
+    return pixel;
   };
 
   canvas.addEventListener("mousemove", (e) => {
@@ -206,8 +212,6 @@ export const initializeProject = async () => {
 
   return {
     createNewPainter,
-    setBrushColor: pixel.setBrushColor,
-    getCurrentColor: pixel.getCurrentColor,
     activeTool,
     setActiveTool,
   };

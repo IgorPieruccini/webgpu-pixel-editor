@@ -7,18 +7,23 @@ import {
   type JSX,
   type Setter,
 } from "solid-js";
-import { initializeProject } from "../project/project";
+import { initializeProject, initialPixelPainter } from "../project/project";
 import { ProjectContext, projectInitialValue } from "../project/projectContext";
-import type { ProjectType } from "../project/types";
+import {
+  type PixelPainterReturnType,
+  type ProjectType,
+} from "../project/types";
 import { useMenu } from "../ui/tools/menuProvider";
 
 type ProjectConfigContextType = {
   projectName: Accessor<string>;
   setProjectName: Setter<string>;
   createNewProject: (name: string) => void;
+  pixel: Accessor<PixelPainterReturnType>;
 };
 
 const initialValue: ProjectConfigContextType = {
+  pixel: () => initialPixelPainter,
   projectName: () => "new project",
   setProjectName: () => {
     console.warn("not implemented");
@@ -37,24 +42,30 @@ type ProjectConfigProviderProps = {
 export const ProjectConfigProvider = (props: ProjectConfigProviderProps) => {
   const [projectName, setProjectName] = createSignal("new-project");
   const [project, setProject] = createSignal<ProjectType>(projectInitialValue);
+  const [pixel, setPixel] =
+    createSignal<PixelPainterReturnType>(initialPixelPainter);
 
   const menu = useMenu();
 
   const createOrOpenProject = (name: string) => {
-    project().createNewPainter(name);
-    menu.openOption(-1);
-    window.localStorage.setItem("active_project", name);
-    const projectsString = window.localStorage.getItem("projects");
-    const projectsName: Array<string> = projectsString
-      ? JSON.parse(projectsString)
-      : null;
+    project()
+      .createNewPainter(name)
+      .then((value) => {
+        setPixel(value);
+        menu.openOption(-1);
+        window.localStorage.setItem("active_project", name);
+        const projectsString = window.localStorage.getItem("projects");
+        const projectsName: Array<string> = projectsString
+          ? JSON.parse(projectsString)
+          : null;
 
-    if (!projectsName?.includes(name)) {
-      window.localStorage.setItem(
-        "projects",
-        JSON.stringify([...(projectsName ?? []), name]),
-      );
-    }
+        if (!projectsName?.includes(name)) {
+          window.localStorage.setItem(
+            "projects",
+            JSON.stringify([...(projectsName ?? []), name]),
+          );
+        }
+      });
   };
 
   onMount(() => {
@@ -70,6 +81,7 @@ export const ProjectConfigProvider = (props: ProjectConfigProviderProps) => {
   return (
     <ProjectConfigContext.Provider
       value={{
+        pixel,
         projectName,
         setProjectName,
         createNewProject: createOrOpenProject,

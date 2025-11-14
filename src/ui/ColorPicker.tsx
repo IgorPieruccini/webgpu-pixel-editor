@@ -1,15 +1,15 @@
-import { useProject } from "../project/projectContext";
+import { useProjectConfig } from "../projectConfig/projectConfigProvider";
 
 export const ColorPicker = () => {
-  const project = useProject();
+  const project = useProjectConfig();
 
   return (
     <input
       type="color"
       name="color"
-      value={project?.().getCurrentColor()}
+      value={project.pixel().getCurrentColor()}
       onInput={(e) => {
-        project?.().setBrushColor(e.target.value);
+        project.pixel().setBrushColor(e.target.value);
       }}
     />
   );

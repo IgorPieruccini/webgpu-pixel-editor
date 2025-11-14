@@ -1,13 +1,12 @@
 import { createContext, useContext, type Accessor } from "solid-js";
 
 import type { ProjectType } from "./types";
+import { initialPixelPainter } from "./project";
 
 export const projectInitialValue: ProjectType = {
-  setBrushColor: () => {},
-  getCurrentColor: () => "",
   activeTool: () => 0,
   setActiveTool: () => {},
-  createNewPainter: async () => {},
+  createNewPainter: async () => initialPixelPainter,
 };
 
 export const ProjectContext = createContext<Accessor<ProjectType>>();
