@@ -1,12 +1,12 @@
-function openDB(): Promise<IDBDatabase> {
+function openDB(name: string): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open("pixel_painter", 1);
+    const request = indexedDB.open(name, 1);
 
     // version change
     request.onupgradeneeded = (event) => {
       const db = (event.target as IDBOpenDBRequest).result;
-      if (!db.objectStoreNames.contains("buffers")) {
-        db.createObjectStore("buffers");
+      if (!db.objectStoreNames.contains(`${name}-layer-0`)) {
+        db.createObjectStore(`${name}-layer-0`);
       }
     };
 
@@ -21,27 +21,25 @@ function openDB(): Promise<IDBDatabase> {
   });
 }
 
-export const localDataBase = async () => {
-  const db = await openDB();
+export const localDataBase = async (name: string) => {
+  const db = await openDB(name);
 
-  async function save(
-    name: string,
-    buffer: Uint32Array<ArrayBuffer>,
-  ): Promise<void> {
+  async function save(buffer: Uint32Array<ArrayBuffer>): Promise<void> {
     return new Promise((resolve, reject) => {
-      const tx = db.transaction("buffers", "readwrite");
-      const store = tx.objectStore("buffers");
-      store.put(buffer, name);
+      const tx = db.transaction(`${name}-layer-0`, "readwrite");
+      const store = tx.objectStore(`${name}-layer-0`);
+      const bufferCopy = new Uint32Array(buffer);
+      store.put(bufferCopy, "PixelArt");
       tx.oncomplete = () => resolve();
       tx.onerror = (e) => reject((e.target as IDBRequest).error);
     });
   }
 
-  async function load(name: string): Promise<Uint32Array<ArrayBuffer>> {
+  async function load(): Promise<Uint32Array<ArrayBuffer>> {
     return new Promise((resolve, reject) => {
-      const tx = db.transaction("buffers", "readonly");
-      const store = tx.objectStore("buffers");
-      const request = store.get(name);
+      const tx = db.transaction(`${name}-layer-0`, "readonly");
+      const store = tx.objectStore(`${name}-layer-0`);
+      const request = store.get("PixelArt");
 
       request.onsuccess = (e) =>
         resolve((e.target as IDBRequest).result as Uint32Array<ArrayBuffer>);

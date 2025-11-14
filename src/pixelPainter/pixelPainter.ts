@@ -142,12 +142,12 @@ export const pixelPainter = async (
   const { device, canvasFormat, context } = await webGPUSetup();
 
   let colorBuffer: Uint32Array<ArrayBuffer>;
-  const db = await localDataBase();
+  const db = await localDataBase(projectName);
   let color: number = 0xff00ff;
   const colorStore = createSignal("#ff00ff");
 
   try {
-    colorBuffer = await db.load(projectName);
+    colorBuffer = await db.load();
     if (!colorBuffer) {
       colorBuffer = new Uint32Array(gridSize * gridSize);
     }
@@ -260,7 +260,7 @@ export const pixelPainter = async (
   const paintPixel = (cellPos: { x: number; y: number }) => {
     const arrayIndex = cellPos.x + cellPos.y * gridSize;
     colorBuffer[arrayIndex] = color;
-    db.save(projectName, colorBuffer);
+    db.save(colorBuffer);
   };
 
   return {
