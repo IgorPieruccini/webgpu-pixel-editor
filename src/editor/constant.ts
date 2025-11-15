@@ -11,4 +11,5 @@ export const INITIAL_PIXEL_PAINTER: PixelPainterReturnType = {
   setBrushColor: () => {},
   getColorFrom: () => 0,
   getCurrentColor: () => "",
+  addLayer: () => {},
 };
