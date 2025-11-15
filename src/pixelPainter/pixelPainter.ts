@@ -241,8 +241,6 @@ export const pixelPainter = async (
       ],
     });
 
-    const binds: GPUBindGroup[] = [];
-
     const bindValues = new Float32Array([
       // gridSize
       gridSize,
@@ -261,23 +259,25 @@ export const pixelPainter = async (
       selectedCells.y,
       selectedCells.z,
       selectedCells.w,
+      1, // is first layer boolean
     ]);
-
-    // binds.push(createBind("bindValues", bindValues, 0));
-    // binds.push(createBind("colors", buffer, 1));
 
     pass.setPipeline(cellPipeline);
     pass.setVertexBuffer(0, vertexBuffer);
-    pass.setBindGroup(0, createBind("bindValues", bindValues, 0));
 
     const array = Array.from(layersBuffer);
+
+    let index = 0;
     for (const [_id, buffer] of array) {
+      if (index !== 0) {
+        // set to false if not the first layer
+        bindValues[13] = 0;
+      }
+      pass.setBindGroup(0, createBind("bindValues", bindValues, 0));
       pass.setBindGroup(1, createBind("colors", buffer, 1));
-      // binds.forEach((bind, i) => {
-      //   pass.setBindGroup(i, bind);
-      // });
 
       pass.draw(vertices.length / 2, gridSize * gridSize); // 6 vertices and draw several times
+      index++;
     }
 
     pass.end();
