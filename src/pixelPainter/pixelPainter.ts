@@ -1,8 +1,8 @@
 /// <reference types="@webgpu/types" />
 
-import type { PixelPainterReturnType } from "../project/types";
 import { localDataBase } from "../storage";
 import gridShader from "./shaders/grid.wgsl";
+import type { PixelPainterReturnType } from "./types";
 import { bind } from "./utils";
 import { createSignal } from "solid-js";
 

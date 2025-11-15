@@ -2,9 +2,9 @@ import { pixelPainter } from "../pixelPainter/pixelPainter";
 import { ZOOM_SENSITIVITY } from "../constants";
 import { ACTIVATE_TOOL, INITIAL_PIXEL_PAINTER } from "./constant";
 import { createSignal } from "solid-js";
-import type { PixelPainterReturnType } from "./types";
+import type { PixelPainterReturnType } from "../pixelPainter/types";
 
-export const initializeProject = async () => {
+export const initializeEditor = async () => {
   const gridSize: number = 64;
   const cellPosition = { x: 0, y: 0 };
   const pan = { x: 0, y: 0 };

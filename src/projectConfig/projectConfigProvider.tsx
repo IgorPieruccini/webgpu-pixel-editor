@@ -7,14 +7,12 @@ import {
   type JSX,
   type Setter,
 } from "solid-js";
-import { initializeProject } from "../project/project";
-import { ProjectContext, projectInitialValue } from "../project/projectContext";
-import {
-  type PixelPainterReturnType,
-  type ProjectType,
-} from "../project/types";
+import { initializeEditor } from "../editor/editor";
+import { ProjectContext, editorInitialValue } from "../editor/editortContext";
+import { type EditorContextType } from "../editor/types";
 import { useMenu } from "../ui/tools/menuProvider";
-import { INITIAL_PIXEL_PAINTER } from "../project/constant";
+import { INITIAL_PIXEL_PAINTER } from "../editor/constant";
+import type { PixelPainterReturnType } from "../pixelPainter/types";
 
 type ProjectConfigContextType = {
   projectName: Accessor<string>;
@@ -42,7 +40,8 @@ type ProjectConfigProviderProps = {
 
 export const ProjectConfigProvider = (props: ProjectConfigProviderProps) => {
   const [projectName, setProjectName] = createSignal("new-project");
-  const [project, setProject] = createSignal<ProjectType>(projectInitialValue);
+  const [project, setProject] =
+    createSignal<EditorContextType>(editorInitialValue);
   const [pixel, setPixel] = createSignal<PixelPainterReturnType>(
     INITIAL_PIXEL_PAINTER,
   );
@@ -71,7 +70,7 @@ export const ProjectConfigProvider = (props: ProjectConfigProviderProps) => {
   };
 
   onMount(() => {
-    initializeProject().then((result) => {
+    initializeEditor().then((result) => {
       setProject(result);
       const activeProjectName = window.localStorage.getItem("active_project");
       if (activeProjectName) {

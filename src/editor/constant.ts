@@ -1,4 +1,4 @@
-import type { PixelPainterReturnType } from "./types";
+import type { PixelPainterReturnType } from "../pixelPainter/types";
 
 export const ACTIVATE_TOOL = {
   PAINT: 0,

@@ -3,8 +3,8 @@ import { BsBrushFill, BsBrush } from "solid-icons/bs";
 import { FiMenu } from "solid-icons/fi";
 
 import "./index.css";
-import { useProject } from "../../project/projectContext";
-import { ACTIVATE_TOOL } from "../../project/constant";
+import { useProject } from "../../editor/editortContext";
+import { ACTIVATE_TOOL } from "../../editor/constant";
 import { MenuOptions } from "./menu/menuOptions";
 import { createSignal } from "solid-js";
 
