@@ -3,10 +3,11 @@
     padding: 0 4px 0 4px;
     display: flex;
     flex-direction: column;
+    justify-items: center;
     gap: 4px;
 
-    br {
-        background-color: white;
+    input {
+        width: 100%;
     }
 
     .menu-btn {

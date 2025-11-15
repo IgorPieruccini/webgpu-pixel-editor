@@ -74,6 +74,7 @@ export const ProjectConfigProvider = (props: ProjectConfigProviderProps) => {
       setProject(result);
       const activeProjectName = window.localStorage.getItem("active_project");
       if (activeProjectName) {
+        setProjectName(activeProjectName);
         createOrOpenProject(activeProjectName);
       }
     });

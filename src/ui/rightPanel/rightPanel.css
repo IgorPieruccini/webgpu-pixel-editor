@@ -1,0 +1,9 @@
+#right-panel {
+    min-width: 300px;
+    position: absolute;
+    right: 0px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    background-color: #242424;
+}

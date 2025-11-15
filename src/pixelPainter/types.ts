@@ -13,6 +13,7 @@ export type PixelPainterReturnType = {
   getColorFrom: (pos: Vec2) => number;
   getCurrentColor: Accessor<string>;
   addLayer: () => void;
+  getLayers: Accessor<Layers>;
 };
 
 export type Layer = {

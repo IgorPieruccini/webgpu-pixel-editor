@@ -14,21 +14,13 @@ export const NewProjectPanel = () => {
     projectConfig.createNewProject(projectName());
   };
 
-  const onNameUpdate = (name: string) => {
-    setProjectName(name);
-  };
-
   return (
     <div class="menu-panel">
       <div id="top-section">
         <AiFillCloseSquare onClick={() => menu.openOption(-1)} />
       </div>
       <label for="project-name-input">Project Name:</label>
-      <input
-        onInput={(e) => onNameUpdate(e.target.value)}
-        type="text"
-        id="project-name-input"
-      />
+      <input type="text" id="project-name-input" />
       <button onClick={onCreate}>Create</button>
     </div>
   );

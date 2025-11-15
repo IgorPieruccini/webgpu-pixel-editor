@@ -162,9 +162,9 @@ export const pixelPainter = async (
     window.localStorage.setItem(`${projectName}-layers`, stringLayers);
   }
 
-  const layers: Layers = JSON.parse(stringLayers);
+  const [layers, setLayers] = createSignal<Layers>(JSON.parse(stringLayers));
 
-  const firstLayer = layers.at(0);
+  const firstLayer = layers().at(0);
   if (!firstLayer) {
     throw new Error(
       "Pixel Painter must be initialized at least with one layer",
@@ -179,7 +179,7 @@ export const pixelPainter = async (
 
   const layersBuffer: Map<string, Uint32Array<ArrayBuffer>> = new Map();
 
-  for (const layer of layers) {
+  for (const layer of layers()) {
     try {
       const layerBuffer = await db.load(layer.id);
       if (layerBuffer) {
@@ -310,12 +310,21 @@ export const pixelPainter = async (
   };
 
   const addLayer = () => {
-    const layer: Layer = { id: generateUUID(), name: `layer ${layers.length}` };
-    layers.push(layer);
+    const currentLayers = layers();
+
+    const layer = {
+      id: generateUUID(),
+      name: `layer ${currentLayers.length}`,
+    };
+
+    const _layers: Layers = [...currentLayers, layer];
+
     window.localStorage.setItem(
       `${projectName}-layers`,
-      JSON.stringify(layers),
+      JSON.stringify(_layers),
     );
+
+    setLayers(_layers);
 
     currentLayerId = layer.id;
     const newBuffer = new Uint32Array(gridSize * gridSize);
@@ -330,5 +339,6 @@ export const pixelPainter = async (
     getColorFrom,
     getCurrentColor: colorStore[0],
     addLayer,
+    getLayers: layers,
   };
 };

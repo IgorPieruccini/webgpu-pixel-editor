@@ -1,7 +1,7 @@
 import "./App.css";
 import { ProjectConfigProvider } from "./projectConfig/projectConfigProvider";
-import { ColorPicker } from "./ui/ColorPicker";
 import { MenuPanels } from "./ui/menuPanels";
+import { RightPanel } from "./ui/rightPanel/rightPanel";
 import { Tools } from "./ui/tools";
 import { MenuProvider } from "./ui/tools/menuProvider";
 
@@ -13,7 +13,7 @@ function App() {
           <div class="row">
             <Tools />
             <canvas id="main-canvas" width={1280} height={1280} />
-            <ColorPicker />
+            <RightPanel />
             <MenuPanels />
           </div>
         </ProjectConfigProvider>
