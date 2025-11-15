@@ -1,8 +1,9 @@
 /// <reference types="@webgpu/types" />
 
 import { localDataBase } from "../storage";
+import { generateUUID } from "../utils";
 import gridShader from "./shaders/grid.wgsl";
-import type { PixelPainterReturnType } from "./types";
+import type { Layer, Layers, PixelPainterReturnType } from "./types";
 import { bind } from "./utils";
 import { createSignal } from "solid-js";
 
@@ -127,6 +128,18 @@ const createPipeline = (
       targets: [
         {
           format: canvasFormat,
+          blend: {
+            color: {
+              srcFactor: "src-alpha",
+              dstFactor: "one-minus-src-alpha",
+              operation: "add",
+            },
+            alpha: {
+              srcFactor: "one",
+              dstFactor: "one-minus-src-alpha",
+              operation: "add",
+            },
+          },
         },
       ],
     },
@@ -142,19 +155,54 @@ export const pixelPainter = async (
 ): Promise<PixelPainterReturnType> => {
   const { device, canvasFormat, context } = await webGPUSetup();
 
-  let colorBuffer: Uint32Array<ArrayBuffer>;
-  const db = await localDataBase(projectName);
-  let color: number = 0xff00ff;
-  const colorStore = createSignal("#ff00ff");
-
-  try {
-    colorBuffer = await db.load();
-    if (!colorBuffer) {
-      colorBuffer = new Uint32Array(gridSize * gridSize);
-    }
-  } catch {
-    throw "Error initializing DB";
+  let stringLayers = window.localStorage.getItem(`${projectName}-layers`);
+  if (!stringLayers) {
+    const l = [{ id: generateUUID(), name: "layer 0" }];
+    stringLayers = JSON.stringify(l);
+    window.localStorage.setItem(`${projectName}-layers`, stringLayers);
   }
+
+  const layers: Layers = JSON.parse(stringLayers);
+
+  const firstLayer = layers.at(0);
+  if (!firstLayer) {
+    throw new Error(
+      "Pixel Painter must be initialized at least with one layer",
+    );
+  }
+
+  let currentLayerId = firstLayer.id;
+
+  let currentBufferLayer: Uint32Array<ArrayBuffer>;
+
+  const db = await localDataBase(projectName);
+
+  const layersBuffer: Map<string, Uint32Array<ArrayBuffer>> = new Map();
+
+  for (const layer of layers) {
+    try {
+      const layerBuffer = await db.load(layer.id);
+      if (layerBuffer) {
+        layersBuffer.set(layer.id, layerBuffer);
+      } else {
+        layersBuffer.set(layer.id, new Uint32Array(gridSize * gridSize));
+      }
+    } catch {
+      layersBuffer.set(layer.id, new Uint32Array(gridSize * gridSize));
+    }
+  }
+
+  const firstBuffer = layersBuffer.get(firstLayer.id);
+  if (!firstBuffer) {
+    throw new Error(
+      "Something went wrong accessing the buffer from first layer",
+    );
+  }
+
+  currentBufferLayer = firstBuffer;
+
+  let currentColorSelected: number = 0xff00ff;
+  const colorStore = createSignal("#ff00ff");
 
   const { vertices, vertexBuffer, vertexBufferLayout } =
     createVertexBuffer(device);
@@ -181,6 +229,18 @@ export const pixelPainter = async (
       label: "Grid encoder",
     });
 
+    //Render passes are when all drawing operations in WebGPU happen.
+    const pass = encoder.beginRenderPass({
+      colorAttachments: [
+        {
+          view: context.getCurrentTexture().createView(),
+          loadOp: "clear",
+          storeOp: "store",
+          clearValue: { r: 0.13, g: 0.13, b: 0.13, a: 0 },
+        },
+      ],
+    });
+
     const binds: GPUBindGroup[] = [];
 
     const bindValues = new Float32Array([
@@ -203,65 +263,64 @@ export const pixelPainter = async (
       selectedCells.w,
     ]);
 
-    binds.push(createBind("bindValues", bindValues, 0));
-    binds.push(createBind("colors", colorBuffer, 1));
-
-    //Render passes are when all drawing operations in WebGPU happen.
-    const pass = encoder.beginRenderPass({
-      colorAttachments: [
-        {
-          // The texture is given as the view property of a
-          // colorAttachment.
-          // Render passes require that you provide a
-          // GPUTextureView instead of a GPUTexture,
-          // which tells it which parts of the texture to render to.
-          view: context.getCurrentTexture().createView(),
-          // value of "clear" indicates that you want the texture to be cleared when the render pass starts.
-          loadOp: "clear",
-          // value of "store" indicates that once the render pass is finished you want the results of any drawing done during the render pass saved into the texture.
-          storeOp: "store",
-          clearValue: { r: 0.13, g: 0.13, b: 0.13, a: 0 },
-        },
-      ],
-    });
+    // binds.push(createBind("bindValues", bindValues, 0));
+    // binds.push(createBind("colors", buffer, 1));
 
     pass.setPipeline(cellPipeline);
     pass.setVertexBuffer(0, vertexBuffer);
+    pass.setBindGroup(0, createBind("bindValues", bindValues, 0));
 
-    binds.forEach((bind, i) => {
-      pass.setBindGroup(i, bind);
-    });
+    const array = Array.from(layersBuffer);
+    for (const [_id, buffer] of array) {
+      pass.setBindGroup(1, createBind("colors", buffer, 1));
+      // binds.forEach((bind, i) => {
+      //   pass.setBindGroup(i, bind);
+      // });
 
-    pass.draw(vertices.length / 2, gridSize * gridSize); // 6 vertices and draw several times
+      pass.draw(vertices.length / 2, gridSize * gridSize); // 6 vertices and draw several times
+    }
 
     pass.end();
-
     const commandBuffer = encoder.finish();
     device.queue.submit([commandBuffer]);
   };
 
   const setBrushColor = (_color: number | string) => {
     if (typeof _color === "string") {
-      color = parseInt(_color.replace("#", ""), 16);
+      currentColorSelected = parseInt(_color.replace("#", ""), 16);
       colorStore[1](_color);
     }
 
     if (typeof _color === "number") {
-      color = _color;
-      colorStore[1]("#" + color.toString(16).padStart(6, "0"));
+      currentColorSelected = _color;
+      colorStore[1]("#" + currentColorSelected.toString(16).padStart(6, "0"));
     }
   };
 
   const getColorFrom = (pos: { x: number; y: number }) => {
     const i = pos.x + pos.y * gridSize;
-    const color = colorBuffer[i];
+    const color = currentBufferLayer[i];
     return color;
   };
 
   const paintPixel = (cellPos: { x: number; y: number }) => {
     const arrayIndex = cellPos.x + cellPos.y * gridSize;
-    colorBuffer[arrayIndex] = color;
-    db.save(colorBuffer);
+    currentBufferLayer[arrayIndex] = currentColorSelected;
+    db.save(currentBufferLayer, currentLayerId);
+  };
+
+  const addLayer = () => {
+    const layer: Layer = { id: generateUUID(), name: `layer ${layers.length}` };
+    layers.push(layer);
+    window.localStorage.setItem(
+      `${projectName}-layers`,
+      JSON.stringify(layers),
+    );
+
+    currentLayerId = layer.id;
+    const newBuffer = new Uint32Array(gridSize * gridSize);
+    layersBuffer.set(layer.id, newBuffer);
+    currentBufferLayer = newBuffer;
   };
 
   return {
@@ -270,5 +329,6 @@ export const pixelPainter = async (
     setBrushColor,
     getColorFrom,
     getCurrentColor: colorStore[0],
+    addLayer,
   };
 };

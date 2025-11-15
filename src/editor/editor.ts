@@ -12,6 +12,7 @@ export const initializeEditor = async () => {
   let pressingSpace = false;
   let isLeftMouseDown = false;
   let selectedCells = { x: -1, y: -1, z: -1, w: -1 };
+  let pixel: PixelPainterReturnType = INITIAL_PIXEL_PAINTER;
 
   const [activeTool, setActiveTool] = createSignal(ACTIVATE_TOOL.PAINT);
 
@@ -27,8 +28,6 @@ export const initializeEditor = async () => {
     width: canvas.clientWidth,
     height: canvas.clientHeight,
   };
-
-  let pixel: PixelPainterReturnType = INITIAL_PIXEL_PAINTER;
 
   const createNewPainter = async (
     name: string,
@@ -138,6 +137,10 @@ export const initializeEditor = async () => {
       );
 
       selectedCells = { x: -1, y: -1, z: -1, w: -1 };
+    }
+
+    if (e.code === "KeyL") {
+      pixel.addLayer();
     }
   });
 

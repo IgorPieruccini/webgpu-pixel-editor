@@ -11,11 +11,12 @@ struct VertexOutput {
     @location(3) @interpolate(flat) isSelected: i32,
 };
 
-fn unpack_rgb(color: u32) -> vec4<f32> {
+fn unpack_rgba(color: u32) -> vec4<f32> {
     let r = f32((color >> 16u) & 0xFFu) / 255.0;
     let g = f32((color >> 8u) & 0xFFu) / 255.0;
     let b = f32(color & 0xFFu) / 255.0;
-    return vec4<f32>(r, g, b, 1.0);
+    let a = f32(1);
+    return vec4<f32>(r, g, b, a);
 }
 
 @vertex
@@ -89,11 +90,11 @@ fn fragmentMain(
     let gridSize = vec2f(bindValues[0], bindValues[1]) ;
     let colorIndex = u32(cellPos.x + cellPos.y * gridSize.x);
     let color = colors[colorIndex];
-    let rgb = unpack_rgb(color);
+    let rgba = unpack_rgba(color);
 
     if (isSelected == 1) {
        let bluesh = vec4f(0.95, 0.95, 0.95, 1.0);
-       return rgb * bluesh;
+       return rgba * bluesh;
     }
 
     if isHovering == 1 {
@@ -106,27 +107,30 @@ fn fragmentMain(
         }
     }
 
+
     if (color == 0) {
-      if (cellPos.x % 2 == 1) {
-        if (cellPos.y % 2 == 0) {
-         return vec4f(0.9, 0.9, 0.9, 1.0);
-        }
+        return vec4f(1.0, 1.0, 1.0, 0.0);
+      // The code bellow should just be applied for the first layer
+      // if (cellPos.x % 2 == 1) {
+      //   if (cellPos.y % 2 == 0) {
+      //    return vec4f(0.9, 0.9, 0.9, 1.0);
+      //   }
 
-        if (cellPos.y % 2 ==1) {
-         return vec4f(1, 1, 1, 1);
-        }
-      }
+      //   if (cellPos.y % 2 ==1) {
+      //    return vec4f(1, 1, 1, 1);
+      //   }
+      // }
 
-      if(cellPos.x % 2 == 0) {
-       if (cellPos.y % 2 == 0) {
-         return vec4f(1, 1, 1, 1);
-       }
+      // if(cellPos.x % 2 == 0) {
+      //  if (cellPos.y % 2 == 0) {
+      //    return vec4f(1, 1, 1, 1);
+      //  }
 
-       if (cellPos.y % 2 ==1) {
-         return vec4f(0.9, 0.9, 0.9, 1.0);
-       }
-      }
+      //  if (cellPos.y % 2 ==1) {
+      //    return vec4f(0.9, 0.9, 0.9, 1.0);
+      //  }
+      // }
     }
 
-    return rgb;
+    return rgba;
 }
