@@ -14,6 +14,8 @@ export type PixelPainterReturnType = {
   getCurrentColor: Accessor<string>;
   addLayer: () => void;
   getLayers: Accessor<Layers>;
+  selectLayer: (layerId: string) => void;
+  getActiveLayer: Accessor<string>;
 };
 
 export type Layer = {

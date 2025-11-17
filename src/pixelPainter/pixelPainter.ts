@@ -3,7 +3,7 @@
 import { localDataBase } from "../storage";
 import { generateUUID } from "../utils";
 import gridShader from "./shaders/grid.wgsl";
-import type { Layer, Layers, PixelPainterReturnType } from "./types";
+import type { Layers, PixelPainterReturnType } from "./types";
 import { bind } from "./utils";
 import { createSignal } from "solid-js";
 
@@ -171,7 +171,7 @@ export const pixelPainter = async (
     );
   }
 
-  let currentLayerId = firstLayer.id;
+  const [activeLayerId, setActiveLayerId] = createSignal<string>(firstLayer.id);
 
   let currentBufferLayer: Uint32Array<ArrayBuffer>;
 
@@ -306,7 +306,7 @@ export const pixelPainter = async (
   const paintPixel = (cellPos: { x: number; y: number }) => {
     const arrayIndex = cellPos.x + cellPos.y * gridSize;
     currentBufferLayer[arrayIndex] = currentColorSelected;
-    db.save(currentBufferLayer, currentLayerId);
+    db.save(currentBufferLayer, activeLayerId());
   };
 
   const addLayer = () => {
@@ -326,10 +326,19 @@ export const pixelPainter = async (
 
     setLayers(_layers);
 
-    currentLayerId = layer.id;
+    setActiveLayerId(layer.id);
     const newBuffer = new Uint32Array(gridSize * gridSize);
     layersBuffer.set(layer.id, newBuffer);
     currentBufferLayer = newBuffer;
+  };
+
+  const selectLayer = (layerId: string) => {
+    setActiveLayerId(layerId);
+    const buffer = layersBuffer.get(layerId);
+    if (!buffer) {
+      throw new Error(`Could not find buffer corresponded to id: ${layerId}`);
+    }
+    currentBufferLayer = buffer;
   };
 
   return {
@@ -340,5 +349,7 @@ export const pixelPainter = async (
     getCurrentColor: colorStore[0],
     addLayer,
     getLayers: layers,
+    selectLayer,
+    getActiveLayer: activeLayerId,
   };
 };

@@ -6,4 +6,22 @@
     display: flex;
     flex-direction: column;
     background-color: #242424;
+
+    #layers {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .active-layer {
+        background-color: #402d53;
+    }
+
+    button {
+        max-height: 42px;
+
+        p {
+            margin: 0;
+        }
+    }
 }

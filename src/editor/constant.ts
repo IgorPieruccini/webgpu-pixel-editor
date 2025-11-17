@@ -13,4 +13,6 @@ export const INITIAL_PIXEL_PAINTER: PixelPainterReturnType = {
   getCurrentColor: () => "",
   addLayer: () => {},
   getLayers: () => [],
+  selectLayer: () => {},
+  getActiveLayer: () => "",
 };
