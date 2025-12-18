@@ -1,4 +1,5 @@
 import { useProjectConfig } from "../../../projectConfig/projectConfigProvider";
+import { LayerTitle } from "./LayerTitle";
 
 export const Layers = () => {
   const projectConfig = useProjectConfig();
@@ -22,7 +23,7 @@ export const Layers = () => {
               }
               onClick={() => onSelectLayer(layer.id)}
             >
-              <p>{layer.name}</p>
+              <LayerTitle layerName={layer.name} />
             </button>
           );
         })}
