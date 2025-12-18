@@ -3,7 +3,7 @@
 import { localDataBase } from "../storage";
 import { generateUUID } from "../utils";
 import gridShader from "./shaders/grid.wgsl";
-import type { Layers, PixelPainterReturnType } from "./types";
+import type { Layer, Layers, PixelPainterReturnType } from "./types";
 import { bind } from "./utils";
 import { createSignal } from "solid-js";
 
@@ -332,6 +332,26 @@ export const pixelPainter = async (
     currentBufferLayer = newBuffer;
   };
 
+  const renameLayer = (name: string) => {
+    const _layers = layers().map((layer: Layer) => {
+      if (layer.id === activeLayerId()) {
+        return {
+          ...layer,
+          name,
+        };
+      }
+
+      return layer;
+    });
+
+    window.localStorage.setItem(
+      `${projectName}-layers`,
+      JSON.stringify(_layers),
+    );
+
+    setLayers(_layers);
+  };
+
   const selectLayer = (layerId: string) => {
     setActiveLayerId(layerId);
     const buffer = layersBuffer.get(layerId);
@@ -348,6 +368,7 @@ export const pixelPainter = async (
     getColorFrom,
     getCurrentColor: colorStore[0],
     addLayer,
+    renameLayer,
     getLayers: layers,
     selectLayer,
     getActiveLayer: activeLayerId,

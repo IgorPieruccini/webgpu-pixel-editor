@@ -1,4 +1,5 @@
 import { createSignal } from "solid-js";
+import { useProjectConfig } from "../../../projectConfig/projectConfigProvider";
 
 type LayerTitleProps = {
   layerName: string;
@@ -7,6 +8,7 @@ type LayerTitleProps = {
 export const LayerTitle = ({ layerName }: LayerTitleProps) => {
   const [name, setName] = createSignal<string>(layerName);
   const [isEditing, setIsEditing] = createSignal<boolean>(false);
+  const projectSettings = useProjectConfig();
 
   const onTypeName = (e: { target: HTMLInputElement }) => {
     setName(e.target.value);
@@ -26,13 +28,18 @@ export const LayerTitle = ({ layerName }: LayerTitleProps) => {
 
   const onEnterPress = (e: KeyboardEvent) => {
     if (e.key == "Enter") {
-      setIsEditing(false);
+      finishEditing();
       window.removeEventListener("keydown", onEnterPress);
     }
   };
 
   const registerListeners = () => {
     window.addEventListener("keydown", onEnterPress);
+  };
+
+  const finishEditing = () => {
+    projectSettings.pixel().renameLayer(name());
+    setIsEditing(false);
   };
 
   return (
@@ -43,10 +50,10 @@ export const LayerTitle = ({ layerName }: LayerTitleProps) => {
           type="text"
           value={name()}
           onInput={onTypeName}
-          onBlur={() => setIsEditing(false)}
+          onBlur={finishEditing}
         />
       ) : (
-        <span onDblClick={onStartEditing}>{name() + "test"}</span>
+        <span onDblClick={onStartEditing}>{name()}</span>
       )}
     </>
   );
