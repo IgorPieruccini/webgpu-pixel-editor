@@ -269,14 +269,18 @@ export const pixelPainter = async (
     pass.setPipeline(cellPipeline);
     pass.setVertexBuffer(0, vertexBuffer);
 
-    const array = Array.from(layersBuffer);
-
     let index = 0;
-    for (const [_id, buffer] of array) {
+    for (const layer of layers()) {
+      const buffer = layersBuffer.get(layer.id);
+      if (!buffer) {
+        throw new Error(`Layer buffer with id ${layer.id} not found`);
+      }
+
       if (index !== 0) {
         // set to false if not the first layer
         bindValues[13] = 0;
       }
+
       pass.setBindGroup(0, createBind("bindValues", bindValues, 0));
       pass.setBindGroup(1, createBind("colors", buffer, 1));
 
@@ -398,17 +402,6 @@ export const pixelPainter = async (
       `${projectName}-layers`,
       JSON.stringify(newLayers),
     );
-
-    layersBuffer.clear();
-    for (const layer of layers()) {
-      db.load(layer.id).then((layerBuffer) => {
-        if (layerBuffer) {
-          layersBuffer.set(layer.id, layerBuffer);
-        } else {
-          layersBuffer.set(layer.id, new Uint32Array(gridSize * gridSize));
-        }
-      });
-    }
   };
 
   const renameLayer = (name: string) => {
