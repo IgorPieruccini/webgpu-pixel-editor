@@ -314,7 +314,7 @@ export const pixelPainter = async (
 
     const layer = {
       id: generateUUID(),
-      name: `layer ${currentLayers.length}`,
+      name: `Layer`,
     };
 
     const _layers: Layers = [...currentLayers, layer];
@@ -330,6 +330,40 @@ export const pixelPainter = async (
     const newBuffer = new Uint32Array(gridSize * gridSize);
     layersBuffer.set(layer.id, newBuffer);
     currentBufferLayer = newBuffer;
+  };
+
+  const removeLayer = (id: string) => {
+    const _layers = [...layers()];
+
+    if (_layers.length === 1) {
+      // At least one layer per project needs to exist
+      return;
+    }
+
+    const index = _layers.findIndex((layer) => layer.id === id);
+    const newActiveLayerIndex = index >= 1 ? index - 1 : index + 1;
+    const newActiveLayerId = _layers[newActiveLayerIndex].id;
+
+    // re-assign current layer id
+    if (activeLayerId() === id) {
+      setActiveLayerId(newActiveLayerId);
+      const newBuffer = layersBuffer.get(newActiveLayerId);
+      if (!newBuffer) {
+        throw new Error(
+          `layer buffer with id ${newActiveLayerId} could not be found`,
+        );
+      }
+      currentBufferLayer = newBuffer;
+    }
+
+    _layers.splice(index, 1);
+    setLayers(_layers);
+    layersBuffer.delete(id);
+
+    window.localStorage.setItem(
+      `${projectName}-layers`,
+      JSON.stringify(_layers),
+    );
   };
 
   const renameLayer = (name: string) => {
@@ -368,6 +402,7 @@ export const pixelPainter = async (
     getColorFrom,
     getCurrentColor: colorStore[0],
     addLayer,
+    removeLayer,
     renameLayer,
     getLayers: layers,
     selectLayer,

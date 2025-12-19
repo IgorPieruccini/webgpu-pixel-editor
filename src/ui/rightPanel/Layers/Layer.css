@@ -1,0 +1,11 @@
+.layer-btn {
+    display: flex;
+    justify-content: space-between;
+}
+
+.layer-delete-btn {
+    width: 20px;
+    height: 20px;
+    background: none;
+    padding: 0;
+}
