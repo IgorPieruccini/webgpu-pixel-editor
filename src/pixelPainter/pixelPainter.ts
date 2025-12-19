@@ -157,7 +157,7 @@ export const pixelPainter = async (
 
   let stringLayers = window.localStorage.getItem(`${projectName}-layers`);
   if (!stringLayers) {
-    const l = [{ id: generateUUID(), name: "layer 0" }];
+    const l = [{ id: generateUUID(), name: "Layer" }];
     stringLayers = JSON.stringify(l);
     window.localStorage.setItem(`${projectName}-layers`, stringLayers);
   }
