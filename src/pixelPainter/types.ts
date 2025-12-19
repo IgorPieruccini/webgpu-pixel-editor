@@ -14,6 +14,7 @@ export type PixelPainterReturnType = {
   getCurrentColor: Accessor<string>;
   addLayer: () => void;
   removeLayer: (id: string) => void;
+  sortLayers: (dragged: string, dropped: string) => void;
   renameLayer: (name: string) => void;
   getLayers: Accessor<Layers>;
   selectLayer: (layerId: string) => void;

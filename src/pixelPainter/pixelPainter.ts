@@ -224,6 +224,10 @@ export const pixelPainter = async (
     zoom: number,
     selectedCells: { x: number; y: number; z: number; w: number },
   ) => {
+    if (layersBuffer.size === 0) {
+      return;
+    }
+
     // Provides an interface for recording GPU commands.
     const encoder = device.createCommandEncoder({
       label: "Grid encoder",
@@ -366,6 +370,47 @@ export const pixelPainter = async (
     );
   };
 
+  const sortLayers = (dragged: string, dropped: string) => {
+    const _layers = [...layers()];
+
+    let draggedIndex = 0;
+    let droppedIndex = 0;
+
+    for (let i = 0; i < _layers.length; i++) {
+      const layer = _layers[i];
+      if (layer.id === dragged) {
+        draggedIndex = i;
+      }
+      if (layer.id == dropped) {
+        droppedIndex = i;
+      }
+    }
+
+    const draggedLayer = _layers.splice(draggedIndex, 1);
+
+    const first = _layers.slice(0, droppedIndex);
+    const second = _layers.slice(droppedIndex, _layers.length);
+    const newLayers = [...first, ...draggedLayer, ...second];
+
+    setLayers(newLayers);
+
+    window.localStorage.setItem(
+      `${projectName}-layers`,
+      JSON.stringify(newLayers),
+    );
+
+    layersBuffer.clear();
+    for (const layer of layers()) {
+      db.load(layer.id).then((layerBuffer) => {
+        if (layerBuffer) {
+          layersBuffer.set(layer.id, layerBuffer);
+        } else {
+          layersBuffer.set(layer.id, new Uint32Array(gridSize * gridSize));
+        }
+      });
+    }
+  };
+
   const renameLayer = (name: string) => {
     const _layers = layers().map((layer: Layer) => {
       if (layer.id === activeLayerId()) {
@@ -402,6 +447,7 @@ export const pixelPainter = async (
     getColorFrom,
     getCurrentColor: colorStore[0],
     addLayer,
+    sortLayers,
     removeLayer,
     renameLayer,
     getLayers: layers,
