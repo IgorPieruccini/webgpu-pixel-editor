@@ -56,12 +56,14 @@ export const initializeEditor = async () => {
       pan.y -= e.movementY;
     }
 
-    if (
-      isLeftMouseDown &&
-      !pressingSpace &&
-      activeTool() === ACTIVATE_TOOL.PAINT
-    ) {
-      pixel.paintPixel(cellPosition);
+    if (isLeftMouseDown && !pressingSpace) {
+      if (activeTool() === ACTIVATE_TOOL.PAINT) {
+        pixel.paintPixel(cellPosition);
+      }
+
+      if (activeTool() === ACTIVATE_TOOL.DELETE) {
+        pixel.deletePixel(cellPosition);
+      }
     }
 
     if (activeTool() === ACTIVATE_TOOL.PAINT_SELECTION && isLeftMouseDown) {
@@ -73,6 +75,10 @@ export const initializeEditor = async () => {
   canvas.addEventListener("mousedown", (e) => {
     if (activeTool() === ACTIVATE_TOOL.PAINT) {
       pixel.paintPixel(cellPosition);
+    }
+
+    if (activeTool() === ACTIVATE_TOOL.DELETE) {
+      pixel.deletePixel(cellPosition);
     }
 
     isLeftMouseDown = true;

@@ -317,6 +317,12 @@ export const pixelPainter = async (
     db.save(currentBufferLayer, activeLayerId());
   };
 
+  const deletePixel = (cellPos: { x: number; y: number }) => {
+    const arrayIndex = cellPos.x + cellPos.y * gridSize;
+    currentBufferLayer[arrayIndex] = 0;
+    db.save(currentBufferLayer, activeLayerId());
+  };
+
   const addLayer = () => {
     const currentLayers = layers();
 
@@ -436,6 +442,7 @@ export const pixelPainter = async (
   return {
     drawFrame,
     paintPixel,
+    deletePixel,
     setBrushColor,
     getColorFrom,
     getCurrentColor: colorStore[0],

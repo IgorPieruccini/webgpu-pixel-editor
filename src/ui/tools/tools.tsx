@@ -1,4 +1,9 @@
-import { BiRegularBrush, BiSolidBrush } from "solid-icons/bi";
+import {
+  BiRegularBrush,
+  BiRegularEraser,
+  BiSolidBrush,
+  BiSolidEraser,
+} from "solid-icons/bi";
 import { BsBrushFill, BsBrush } from "solid-icons/bs";
 import { FiMenu } from "solid-icons/fi";
 
@@ -23,9 +28,10 @@ export const Tools = () => {
       <ColorPicker />
       <br />
       <button
-        class={`${
-          project?.().activeTool() === ACTIVATE_TOOL.PAINT ? "active" : ""
-        } menu-btn`}
+        class="menu-btn"
+        classList={{
+          active: project?.().activeTool() === ACTIVATE_TOOL.PAINT,
+        }}
         onClick={() => {
           project?.().setActiveTool(ACTIVATE_TOOL.PAINT);
         }}
@@ -37,11 +43,10 @@ export const Tools = () => {
         )}
       </button>
       <button
-        class={`${
-          project?.().activeTool() === ACTIVATE_TOOL.PAINT_SELECTION
-            ? "active"
-            : ""
-        } menu-btn`}
+        class="menu-btn"
+        classList={{
+          active: project?.().activeTool() === ACTIVATE_TOOL.PAINT_SELECTION,
+        }}
         onClick={() => {
           project?.().setActiveTool(ACTIVATE_TOOL.PAINT_SELECTION);
         }}
@@ -50,6 +55,21 @@ export const Tools = () => {
           <BiSolidBrush />
         ) : (
           <BiRegularBrush />
+        )}
+      </button>
+      <button
+        class="menu-btn"
+        classList={{
+          active: project?.().activeTool() === ACTIVATE_TOOL.DELETE,
+        }}
+        onClick={() => {
+          project?.().setActiveTool(ACTIVATE_TOOL.DELETE);
+        }}
+      >
+        {project?.().activeTool() === ACTIVATE_TOOL.DELETE ? (
+          <BiSolidEraser />
+        ) : (
+          <BiRegularEraser />
         )}
       </button>
     </div>
