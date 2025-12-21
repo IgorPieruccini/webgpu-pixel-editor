@@ -10,6 +10,15 @@
         width: 100%;
     }
 
+    button {
+        stroke: none;
+        border: none;
+    }
+
+    button:focus {
+        outline: none;
+    }
+
     .menu-btn {
         width: 56px;
         height: 56px;
@@ -24,7 +33,8 @@
     }
 
     .active {
-        border: 2px solid white;
+        /*border: 2px solid white;*/
+        background-color: #402d53;
     }
 }
 

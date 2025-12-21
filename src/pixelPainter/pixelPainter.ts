@@ -150,7 +150,7 @@ export const pixelPainter = async (
       }
 
       if (layer.id === activeLayer().id) {
-        drawPreview(buffer);
+        drawPreview(buffer, layer.opacity);
       }
 
       if (index !== 0) {
