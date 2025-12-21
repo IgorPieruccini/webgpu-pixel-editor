@@ -22,7 +22,9 @@ export const pixelPainter = async (
 
   let stringLayers = window.localStorage.getItem(`${projectName}-layers`);
   if (!stringLayers) {
-    const l: Layers = [{ id: generateUUID(), name: "Layer", display: true }];
+    const l: Layers = [
+      { id: generateUUID(), name: "Layer", display: true, opacity: 1 },
+    ];
     stringLayers = JSON.stringify(l);
     window.localStorage.setItem(`${projectName}-layers`, stringLayers);
   }
@@ -36,7 +38,7 @@ export const pixelPainter = async (
     );
   }
 
-  const [activeLayerId, setActiveLayerId] = createSignal<string>(firstLayer.id);
+  const [activeLayer, setActiveLayer] = createSignal<Layer>(firstLayer);
 
   let currentBufferLayer: Uint32Array<ArrayBuffer>;
 
@@ -129,6 +131,7 @@ export const pixelPainter = async (
       selectedCells.z,
       selectedCells.w,
       1, // is first layer boolean
+      1, // opacity
     ]);
 
     pass.setPipeline(cellPipeline);
@@ -146,7 +149,7 @@ export const pixelPainter = async (
         throw new Error(`Layer buffer with id ${layer.id} not found`);
       }
 
-      if (layer.id === activeLayerId()) {
+      if (layer.id === activeLayer().id) {
         drawPreview(buffer);
       }
 
@@ -154,6 +157,8 @@ export const pixelPainter = async (
         // set to false if not the first layer
         bindValues[13] = 0;
       }
+
+      bindValues[14] = layer.opacity;
 
       pass.setBindGroup(0, createBind("bindValues", bindValues, 0));
       pass.setBindGroup(1, createBind("colors", buffer, 1));
@@ -188,21 +193,23 @@ export const pixelPainter = async (
   const paintPixel = (cellPos: { x: number; y: number }) => {
     const arrayIndex = cellPos.x + cellPos.y * gridSize;
     currentBufferLayer[arrayIndex] = currentColorSelected;
-    db.save(currentBufferLayer, activeLayerId());
+    db.save(currentBufferLayer, activeLayer().id);
   };
 
   const deletePixel = (cellPos: { x: number; y: number }) => {
     const arrayIndex = cellPos.x + cellPos.y * gridSize;
     currentBufferLayer[arrayIndex] = 0;
-    db.save(currentBufferLayer, activeLayerId());
+    db.save(currentBufferLayer, activeLayer().id);
   };
 
   const addLayer = () => {
     const currentLayers = layers();
 
-    const layer = {
+    const layer: Layer = {
       id: generateUUID(),
       name: `Layer`,
+      display: true,
+      opacity: 1,
     };
 
     const _layers: Layers = [...currentLayers, layer];
@@ -214,7 +221,7 @@ export const pixelPainter = async (
 
     setLayers(_layers);
 
-    setActiveLayerId(layer.id);
+    setActiveLayer(layer);
     const newBuffer = new Uint32Array(gridSize * gridSize);
     layersBuffer.set(layer.id, newBuffer);
     currentBufferLayer = newBuffer;
@@ -230,15 +237,15 @@ export const pixelPainter = async (
 
     const index = _layers.findIndex((layer) => layer.id === id);
     const newActiveLayerIndex = index >= 1 ? index - 1 : index + 1;
-    const newActiveLayerId = _layers[newActiveLayerIndex].id;
+    const newActiveLayer = _layers[newActiveLayerIndex];
 
     // re-assign current layer id
-    if (activeLayerId() === id) {
-      setActiveLayerId(newActiveLayerId);
-      const newBuffer = layersBuffer.get(newActiveLayerId);
+    if (activeLayer().id === id) {
+      setActiveLayer(newActiveLayer);
+      const newBuffer = layersBuffer.get(newActiveLayer.id);
       if (!newBuffer) {
         throw new Error(
-          `layer buffer with id ${newActiveLayerId} could not be found`,
+          `layer buffer with id ${newActiveLayer} could not be found`,
         );
       }
       currentBufferLayer = newBuffer;
@@ -286,7 +293,7 @@ export const pixelPainter = async (
 
   const renameLayer = (name: string) => {
     const _layers = layers().map((layer: Layer) => {
-      if (layer.id === activeLayerId()) {
+      if (layer.id === activeLayer().id) {
         return {
           ...layer,
           name,
@@ -326,12 +333,46 @@ export const pixelPainter = async (
   };
 
   const selectLayer = (layerId: string) => {
-    setActiveLayerId(layerId);
+    const layer = layers().find((layer) => layer.id === layerId);
+    if (!layer) {
+      throw new Error(`Could not find current layer bt id ${layerId}`);
+    }
+
+    setActiveLayer(layer);
+
     const buffer = layersBuffer.get(layerId);
     if (!buffer) {
       throw new Error(`Could not find buffer corresponded to id: ${layerId}`);
     }
     currentBufferLayer = buffer;
+  };
+
+  const setLayerOpacity = (layerId: string, opacity: number) => {
+    const _layers = [...layers()];
+
+    const newLayers = _layers.map((layer) => {
+      if (layer.id === layerId) {
+        return {
+          ...layer,
+          opacity,
+        };
+      }
+      return layer;
+    });
+
+    setLayers(newLayers);
+
+    window.localStorage.setItem(
+      `${projectName}-layers`,
+      JSON.stringify(newLayers),
+    );
+
+    if (layerId === activeLayer().id) {
+      setActiveLayer({
+        ...activeLayer(),
+        opacity,
+      });
+    }
   };
 
   return {
@@ -348,6 +389,7 @@ export const pixelPainter = async (
     toggleLayerDisplay,
     getLayers: layers,
     selectLayer,
-    getActiveLayer: activeLayerId,
+    getActiveLayer: activeLayer,
+    setLayerOpacity,
   };
 };

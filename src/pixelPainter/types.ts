@@ -20,13 +20,15 @@ export type PixelPainterReturnType = {
   renameLayer: (name: string) => void;
   getLayers: Accessor<Layers>;
   selectLayer: (layerId: string) => void;
-  getActiveLayer: Accessor<string>;
+  getActiveLayer: Accessor<Layer>;
+  setLayerOpacity: (layerId: string, opacity: number) => void;
 };
 
 export type Layer = {
   id: string;
   name: string;
   display: boolean;
+  opacity: number;
 };
 
 export type Layers = Layer[];

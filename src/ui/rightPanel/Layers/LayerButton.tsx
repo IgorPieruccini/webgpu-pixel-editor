@@ -31,7 +31,8 @@ export const LayerButton = ({ layer }: LayerButtonProps) => {
       <button
         class={"layer-btn"}
         classList={{
-          "active-layer": projectConfig.pixel().getActiveLayer() === layer.id,
+          "active-layer":
+            projectConfig.pixel().getActiveLayer().id === layer.id,
         }}
         onClick={() => onSelectLayer(layer.id)}
       >

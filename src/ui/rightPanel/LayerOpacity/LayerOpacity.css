@@ -1,0 +1,17 @@
+#layer-opacity-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.layer-opacity-input-content {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    p {
+        font-size: 12px;
+    }
+
+    input {
+        flex: 1;
+    }
+}

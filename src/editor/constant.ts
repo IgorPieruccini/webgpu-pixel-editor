@@ -20,5 +20,11 @@ export const INITIAL_PIXEL_PAINTER: PixelPainterReturnType = {
   renameLayer: () => {},
   getLayers: () => [],
   selectLayer: () => {},
-  getActiveLayer: () => "",
+  getActiveLayer: () => ({
+    name: "",
+    opacity: 1,
+    display: true,
+    id: "",
+  }),
+  setLayerOpacity: () => {},
 };
