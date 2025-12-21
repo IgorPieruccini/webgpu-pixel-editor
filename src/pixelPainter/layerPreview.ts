@@ -23,7 +23,7 @@ export const createLayerPreview = async (gridSize: number) => {
 
   const { createBind } = bind(device, cellPipeline);
 
-  const drawPreview = (buffer: Uint32Array<ArrayBuffer>) => {
+  const drawPreview = (buffer: Uint32Array<ArrayBuffer>, opacity: number) => {
     // Provides an interface for recording GPU commands.
     const encoder = device.createCommandEncoder({
       label: "Grid encoder",
@@ -64,6 +64,7 @@ export const createLayerPreview = async (gridSize: number) => {
       0, // selectedCells.z,
       0, // selectedCells.w,
       1, // is first layer boolean
+      opacity,
     ]);
 
     pass.setPipeline(cellPipeline);
