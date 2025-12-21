@@ -13,6 +13,10 @@ export const RightPanel = () => {
     <div id="right-panel">
       <p>{projectConfig.projectName()}</p>
       <Layers />
+      <div id="layer-preview">
+        <p>Layer preview</p>
+        <canvas id="preview-canvas" width={300} height={300} />
+      </div>
     </div>
   );
 };

@@ -10,8 +10,18 @@
     #layers {
         display: flex;
         flex-direction: column;
-        justify-content: start;
+        justify-content: space-between;
         gap: 8px;
+        height: 400px;
+
+        #layer-slider {
+            display: flex;
+            flex-direction: column;
+            justify-content: start;
+            gap: 8px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
     }
 
     .active-layer {
@@ -24,5 +34,9 @@
         p {
             margin: 0;
         }
+    }
+
+    #layer-preview {
+        margin-top: 16px;
     }
 }

@@ -37,11 +37,13 @@ export const Layers = () => {
     <div id="layers">
       <DragDropProvider onDragEnd={onDragEnd} collisionDetector={closestCenter}>
         <DragDropSensors />
-        <SortableProvider ids={getLayerIds()}>
-          <For each={projectConfig.pixel().getLayers()}>
-            {(layer) => <LayerButton layer={layer}></LayerButton>}
-          </For>
-        </SortableProvider>
+        <div id="layer-slider">
+          <SortableProvider ids={getLayerIds()}>
+            <For each={projectConfig.pixel().getLayers()}>
+              {(layer) => <LayerButton layer={layer}></LayerButton>}
+            </For>
+          </SortableProvider>
+        </div>
       </DragDropProvider>
       <button onClick={onAddLayer}>
         <AiOutlinePlus />
