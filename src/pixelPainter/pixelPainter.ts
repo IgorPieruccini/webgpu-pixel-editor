@@ -22,7 +22,7 @@ export const pixelPainter = async (
 
   let stringLayers = window.localStorage.getItem(`${projectName}-layers`);
   if (!stringLayers) {
-    const l = [{ id: generateUUID(), name: "Layer" }];
+    const l: Layers = [{ id: generateUUID(), name: "Layer", display: true }];
     stringLayers = JSON.stringify(l);
     window.localStorage.setItem(`${projectName}-layers`, stringLayers);
   }
@@ -137,6 +137,10 @@ export const pixelPainter = async (
     let index = 0;
 
     for (const layer of layers()) {
+      if (!layer.display) {
+        continue;
+      }
+
       const buffer = layersBuffer.get(layer.id);
       if (!buffer) {
         throw new Error(`Layer buffer with id ${layer.id} not found`);
@@ -300,6 +304,27 @@ export const pixelPainter = async (
     setLayers(_layers);
   };
 
+  const toggleLayerDisplay = (id: string) => {
+    const _layers = [...layers()];
+
+    const newLayers = _layers.map((layer) => {
+      if (layer.id === id) {
+        return {
+          ...layer,
+          display: !layer.display,
+        };
+      }
+      return layer;
+    });
+
+    setLayers(newLayers);
+
+    window.localStorage.setItem(
+      `${projectName}-layers`,
+      JSON.stringify(newLayers),
+    );
+  };
+
   const selectLayer = (layerId: string) => {
     setActiveLayerId(layerId);
     const buffer = layersBuffer.get(layerId);
@@ -320,6 +345,7 @@ export const pixelPainter = async (
     sortLayers,
     removeLayer,
     renameLayer,
+    toggleLayerDisplay,
     getLayers: layers,
     selectLayer,
     getActiveLayer: activeLayerId,

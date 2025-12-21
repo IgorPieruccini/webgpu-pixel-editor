@@ -3,6 +3,7 @@ import type { Layer } from "../../../pixelPainter/types";
 import { useProjectConfig } from "../../../projectConfig/projectConfigProvider";
 import { DeleteLayerButton } from "./DeleteLayerButton";
 import { LayerTitle } from "./LayerTitle";
+import { DisplayLayerToggle } from "./DisplayLayerToggle";
 
 type LayerButtonProps = {
   layer: Layer;
@@ -35,7 +36,11 @@ export const LayerButton = ({ layer }: LayerButtonProps) => {
         onClick={() => onSelectLayer(layer.id)}
       >
         <LayerTitle layerName={layer.name} />
-        <DeleteLayerButton layerId={layer.id} />
+
+        <div class="layer-opt-btn">
+          <DisplayLayerToggle layer={layer} />
+          <DeleteLayerButton layerId={layer.id} />
+        </div>
       </button>
     </div>
   );

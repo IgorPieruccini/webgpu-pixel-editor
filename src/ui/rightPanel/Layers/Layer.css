@@ -14,3 +14,16 @@
 .opacity-50 {
     opacity: 50%;
 }
+
+.layer-opt-btn {
+    display: flex;
+    background: none;
+    gap: 8px;
+}
+
+.layer-display-toggle {
+    width: 20px;
+    height: 20px;
+    background: none;
+    padding: 0;
+}

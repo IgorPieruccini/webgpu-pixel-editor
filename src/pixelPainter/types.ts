@@ -15,6 +15,7 @@ export type PixelPainterReturnType = {
   getCurrentColor: Accessor<string>;
   addLayer: () => void;
   removeLayer: (id: string) => void;
+  toggleLayerDisplay: (id: string) => void;
   sortLayers: (dragged: string, dropped: string) => void;
   renameLayer: (name: string) => void;
   getLayers: Accessor<Layers>;
@@ -25,6 +26,7 @@ export type PixelPainterReturnType = {
 export type Layer = {
   id: string;
   name: string;
+  display: boolean;
 };
 
 export type Layers = Layer[];
