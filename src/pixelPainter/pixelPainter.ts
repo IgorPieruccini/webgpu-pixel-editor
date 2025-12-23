@@ -140,10 +140,6 @@ export const pixelPainter = async (
     let index = 0;
 
     for (const layer of layers()) {
-      if (!layer.display) {
-        continue;
-      }
-
       const buffer = layersBuffer.get(layer.id);
       if (!buffer) {
         throw new Error(`Layer buffer with id ${layer.id} not found`);
@@ -151,6 +147,10 @@ export const pixelPainter = async (
 
       if (layer.id === activeLayer().id) {
         drawPreview(buffer, layer.opacity);
+      }
+
+      if (!layer.display) {
+        continue;
       }
 
       if (index !== 0) {
