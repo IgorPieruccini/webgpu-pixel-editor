@@ -1,5 +1,6 @@
 import type { Accessor } from "solid-js";
 import type { Vec2, Vec4 } from "../editor/types";
+import type { Setter } from "solid-js/types/server/reactive.js";
 
 export type PixelPainterReturnType = {
   drawFrame: (
@@ -22,6 +23,8 @@ export type PixelPainterReturnType = {
   selectLayer: (layerId: string) => void;
   getActiveLayer: Accessor<Layer>;
   setLayerOpacity: (layerId: string, opacity: number) => void;
+  getBrushOpacity: Accessor<number>;
+  setBrushOpacity: Setter<number>;
 };
 
 export type Layer = {

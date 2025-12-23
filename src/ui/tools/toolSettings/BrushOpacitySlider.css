@@ -1,0 +1,12 @@
+#brush-opacity-container {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    p {
+        font-size: 12px;
+    }
+
+    input {
+        flex: 1;
+    }
+}

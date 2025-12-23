@@ -29,3 +29,10 @@ export const bind = (device: GPUDevice, pipeline: GPURenderPipeline) => {
     createBind,
   };
 };
+
+export const percentToHexAlpha = (percent: number) => {
+  if (percent < 0) percent = 0;
+  if (percent > 100) percent = 100;
+  const alpha = Math.round((percent / 100) * 255);
+  return "0x" + alpha.toString(16).padStart(2, "0").toUpperCase();
+};

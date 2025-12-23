@@ -2,7 +2,7 @@ import "./App.css";
 import { ProjectConfigProvider } from "./projectConfig/projectConfigProvider";
 import { MenuPanels } from "./ui/menuPanels";
 import { RightPanel } from "./ui/rightPanel/rightPanel";
-import { Tools } from "./ui/tools";
+import { Tools, ToolSettings } from "./ui/tools";
 import { MenuProvider } from "./ui/tools/menuProvider";
 
 function App() {
@@ -11,6 +11,7 @@ function App() {
       <MenuProvider>
         <ProjectConfigProvider>
           <div class="row">
+            <ToolSettings />
             <Tools />
             <canvas id="main-canvas" width={1280} height={1280} />
             <RightPanel />

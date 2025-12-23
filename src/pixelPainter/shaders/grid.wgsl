@@ -12,11 +12,14 @@ struct VertexOutput {
 };
 
 fn unpack_rgba(color: u32, opacity: f32) -> vec4<f32> {
+
     let r = f32((color >> 16u) & 0xFFu) / 255.0;
     let g = f32((color >> 8u) & 0xFFu) / 255.0;
     let b = f32(color & 0xFFu) / 255.0;
-    let a = f32(opacity);
-    return vec4<f32>(r, g, b, a);
+    let a = f32(color >> 24) / 255;
+    let layerOpacity = f32(opacity);
+
+    return vec4<f32>(r, g, b,  a * layerOpacity);
 }
 
 @vertex

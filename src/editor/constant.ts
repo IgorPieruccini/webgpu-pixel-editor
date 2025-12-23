@@ -1,3 +1,4 @@
+import type { Setter } from "solid-js";
 import type { PixelPainterReturnType } from "../pixelPainter/types";
 
 export const ACTIVATE_TOOL = {
@@ -27,4 +28,6 @@ export const INITIAL_PIXEL_PAINTER: PixelPainterReturnType = {
     id: "",
   }),
   setLayerOpacity: () => {},
+  getBrushOpacity: () => 100,
+  setBrushOpacity: (() => {}) as unknown as Setter<number>,
 };

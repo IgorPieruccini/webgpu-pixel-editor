@@ -1,15 +1,15 @@
 /// <reference types="@webgpu/types" />
 
+import { createSignal } from "solid-js";
 import { localDataBase } from "../storage";
 import { generateUUID } from "../utils";
-import type { Layer, Layers, PixelPainterReturnType } from "./types";
-import { bind } from "./utils";
-import { createSignal } from "solid-js";
-import { webGPUSetup } from "./webGPUSetup";
 import { createVertexBuffer } from "./createBufferLayout";
-import { createShadeModule } from "./createShaderModule";
 import { createPipeline } from "./createPipeline";
+import { createShadeModule } from "./createShaderModule";
 import { createLayerPreview } from "./layerPreview";
+import type { Layer, Layers, PixelPainterReturnType } from "./types";
+import { bind, percentToHexAlpha } from "./utils";
+import { webGPUSetup } from "./webGPUSetup";
 
 export const pixelPainter = async (
   projectName: string,
@@ -68,8 +68,11 @@ export const pixelPainter = async (
 
   currentBufferLayer = firstBuffer;
 
+  // TODO: merge this two colors
   let currentColorSelected: number = 0xff00ff;
   const colorStore = createSignal("#ff00ff");
+
+  const [getBrushOpacity, setBrushOpacity] = createSignal(100);
 
   const { vertices, vertexBuffer, vertexBufferLayout } =
     createVertexBuffer(device);
@@ -107,7 +110,7 @@ export const pixelPainter = async (
           view: context.getCurrentTexture().createView(),
           loadOp: "clear",
           storeOp: "store",
-          clearValue: { r: 0.13, g: 0.13, b: 0.13, a: 0 },
+          clearValue: { r: 0.08, g: 0.08, b: 0.08, a: 0 },
         },
       ],
     });
@@ -192,7 +195,12 @@ export const pixelPainter = async (
 
   const paintPixel = (cellPos: { x: number; y: number }) => {
     const arrayIndex = cellPos.x + cellPos.y * gridSize;
-    currentBufferLayer[arrayIndex] = currentColorSelected;
+
+    const alpha = parseInt(percentToHexAlpha(getBrushOpacity()));
+
+    const rgba = (alpha << 24) | currentColorSelected;
+
+    currentBufferLayer[arrayIndex] = rgba;
     db.save(currentBufferLayer, activeLayer().id);
   };
 
@@ -391,5 +399,7 @@ export const pixelPainter = async (
     selectLayer,
     getActiveLayer: activeLayer,
     setLayerOpacity,
+    getBrushOpacity,
+    setBrushOpacity,
   };
 };
