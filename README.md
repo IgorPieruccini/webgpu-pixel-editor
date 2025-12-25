@@ -23,9 +23,8 @@ It correctly bundles Solid in production mode and optimizes the build for the be
 The build is minified and the filenames include the hashes.<br>
 Your app is ready to be deployed!
 
-### First Pixelart ever created with this editor 😝
-<img width="863" height="867" alt="Screenshot 2025-11-08 at 21 38 48" src="https://github.com/user-attachments/assets/3a02f9a1-3a9d-4dde-89cb-ade8af0228ae" />
-<img width="550" height="549" alt="Screenshot 2025-11-07 at 20 32 11" src="https://github.com/user-attachments/assets/9bbcfa00-0f15-40a3-a0ec-936099321e1d" />
+### Dev Gallery 😝
+<img width="488" height="495" alt="Screenshot 2025-12-25 at 22 28 25" src="https://github.com/user-attachments/assets/bb0fa136-9f89-461f-94a0-d81df5b5d728" />
 
 
 
