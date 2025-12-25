@@ -19,8 +19,17 @@ export const pixelPainter = async (
   const alphaLayer = new Uint32Array(gridSize * gridSize);
 
   const { device, canvasFormat, context } = await webGPUSetup("main-canvas");
+  const canvas = document.querySelector<HTMLCanvasElement>("#" + "main-canvas");
+  if (!canvas) {
+    throw new Error("Could not find main canvas");
+  }
 
   const { drawPreview } = await createLayerPreview(gridSize);
+
+  const currentPaintedPixels = new Set<number>();
+  canvas.addEventListener("mouseup", () => {
+    currentPaintedPixels.clear();
+  });
 
   let stringLayers = window.localStorage.getItem(`${projectName}-layers`);
   if (!stringLayers) {
@@ -201,6 +210,10 @@ export const pixelPainter = async (
   const paintPixel = (cellPos: { x: number; y: number }) => {
     const arrayIndex = cellPos.x + cellPos.y * gridSize;
 
+    if (currentPaintedPixels.has(arrayIndex)) {
+      return;
+    }
+
     let destColor = currentBufferLayer.at(arrayIndex) ?? 0xffffffff;
 
     const destRGBA =
@@ -217,6 +230,8 @@ export const pixelPainter = async (
 
     currentBufferLayer[arrayIndex] = blendedHex;
     db.save(currentBufferLayer, activeLayer().id);
+
+    currentPaintedPixels.add(arrayIndex);
   };
 
   const deletePixel = (cellPos: { x: number; y: number }) => {
