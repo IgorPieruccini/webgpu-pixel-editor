@@ -93,8 +93,32 @@ fn fragmentMain(
     let gridSize = vec2f(bindValues[0], bindValues[1]) ;
     let colorIndex = u32(cellPos.x + cellPos.y * gridSize.x);
     let color = colors[colorIndex];
+    let alphaLayer = bindValues[13];
     let opacity = bindValues[14];
     let rgba = unpack_rgba(color, opacity);
+
+    if(alphaLayer == 1) {
+        if (cellPos.x % 2 == 1) {
+            if (cellPos.y % 2 == 0) {
+                return vec4f(0.9, 0.9, 0.9, 1.0);
+            }
+
+            if (cellPos.y % 2 ==1) {
+                return vec4f(1, 1, 1, 1);
+            }
+        }
+
+        if(cellPos.x % 2 == 0) {
+            if (cellPos.y % 2 == 0) {
+                return vec4f(1, 1, 1, 1);
+            }
+
+            if (cellPos.y % 2 ==1) {
+                return vec4f(0.9, 0.9, 0.9, 1.0);
+           }
+        }
+
+    }
 
     if (isSelected == 1) {
        let bluesh = vec4f(0.95, 0.95, 0.95, 1.0);
@@ -113,31 +137,33 @@ fn fragmentMain(
 
 
     if (color == 0) {
-      if(bindValues[13] == 1) {
-        if (cellPos.x % 2 == 1) {
-                if (cellPos.y % 2 == 0) {
-                    return vec4f(0.9, 0.9, 0.9, 1.0);
-                }
-
-                if (cellPos.y % 2 ==1) {
-                    return vec4f(1, 1, 1, 1);
-                }
-            }
-
-            if(cellPos.x % 2 == 0) {
-                if (cellPos.y % 2 == 0) {
-                    return vec4f(1, 1, 1, 1);
-                }
-
-                if (cellPos.y % 2 ==1) {
-                    return vec4f(0.9, 0.9, 0.9, 1.0);
-                }
-            }
-        } else {
-            return vec4f(1.0, 1.0, 1.0, 0.0);
-       }
-
+        return vec4f(1.0, 1.0, 1.0, 0.0);
     }
 
     return rgba;
-}
+
+
+    /**
+    if(bindValues[13] == 1) {
+            if (cellPos.x % 2 == 1) {
+                    if (cellPos.y % 2 == 0) {
+                        return vec4f(0.9, 0.9, 0.9, 1.0);
+                    }
+
+                    if (cellPos.y % 2 ==1) {
+                        return vec4f(1, 1, 1, 1);
+                    }
+                }
+
+                if(cellPos.x % 2 == 0) {
+                    if (cellPos.y % 2 == 0) {
+                        return vec4f(1, 1, 1, 1);
+                    }
+
+                    if (cellPos.y % 2 ==1) {
+                        return vec4f(0.9, 0.9, 0.9, 1.0);
+                    }
+                }
+            }
+
+    */}

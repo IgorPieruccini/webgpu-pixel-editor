@@ -70,6 +70,12 @@ export const createLayerPreview = async (gridSize: number) => {
     pass.setPipeline(cellPipeline);
     pass.setVertexBuffer(0, vertexBuffer);
 
+    // DRAW ALPHA_LAYER
+    pass.setBindGroup(0, createBind("bindValues", bindValues, 0));
+    pass.setBindGroup(1, createBind("colors", buffer, 1));
+    pass.draw(vertices.length / 2, gridSize * gridSize); // 6 vertices and draw several times
+    bindValues[13] = 0;
+
     pass.setBindGroup(0, createBind("bindValues", bindValues, 0));
     pass.setBindGroup(1, createBind("colors", buffer, 1));
 

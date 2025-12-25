@@ -16,6 +16,8 @@ export const pixelPainter = async (
   gridSize: number,
   canvasSize: { x: number; y: number },
 ): Promise<PixelPainterReturnType> => {
+  const alphaLayer = new Uint32Array(gridSize * gridSize);
+
   const { device, canvasFormat, context } = await webGPUSetup("main-canvas");
 
   const { drawPreview } = await createLayerPreview(gridSize);
@@ -142,6 +144,14 @@ export const pixelPainter = async (
 
     let index = 0;
 
+    // DRAW ALPHA LAYER
+    pass.setBindGroup(0, createBind("bindValues", bindValues, 0));
+    pass.setBindGroup(1, createBind("colors", alphaLayer, 1));
+
+    pass.draw(vertices.length / 2, gridSize * gridSize); // 6 vertices and draw several times
+
+    bindValues[13] = 0;
+
     for (const layer of layers()) {
       const buffer = layersBuffer.get(layer.id);
       if (!buffer) {
@@ -154,11 +164,6 @@ export const pixelPainter = async (
 
       if (!layer.display) {
         continue;
-      }
-
-      if (index !== 0) {
-        // set to false if not the first layer
-        bindValues[13] = 0;
       }
 
       bindValues[14] = layer.opacity;
