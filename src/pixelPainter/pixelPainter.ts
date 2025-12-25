@@ -8,7 +8,7 @@ import { createPipeline } from "./createPipeline";
 import { createShadeModule } from "./createShaderModule";
 import { createLayerPreview } from "./layerPreview";
 import type { Layer, Layers, PixelPainterReturnType } from "./types";
-import { bind, percentToHexAlpha } from "./utils";
+import { alphaComposite, bind, numberToRGBA, rgbaToHex } from "./utils";
 import { webGPUSetup } from "./webGPUSetup";
 
 export const pixelPainter = async (
@@ -196,11 +196,21 @@ export const pixelPainter = async (
   const paintPixel = (cellPos: { x: number; y: number }) => {
     const arrayIndex = cellPos.x + cellPos.y * gridSize;
 
-    const alpha = parseInt(percentToHexAlpha(getBrushOpacity()));
+    let destColor = currentBufferLayer.at(arrayIndex) ?? 0xffffffff;
 
-    const rgba = (alpha << 24) | currentColorSelected;
+    const destRGBA =
+      destColor === 0
+        ? { r: 255, g: 255, b: 255, a: 0 }
+        : numberToRGBA(destColor);
 
-    currentBufferLayer[arrayIndex] = rgba;
+    const sourceRGBA = numberToRGBA(currentColorSelected);
+    sourceRGBA.a = getBrushOpacity() / 100;
+
+    const blendedRGBA = alphaComposite(sourceRGBA, destRGBA);
+
+    const blendedHex = rgbaToHex(blendedRGBA);
+
+    currentBufferLayer[arrayIndex] = blendedHex;
     db.save(currentBufferLayer, activeLayer().id);
   };
 
