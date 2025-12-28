@@ -12,13 +12,13 @@ import { ProjectContext, editorInitialValue } from "../editor/editortContext";
 import { type EditorContextType } from "../editor/types";
 import { useMenu } from "../ui/tools/menuProvider";
 import { INITIAL_PIXEL_PAINTER } from "../editor/constant";
-import type { PixelPainterReturnType } from "../pixelPainter/types";
+import type { PixelPainterMethods } from "../pixelPainter/types";
 
 type ProjectConfigContextType = {
   projectName: Accessor<string>;
   setProjectName: Setter<string>;
   createNewProject: (name: string) => void;
-  pixel: Accessor<PixelPainterReturnType>;
+  pixel: Accessor<PixelPainterMethods>;
 };
 
 const initialProjectConfig: ProjectConfigContextType = {
@@ -42,7 +42,7 @@ export const ProjectConfigProvider = (props: ProjectConfigProviderProps) => {
   const [projectName, setProjectName] = createSignal("new-project");
   const [project, setProject] =
     createSignal<EditorContextType>(editorInitialValue);
-  const [pixel, setPixel] = createSignal<PixelPainterReturnType>(
+  const [pixel, setPixel] = createSignal<PixelPainterMethods>(
     INITIAL_PIXEL_PAINTER,
   );
 

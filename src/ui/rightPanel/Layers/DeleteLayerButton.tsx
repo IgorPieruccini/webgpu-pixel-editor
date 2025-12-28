@@ -10,7 +10,7 @@ export const DeleteLayerButton = ({ layerId }: DeleteLayerButtonProps) => {
 
   const onDelete = (e: MouseEvent) => {
     e.stopPropagation();
-    projectConfig.pixel().removeLayer(layerId);
+    projectConfig.pixel().layer.remove(layerId);
   };
 
   return (

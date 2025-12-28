@@ -16,9 +16,9 @@ export const createLayerHandler = async (
     window.localStorage.setItem(`${projectName}-layers`, stringLayers);
   }
 
-  const [get, set] = createSignal<Layers>(JSON.parse(stringLayers));
+  const [getList, setList] = createSignal<Layers>(JSON.parse(stringLayers));
 
-  const firstLayer = get().at(0);
+  const firstLayer = getList().at(0);
   if (!firstLayer) {
     throw new Error(
       "Pixel Painter must be initialized at least with one layer",
@@ -30,7 +30,7 @@ export const createLayerHandler = async (
   const buffers: Map<string, Uint32Array<ArrayBuffer>> = new Map();
   const db = await localDataBase(projectName);
 
-  for (const layer of get()) {
+  for (const layer of getList()) {
     try {
       const layerBuffer = await db.load(layer.id);
       if (layerBuffer) {
@@ -53,8 +53,8 @@ export const createLayerHandler = async (
   const [getCurrentBuffer, setCurrentBuffer] =
     createSignal<Uint32Array<ArrayBuffer>>(firstBuffer);
 
-  const addLayer = () => {
-    const layers = get();
+  const add = () => {
+    const layers = getList();
 
     const layer: Layer = {
       id: generateUUID(),
@@ -64,7 +64,7 @@ export const createLayerHandler = async (
     };
 
     const _layers: Layers = [...layers, layer];
-    set(_layers);
+    setList(_layers);
 
     window.localStorage.setItem(
       `${projectName}-layers`,
@@ -79,8 +79,8 @@ export const createLayerHandler = async (
     setCurrentBuffer(newBuffer);
   };
 
-  const removeLayer = (id: string) => {
-    const _layers = [...get()];
+  const remove = (id: string) => {
+    const _layers = [...getList()];
 
     if (_layers.length === 1) {
       // At least one layer per project needs to exist
@@ -104,7 +104,7 @@ export const createLayerHandler = async (
     }
 
     _layers.splice(index, 1);
-    set(_layers);
+    setList(_layers);
     buffers.delete(id);
 
     window.localStorage.setItem(
@@ -113,8 +113,8 @@ export const createLayerHandler = async (
     );
   };
 
-  const sortLayers = (dragged: string, dropped: string) => {
-    const _layers = [...get()];
+  const sort = (dragged: string, dropped: string) => {
+    const _layers = [...getList()];
 
     let draggedIndex = 0;
     let droppedIndex = 0;
@@ -135,7 +135,7 @@ export const createLayerHandler = async (
     const second = _layers.slice(droppedIndex, _layers.length);
     const newLayers = [...first, ...draggedLayer, ...second];
 
-    set(newLayers);
+    setList(newLayers);
 
     window.localStorage.setItem(
       `${projectName}-layers`,
@@ -143,8 +143,8 @@ export const createLayerHandler = async (
     );
   };
 
-  const renameLayer = (name: string) => {
-    const _layers = get().map((layer: Layer) => {
+  const rename = (name: string) => {
+    const _layers = getList().map((layer: Layer) => {
       if (layer.id === getActive().id) {
         return {
           ...layer,
@@ -160,11 +160,11 @@ export const createLayerHandler = async (
       JSON.stringify(_layers),
     );
 
-    set(_layers);
+    setList(_layers);
   };
 
-  const toggleLayerDisplay = (id: string) => {
-    const _layers = [...get()];
+  const toggleDisplay = (id: string) => {
+    const _layers = [...getList()];
 
     const newLayers = _layers.map((layer) => {
       if (layer.id === id) {
@@ -176,7 +176,7 @@ export const createLayerHandler = async (
       return layer;
     });
 
-    set(newLayers);
+    setList(newLayers);
 
     window.localStorage.setItem(
       `${projectName}-layers`,
@@ -184,8 +184,8 @@ export const createLayerHandler = async (
     );
   };
 
-  const selectLayer = (layerId: string) => {
-    const layer = get().find((layer) => layer.id === layerId);
+  const select = (layerId: string) => {
+    const layer = getList().find((layer) => layer.id === layerId);
     if (!layer) {
       throw new Error(`Could not find current layer bt id ${layerId}`);
     }
@@ -200,8 +200,8 @@ export const createLayerHandler = async (
     setCurrentBuffer(buffer);
   };
 
-  const setLayerOpacity = (layerId: string, opacity: number) => {
-    const _layers = [...get()];
+  const setOpacity = (layerId: string, opacity: number) => {
+    const _layers = [...getList()];
 
     const newLayers = _layers.map((layer) => {
       if (layer.id === layerId) {
@@ -213,7 +213,7 @@ export const createLayerHandler = async (
       return layer;
     });
 
-    set(newLayers);
+    setList(newLayers);
 
     window.localStorage.setItem(
       `${projectName}-layers`,
@@ -233,24 +233,17 @@ export const createLayerHandler = async (
   };
 
   return {
-    // methods exposed to the editor (ui)
-    publicMethods: {
-      addLayer,
-      removeLayer,
-      sortLayers,
-      renameLayer,
-      toggleLayerDisplay,
-      selectLayer,
-      setLayerOpacity,
-      getLayers: get,
-      getActiveLayer: getActive,
-    },
-
-    // methods used within pixelPainter
+    add,
+    remove,
+    sort,
+    rename,
+    toggleDisplay,
+    select,
+    setOpacity,
+    getList,
+    getActive,
     saveCurrentBuffer,
-    setActive,
     getCurrentBuffer,
-    setCurrentBuffer,
     buffers,
   };
 };

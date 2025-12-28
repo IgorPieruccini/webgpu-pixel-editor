@@ -17,7 +17,7 @@ export const LayerButton = ({ layer }: LayerButtonProps) => {
   const state = dropDownContext[0];
 
   const onSelectLayer = (layerId: string) => {
-    projectConfig.pixel().selectLayer(layerId);
+    projectConfig.pixel().layer.select(layerId);
   };
 
   return (
@@ -32,7 +32,7 @@ export const LayerButton = ({ layer }: LayerButtonProps) => {
         class={"layer-btn"}
         classList={{
           "active-layer":
-            projectConfig.pixel().getActiveLayer().id === layer.id,
+            projectConfig.pixel().layer.getActive().id === layer.id,
         }}
         onClick={() => onSelectLayer(layer.id)}
       >

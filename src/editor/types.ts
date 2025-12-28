@@ -1,11 +1,11 @@
 import type { Accessor, Setter } from "solid-js";
 import type { ACTIVATE_TOOL } from "./constant";
-import type { PixelPainterReturnType } from "../pixelPainter/types";
+import type { PixelPainterMethods } from "../pixelPainter/types";
 
 export type EditorContextType = {
   activeTool: Accessor<number>;
   setActiveTool: Setter<number>;
-  createNewPainter: (name: string) => Promise<PixelPainterReturnType>;
+  createNewPainter: (name: string) => Promise<PixelPainterMethods>;
 };
 
 export type ToolType = keyof typeof ACTIVATE_TOOL;

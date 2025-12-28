@@ -15,13 +15,13 @@ export const Layers = () => {
   const projectConfig = useProjectConfig();
 
   const onAddLayer = () => {
-    projectConfig.pixel().addLayer();
+    projectConfig.pixel().layer.add();
   };
 
   const getLayerIds = () => {
     return projectConfig
       .pixel()
-      .getLayers()
+      .layer.getList()
       .map((layer) => layer.id);
   };
 
@@ -29,7 +29,7 @@ export const Layers = () => {
     if (event.droppable) {
       projectConfig
         .pixel()
-        .sortLayers(event.draggable.id as string, event.droppable.id as string);
+        .layer.sort(event.draggable.id as string, event.droppable.id as string);
     }
   };
 
@@ -39,7 +39,7 @@ export const Layers = () => {
         <DragDropSensors />
         <div id="layer-slider">
           <SortableProvider ids={getLayerIds()}>
-            <For each={projectConfig.pixel().getLayers()}>
+            <For each={projectConfig.pixel().layer.getList()}>
               {(layer) => <LayerButton layer={layer}></LayerButton>}
             </For>
           </SortableProvider>

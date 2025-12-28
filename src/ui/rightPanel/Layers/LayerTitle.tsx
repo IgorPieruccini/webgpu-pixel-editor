@@ -38,7 +38,7 @@ export const LayerTitle = ({ layerName }: LayerTitleProps) => {
   };
 
   const finishEditing = () => {
-    projectSettings.pixel().renameLayer(name());
+    projectSettings.pixel().layer.rename(name());
     setIsEditing(false);
   };
 

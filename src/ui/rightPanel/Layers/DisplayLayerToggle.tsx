@@ -11,7 +11,7 @@ export const DisplayLayerToggle = ({ layer }: DisplayLayerToggleProps) => {
 
   const onToggleDisplay = (e: MouseEvent) => {
     e.preventDefault();
-    projectConfig.pixel().toggleLayerDisplay(layer.id);
+    projectConfig.pixel().layer.toggleDisplay(layer.id);
   };
 
   return (

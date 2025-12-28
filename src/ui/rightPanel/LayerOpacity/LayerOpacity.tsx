@@ -6,7 +6,7 @@ export const LayerOpacity = () => {
 
   const onChangeOpacity = (e: InputEvent) => {
     if (e.target) {
-      const activeLayerId = projectConfig.pixel().getActiveLayer().id;
+      const activeLayerId = projectConfig.pixel().layer.getActive().id;
 
       projectConfig
         .pixel()
@@ -24,11 +24,11 @@ export const LayerOpacity = () => {
           type="range"
           min={0}
           max={100}
-          value={projectConfig.pixel().getActiveLayer().opacity * 100}
+          value={projectConfig.pixel().layer.getActive().opacity * 100}
           onInput={onChangeOpacity}
         />
         <p>
-          {Math.floor(projectConfig.pixel().getActiveLayer().opacity * 100)}%
+          {Math.floor(projectConfig.pixel().layer.getActive().opacity * 100)}%
         </p>
       </div>
     </div>

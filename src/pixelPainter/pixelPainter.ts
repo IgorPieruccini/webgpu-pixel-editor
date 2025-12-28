@@ -5,7 +5,6 @@ import { createVertexBuffer } from "./createBufferLayout";
 import { createPipeline } from "./createPipeline";
 import { createShadeModule } from "./createShaderModule";
 import { createLayerPreview } from "./layerPreview";
-import type { PixelPainterReturnType } from "./types";
 import { alphaComposite, bind, numberToRGBA, rgbaToHex } from "./utils";
 import { webGPUSetup } from "./webGPUSetup";
 import { createLayerHandler } from "./handlers/layerHandler";
@@ -14,7 +13,7 @@ export const pixelPainter = async (
   projectName: string,
   gridSize: number,
   canvasSize: { x: number; y: number },
-): Promise<PixelPainterReturnType> => {
+) => {
   const alphaLayer = new Uint32Array(gridSize * gridSize);
 
   const { device, canvasFormat, context } = await webGPUSetup("main-canvas");
@@ -114,13 +113,13 @@ export const pixelPainter = async (
 
     bindValues[13] = 0;
 
-    for (const layer of layerHandler.publicMethods.getLayers()) {
+    for (const layer of layerHandler.getList()) {
       const buffer = layerHandler.buffers.get(layer.id);
       if (!buffer) {
         throw new Error(`Layer buffer with id ${layer.id} not found`);
       }
 
-      if (layer.id === layerHandler.publicMethods.getActiveLayer().id) {
+      if (layer.id === layerHandler.getActive().id) {
         drawPreview(buffer, layer.opacity);
       }
 
@@ -195,13 +194,23 @@ export const pixelPainter = async (
   };
 
   return {
+    layer: {
+      add: layerHandler.add,
+      remove: layerHandler.remove,
+      sort: layerHandler.sort,
+      rename: layerHandler.rename,
+      toggleDisplay: layerHandler.toggleDisplay,
+      select: layerHandler.select,
+      setOpacity: layerHandler.setOpacity,
+      getList: layerHandler.getList,
+      getActive: layerHandler.getActive,
+    },
     drawFrame,
     paintPixel,
     deletePixel,
     setBrushColor,
     getColorFrom,
     getCurrentColor: colorStore[0],
-    ...layerHandler.publicMethods,
     getBrushOpacity,
     setBrushOpacity,
   };
