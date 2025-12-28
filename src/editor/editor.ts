@@ -5,7 +5,7 @@ import { createSignal } from "solid-js";
 import type { PixelPainterReturnType } from "../pixelPainter/types";
 
 export const initializeEditor = async () => {
-  const gridSize: number = 64;
+  const gridSize: number = 128;
   const cellPosition = { x: 0, y: 0 };
   const pan = { x: 0, y: 0 };
   let zoom = 1;

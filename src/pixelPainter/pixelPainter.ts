@@ -1,15 +1,14 @@
 /// <reference types="@webgpu/types" />
 
 import { createSignal } from "solid-js";
-import { localDataBase } from "../storage";
-import { generateUUID } from "../utils";
 import { createVertexBuffer } from "./createBufferLayout";
 import { createPipeline } from "./createPipeline";
 import { createShadeModule } from "./createShaderModule";
 import { createLayerPreview } from "./layerPreview";
-import type { Layer, Layers, PixelPainterReturnType } from "./types";
+import type { PixelPainterReturnType } from "./types";
 import { alphaComposite, bind, numberToRGBA, rgbaToHex } from "./utils";
 import { webGPUSetup } from "./webGPUSetup";
+import { createLayerHandler } from "./handlers/layerHandler";
 
 export const pixelPainter = async (
   projectName: string,
@@ -24,60 +23,14 @@ export const pixelPainter = async (
     throw new Error("Could not find main canvas");
   }
 
+  const layerHandler = await createLayerHandler(projectName, gridSize);
+
   const { drawPreview } = await createLayerPreview(gridSize);
 
   const currentPaintedPixels = new Set<number>();
   canvas.addEventListener("mouseup", () => {
     currentPaintedPixels.clear();
   });
-
-  let stringLayers = window.localStorage.getItem(`${projectName}-layers`);
-  if (!stringLayers) {
-    const l: Layers = [
-      { id: generateUUID(), name: "Layer", display: true, opacity: 1 },
-    ];
-    stringLayers = JSON.stringify(l);
-    window.localStorage.setItem(`${projectName}-layers`, stringLayers);
-  }
-
-  const [layers, setLayers] = createSignal<Layers>(JSON.parse(stringLayers));
-
-  const firstLayer = layers().at(0);
-  if (!firstLayer) {
-    throw new Error(
-      "Pixel Painter must be initialized at least with one layer",
-    );
-  }
-
-  const [activeLayer, setActiveLayer] = createSignal<Layer>(firstLayer);
-
-  let currentBufferLayer: Uint32Array<ArrayBuffer>;
-
-  const db = await localDataBase(projectName);
-
-  const layersBuffer: Map<string, Uint32Array<ArrayBuffer>> = new Map();
-
-  for (const layer of layers()) {
-    try {
-      const layerBuffer = await db.load(layer.id);
-      if (layerBuffer) {
-        layersBuffer.set(layer.id, layerBuffer);
-      } else {
-        layersBuffer.set(layer.id, new Uint32Array(gridSize * gridSize));
-      }
-    } catch {
-      layersBuffer.set(layer.id, new Uint32Array(gridSize * gridSize));
-    }
-  }
-
-  const firstBuffer = layersBuffer.get(firstLayer.id);
-  if (!firstBuffer) {
-    throw new Error(
-      "Something went wrong accessing the buffer from first layer",
-    );
-  }
-
-  currentBufferLayer = firstBuffer;
 
   // TODO: merge this two colors
   let currentColorSelected: number = 0xff00ff;
@@ -105,7 +58,7 @@ export const pixelPainter = async (
     zoom: number,
     selectedCells: { x: number; y: number; z: number; w: number },
   ) => {
-    if (layersBuffer.size === 0) {
+    if (layerHandler.buffers.size === 0) {
       return;
     }
 
@@ -161,13 +114,13 @@ export const pixelPainter = async (
 
     bindValues[13] = 0;
 
-    for (const layer of layers()) {
-      const buffer = layersBuffer.get(layer.id);
+    for (const layer of layerHandler.publicMethods.getLayers()) {
+      const buffer = layerHandler.buffers.get(layer.id);
       if (!buffer) {
         throw new Error(`Layer buffer with id ${layer.id} not found`);
       }
 
-      if (layer.id === activeLayer().id) {
+      if (layer.id === layerHandler.publicMethods.getActiveLayer().id) {
         drawPreview(buffer, layer.opacity);
       }
 
@@ -203,7 +156,7 @@ export const pixelPainter = async (
 
   const getColorFrom = (pos: { x: number; y: number }) => {
     const i = pos.x + pos.y * gridSize;
-    const color = currentBufferLayer[i];
+    const color = layerHandler.getCurrentBuffer()[i];
     return color;
   };
 
@@ -214,7 +167,8 @@ export const pixelPainter = async (
       return;
     }
 
-    let destColor = currentBufferLayer.at(arrayIndex) ?? 0xffffffff;
+    let destColor =
+      layerHandler.getCurrentBuffer().at(arrayIndex) ?? 0xffffffff;
 
     const destRGBA =
       destColor === 0
@@ -228,189 +182,16 @@ export const pixelPainter = async (
 
     const blendedHex = rgbaToHex(blendedRGBA);
 
-    currentBufferLayer[arrayIndex] = blendedHex;
-    db.save(currentBufferLayer, activeLayer().id);
+    layerHandler.getCurrentBuffer()[arrayIndex] = blendedHex;
+    layerHandler.saveCurrentBuffer();
 
     currentPaintedPixels.add(arrayIndex);
   };
 
   const deletePixel = (cellPos: { x: number; y: number }) => {
     const arrayIndex = cellPos.x + cellPos.y * gridSize;
-    currentBufferLayer[arrayIndex] = 0;
-    db.save(currentBufferLayer, activeLayer().id);
-  };
-
-  const addLayer = () => {
-    const currentLayers = layers();
-
-    const layer: Layer = {
-      id: generateUUID(),
-      name: `Layer`,
-      display: true,
-      opacity: 1,
-    };
-
-    const _layers: Layers = [...currentLayers, layer];
-
-    window.localStorage.setItem(
-      `${projectName}-layers`,
-      JSON.stringify(_layers),
-    );
-
-    setLayers(_layers);
-
-    setActiveLayer(layer);
-    const newBuffer = new Uint32Array(gridSize * gridSize);
-    layersBuffer.set(layer.id, newBuffer);
-    currentBufferLayer = newBuffer;
-  };
-
-  const removeLayer = (id: string) => {
-    const _layers = [...layers()];
-
-    if (_layers.length === 1) {
-      // At least one layer per project needs to exist
-      return;
-    }
-
-    const index = _layers.findIndex((layer) => layer.id === id);
-    const newActiveLayerIndex = index >= 1 ? index - 1 : index + 1;
-    const newActiveLayer = _layers[newActiveLayerIndex];
-
-    // re-assign current layer id
-    if (activeLayer().id === id) {
-      setActiveLayer(newActiveLayer);
-      const newBuffer = layersBuffer.get(newActiveLayer.id);
-      if (!newBuffer) {
-        throw new Error(
-          `layer buffer with id ${newActiveLayer} could not be found`,
-        );
-      }
-      currentBufferLayer = newBuffer;
-    }
-
-    _layers.splice(index, 1);
-    setLayers(_layers);
-    layersBuffer.delete(id);
-
-    window.localStorage.setItem(
-      `${projectName}-layers`,
-      JSON.stringify(_layers),
-    );
-  };
-
-  const sortLayers = (dragged: string, dropped: string) => {
-    const _layers = [...layers()];
-
-    let draggedIndex = 0;
-    let droppedIndex = 0;
-
-    for (let i = 0; i < _layers.length; i++) {
-      const layer = _layers[i];
-      if (layer.id === dragged) {
-        draggedIndex = i;
-      }
-      if (layer.id == dropped) {
-        droppedIndex = i;
-      }
-    }
-
-    const draggedLayer = _layers.splice(draggedIndex, 1);
-
-    const first = _layers.slice(0, droppedIndex);
-    const second = _layers.slice(droppedIndex, _layers.length);
-    const newLayers = [...first, ...draggedLayer, ...second];
-
-    setLayers(newLayers);
-
-    window.localStorage.setItem(
-      `${projectName}-layers`,
-      JSON.stringify(newLayers),
-    );
-  };
-
-  const renameLayer = (name: string) => {
-    const _layers = layers().map((layer: Layer) => {
-      if (layer.id === activeLayer().id) {
-        return {
-          ...layer,
-          name,
-        };
-      }
-
-      return layer;
-    });
-
-    window.localStorage.setItem(
-      `${projectName}-layers`,
-      JSON.stringify(_layers),
-    );
-
-    setLayers(_layers);
-  };
-
-  const toggleLayerDisplay = (id: string) => {
-    const _layers = [...layers()];
-
-    const newLayers = _layers.map((layer) => {
-      if (layer.id === id) {
-        return {
-          ...layer,
-          display: !layer.display,
-        };
-      }
-      return layer;
-    });
-
-    setLayers(newLayers);
-
-    window.localStorage.setItem(
-      `${projectName}-layers`,
-      JSON.stringify(newLayers),
-    );
-  };
-
-  const selectLayer = (layerId: string) => {
-    const layer = layers().find((layer) => layer.id === layerId);
-    if (!layer) {
-      throw new Error(`Could not find current layer bt id ${layerId}`);
-    }
-
-    setActiveLayer(layer);
-
-    const buffer = layersBuffer.get(layerId);
-    if (!buffer) {
-      throw new Error(`Could not find buffer corresponded to id: ${layerId}`);
-    }
-    currentBufferLayer = buffer;
-  };
-
-  const setLayerOpacity = (layerId: string, opacity: number) => {
-    const _layers = [...layers()];
-
-    const newLayers = _layers.map((layer) => {
-      if (layer.id === layerId) {
-        return {
-          ...layer,
-          opacity,
-        };
-      }
-      return layer;
-    });
-
-    setLayers(newLayers);
-
-    window.localStorage.setItem(
-      `${projectName}-layers`,
-      JSON.stringify(newLayers),
-    );
-
-    if (layerId === activeLayer().id) {
-      setActiveLayer({
-        ...activeLayer(),
-        opacity,
-      });
-    }
+    layerHandler.getCurrentBuffer()[arrayIndex] = 0;
+    layerHandler.saveCurrentBuffer();
   };
 
   return {
@@ -420,15 +201,7 @@ export const pixelPainter = async (
     setBrushColor,
     getColorFrom,
     getCurrentColor: colorStore[0],
-    addLayer,
-    sortLayers,
-    removeLayer,
-    renameLayer,
-    toggleLayerDisplay,
-    getLayers: layers,
-    selectLayer,
-    getActiveLayer: activeLayer,
-    setLayerOpacity,
+    ...layerHandler.publicMethods,
     getBrushOpacity,
     setBrushOpacity,
   };
