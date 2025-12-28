@@ -1,17 +1,15 @@
-import { useProjectConfig } from "../../../projectConfig/projectConfigProvider";
+import { API } from "../../../projectConfig/projectConfigProvider";
 import "./LayerOpacity.css";
 
 export const LayerOpacity = () => {
-  const projectConfig = useProjectConfig();
+  const layersAPI = API.layers();
 
   const onChangeOpacity = (e: InputEvent) => {
     if (e.target) {
-      const activeLayerId = projectConfig.pixel().layer.getActive().id;
+      const activeLayerId = layersAPI().getActive().id;
 
-      projectConfig
-        .pixel()
-        //@ts-expect-error - test
-        .setLayerOpacity(activeLayerId, e.target.valueAsNumber / 100 ?? 1);
+      //@ts-expect-error - fix input type
+      layersAPI().setOpacity(activeLayerId, e.target.valueAsNumber / 100 ?? 1);
     }
   };
 
@@ -24,12 +22,10 @@ export const LayerOpacity = () => {
           type="range"
           min={0}
           max={100}
-          value={projectConfig.pixel().layer.getActive().opacity * 100}
+          value={layersAPI().getActive().opacity * 100}
           onInput={onChangeOpacity}
         />
-        <p>
-          {Math.floor(projectConfig.pixel().layer.getActive().opacity * 100)}%
-        </p>
+        <p>{Math.floor(layersAPI().getActive().opacity * 100)}%</p>
       </div>
     </div>
   );

@@ -1,9 +1,9 @@
 import { createSortable, useDragDropContext } from "@thisbeyond/solid-dnd";
 import type { Layer } from "../../../pixelPainter/types";
-import { useProjectConfig } from "../../../projectConfig/projectConfigProvider";
 import { DeleteLayerButton } from "./DeleteLayerButton";
 import { LayerTitle } from "./LayerTitle";
 import { DisplayLayerToggle } from "./DisplayLayerToggle";
+import { API } from "../../../projectConfig/projectConfigProvider";
 
 type LayerButtonProps = {
   layer: Layer;
@@ -12,12 +12,12 @@ type LayerButtonProps = {
 export const LayerButton = ({ layer }: LayerButtonProps) => {
   const sortable = createSortable(layer.id);
   const dropDownContext = useDragDropContext()!;
-  const projectConfig = useProjectConfig();
+  const layersAPI = API.layers();
 
   const state = dropDownContext[0];
 
   const onSelectLayer = (layerId: string) => {
-    projectConfig.pixel().layer.select(layerId);
+    layersAPI().select(layerId);
   };
 
   return (
@@ -31,8 +31,7 @@ export const LayerButton = ({ layer }: LayerButtonProps) => {
       <button
         class={"layer-btn"}
         classList={{
-          "active-layer":
-            projectConfig.pixel().layer.getActive().id === layer.id,
+          "active-layer": layersAPI().getActive().id === layer.id,
         }}
         onClick={() => onSelectLayer(layer.id)}
       >

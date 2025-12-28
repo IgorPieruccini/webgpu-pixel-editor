@@ -100,3 +100,12 @@ export const useProjectConfig = () => {
   const context = useContext(ProjectConfigContext);
   return context;
 };
+
+const getLayers = () => {
+  const context = useContext(ProjectConfigContext);
+  return () => context.pixel().layer;
+};
+
+export const API = {
+  layers: getLayers,
+};

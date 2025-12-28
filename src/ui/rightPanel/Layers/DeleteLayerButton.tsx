@@ -1,16 +1,16 @@
 import { AiOutlineDelete } from "solid-icons/ai";
-import { useProjectConfig } from "../../../projectConfig/projectConfigProvider";
+import { API } from "../../../projectConfig/projectConfigProvider";
 
 type DeleteLayerButtonProps = {
   layerId: string;
 };
 
 export const DeleteLayerButton = ({ layerId }: DeleteLayerButtonProps) => {
-  const projectConfig = useProjectConfig();
+  const layersAPI = API.layers();
 
   const onDelete = (e: MouseEvent) => {
     e.stopPropagation();
-    projectConfig.pixel().layer.remove(layerId);
+    layersAPI().remove(layerId);
   };
 
   return (

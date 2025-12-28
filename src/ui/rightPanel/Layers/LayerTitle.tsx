@@ -1,5 +1,5 @@
 import { createSignal } from "solid-js";
-import { useProjectConfig } from "../../../projectConfig/projectConfigProvider";
+import { API } from "../../../projectConfig/projectConfigProvider";
 
 type LayerTitleProps = {
   layerName: string;
@@ -8,7 +8,7 @@ type LayerTitleProps = {
 export const LayerTitle = ({ layerName }: LayerTitleProps) => {
   const [name, setName] = createSignal<string>(layerName);
   const [isEditing, setIsEditing] = createSignal<boolean>(false);
-  const projectSettings = useProjectConfig();
+  const layersAPI = API.layers();
 
   const onTypeName = (e: { target: HTMLInputElement }) => {
     setName(e.target.value);
@@ -38,7 +38,7 @@ export const LayerTitle = ({ layerName }: LayerTitleProps) => {
   };
 
   const finishEditing = () => {
-    projectSettings.pixel().layer.rename(name());
+    layersAPI().rename(name());
     setIsEditing(false);
   };
 

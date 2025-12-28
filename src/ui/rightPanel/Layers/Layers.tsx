@@ -1,4 +1,4 @@
-import { useProjectConfig } from "../../../projectConfig/projectConfigProvider";
+import { API } from "../../../projectConfig/projectConfigProvider";
 import { AiOutlinePlus } from "solid-icons/ai";
 import "./Layer.css";
 import { For } from "solid-js";
@@ -12,24 +12,24 @@ import {
 } from "@thisbeyond/solid-dnd";
 
 export const Layers = () => {
-  const projectConfig = useProjectConfig();
+  const layersAPI = API.layers();
 
   const onAddLayer = () => {
-    projectConfig.pixel().layer.add();
+    layersAPI().add();
   };
 
   const getLayerIds = () => {
-    return projectConfig
-      .pixel()
-      .layer.getList()
+    return layersAPI()
+      .getList()
       .map((layer) => layer.id);
   };
 
   const onDragEnd = (event: DragEvent) => {
     if (event.droppable) {
-      projectConfig
-        .pixel()
-        .layer.sort(event.draggable.id as string, event.droppable.id as string);
+      layersAPI().sort(
+        event.draggable.id as string,
+        event.droppable.id as string,
+      );
     }
   };
 
@@ -39,7 +39,7 @@ export const Layers = () => {
         <DragDropSensors />
         <div id="layer-slider">
           <SortableProvider ids={getLayerIds()}>
-            <For each={projectConfig.pixel().layer.getList()}>
+            <For each={layersAPI().getList()}>
               {(layer) => <LayerButton layer={layer}></LayerButton>}
             </For>
           </SortableProvider>

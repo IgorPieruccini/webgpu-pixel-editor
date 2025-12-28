@@ -1,17 +1,17 @@
 import { BiRegularShow, BiRegularHide } from "solid-icons/bi";
 import type { Layer } from "../../../pixelPainter/types";
-import { useProjectConfig } from "../../../projectConfig/projectConfigProvider";
+import { API } from "../../../projectConfig/projectConfigProvider";
 
 type DisplayLayerToggleProps = {
   layer: Layer;
 };
 
 export const DisplayLayerToggle = ({ layer }: DisplayLayerToggleProps) => {
-  const projectConfig = useProjectConfig();
+  const layersAPI = API.layers();
 
   const onToggleDisplay = (e: MouseEvent) => {
     e.preventDefault();
-    projectConfig.pixel().layer.toggleDisplay(layer.id);
+    layersAPI().toggleDisplay(layer.id);
   };
 
   return (
