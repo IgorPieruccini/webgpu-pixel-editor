@@ -17,6 +17,7 @@ export const createBrushHandler = (
   const currentPaintedPixels = new Set<number>();
   canvas.addEventListener("mouseup", () => {
     currentPaintedPixels.clear();
+    layerHandler.saveCurrentBuffer();
   });
 
   const [_getSelectedColor, _setSelectedColor] = createSignal(0xff00ff);
@@ -64,7 +65,6 @@ export const createBrushHandler = (
     const blendedHex = rgbaToHex(blendedRGBA);
 
     layerHandler.getCurrentBuffer()[arrayIndex] = blendedHex;
-    layerHandler.saveCurrentBuffer();
 
     currentPaintedPixels.add(arrayIndex);
   };
