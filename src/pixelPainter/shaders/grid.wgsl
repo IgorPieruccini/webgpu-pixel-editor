@@ -6,7 +6,6 @@
 struct VertexOutput {
     @builtin(position) position: vec4f,
     @location(0) cellPos: vec2f,
-    @location(1) worldPos: vec3f,
 };
 
 fn unpack_rgba(color: u32, opacity: f32) -> vec4<f32> {
@@ -26,20 +25,15 @@ fn vertexMain(@location(0) pos: vec2f, @builtin(instance_index) instance: u32) -
     let i = f32(instance);
 
     let gridSize = vec2f(bindValues[0], bindValues[1]);
-    let mouseCellPos = vec2f(bindValues[2], bindValues[3]);
-    let canvasSize = vec2f(bindValues[4], bindValues[5]);
+    let canvasSize = vec2f(bindValues[2], bindValues[3]);
 
     let aspectRatio = canvasSize.x / canvasSize.y;
-    let pan = vec2f(bindValues[6], bindValues[7]);
-    let zoom:f32 = bindValues[8];
-    let zoomScale = 1.0 / zoom;
-
-    let selectionRect = vec4f(bindValues[9],  bindValues[10] , bindValues[11], bindValues[12] );
+    let pan = vec2f(bindValues[4], bindValues[5]);
+    let zoom:f32 = bindValues[6];
 
     let cellPos = vec2f(i % gridSize.x, floor(i / gridSize.x));
     let gridPos = (pos + 1) / gridSize - 1;
     let center = (gridPos + cellPos / gridSize * 2);
-    let cellCoords = center;
     let zoomed = center * zoom;
 
     var inverseOwnCell = vec2f(cellPos.x, gridSize.y - 1 - cellPos.y);
@@ -55,7 +49,7 @@ fn vertexMain(@location(0) pos: vec2f, @builtin(instance_index) instance: u32) -
 
     out.cellPos = inverseOwnCell;
     out.position = vec4f(corrected, 0, 1);
-    out.worldPos = vec3f(pos, 1);
+
 
     return out;
 }
@@ -64,32 +58,31 @@ fn vertexMain(@location(0) pos: vec2f, @builtin(instance_index) instance: u32) -
 fn fragmentMain(
     @builtin(position) fragCoord: vec4f,
     @location(0) cellPos: vec2f,
-    @location(1) worldPos: vec3f,
 ) -> @location(0)vec4f {
     let gridSize = vec2f(bindValues[0], bindValues[1]) ;
     let colorIndex = u32(cellPos.x + cellPos.y * gridSize.x);
     let color = colors[colorIndex];
-    let alphaLayer = bindValues[13];
-    let opacity = bindValues[14];
+    let alphaLayer = bindValues[7];
+    let opacity = bindValues[8];
     let rgba = unpack_rgba(color, opacity);
 
     if(alphaLayer == 1) {
-        if (cellPos.x % 2 == 1) {
-            if (cellPos.y % 2 == 0) {
+        if (cellPos.x % 8 <= 3) {
+            if (cellPos.y % 8 > 3) {
                 return vec4f(0.9, 0.9, 0.9, 1.0);
             }
 
-            if (cellPos.y % 2 ==1) {
+            if (cellPos.y % 8 <= 3) {
                 return vec4f(1, 1, 1, 1);
             }
         }
 
-        if(cellPos.x % 2 == 0) {
-            if (cellPos.y % 2 == 0) {
+        if(cellPos.x % 8 > 3) {
+            if (cellPos.y % 8 > 3) {
                 return vec4f(1, 1, 1, 1);
             }
 
-            if (cellPos.y % 2 ==1) {
+            if (cellPos.y % 8 <= 3) {
                 return vec4f(0.9, 0.9, 0.9, 1.0);
            }
         }

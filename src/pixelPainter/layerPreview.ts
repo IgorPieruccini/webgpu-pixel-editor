@@ -38,42 +38,28 @@ export const createLayerPreview = async (gridSize: number) => {
       ],
     });
 
-    const bindValues = new Float32Array([
-      // gridSize
-      gridSize,
-      gridSize,
-      // mouseCellPos,
-      0, // cellPos.x,
-
-      0, // cellPos.y,
-
-      // canvasSize
-      canvasSize.x,
-      canvasSize.y,
-
-      // pan viewport
-      1, // pan.x,
-      1, // pan.y,
-
-      1, // zoom,
-      0, // selectedCells.x,
-      0, // selectedCells.y,
-      0, // selectedCells.z,
-      0, // selectedCells.w,
-      1, // is first layer boolean
-      opacity,
+    const gridValues = new Float32Array([
+      gridSize, // grid width in cells
+      gridSize, // grid height in cells
+      canvasSize.x, // canvas width
+      canvasSize.y, // canvas height
+      1, // viewport offset x
+      1, // viewport offset y
+      1, // viewport zoom
+      1, // 1 = is first layer, 0 = not first layer
+      opacity, // layer opacity (start with full opacity)
     ]);
 
     pass.setPipeline(cellPipeline);
     pass.setVertexBuffer(0, vertexBuffer);
 
     // DRAW ALPHA_LAYER
-    pass.setBindGroup(0, createBind("bindValues", bindValues, 0));
+    pass.setBindGroup(0, createBind("bindValues", gridValues, 0));
     pass.setBindGroup(1, createBind("colors", buffer, 1));
     pass.draw(vertices.length / 2, gridSize * gridSize); // 6 vertices and draw several times
-    bindValues[13] = 0;
+    gridValues[7] = 0;
 
-    pass.setBindGroup(0, createBind("bindValues", bindValues, 0));
+    pass.setBindGroup(0, createBind("bindValues", gridValues, 0));
     pass.setBindGroup(1, createBind("colors", buffer, 1));
 
     pass.draw(vertices.length / 2, gridSize * gridSize); // 6 vertices and draw several times

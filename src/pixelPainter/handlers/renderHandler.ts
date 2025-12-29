@@ -63,26 +63,32 @@ export const createRenderHandler = async (
       ],
     });
 
-    const bindValues = new Float32Array([
-      // gridSize
-      gridSize,
-      gridSize,
-      // mouseCellPos,
-      cellPos.x,
-      cellPos.y,
-      // canvasSize
-      canvasSize.x,
-      canvasSize.y,
-      // pan viewport
-      pan.x,
-      pan.y,
-      zoom,
-      selectedCells.x,
-      selectedCells.y,
-      selectedCells.z,
-      selectedCells.w,
-      1, // is first layer boolean
-      1, // opacity
+    const gridValues = new Float32Array([
+      gridSize, // grid width in cells
+      gridSize, // grid height in cells
+      canvasSize.x, // canvas width
+      canvasSize.y, // canvas height
+      pan.x, // viewport offset x
+      pan.y, // viewport offset y
+      zoom, // viewport zoom
+      1, // 1 = is first layer, 0 = not first layer
+      1, // layer opacity (start with full opacity)
+    ]);
+
+    const uiValues = new Float32Array([
+      gridSize, // grid width in cells
+      gridSize, // grid height in cells
+      cellPos.x, // the cell x position
+      cellPos.y, // the cell y position
+      canvasSize.x, // canvas width
+      canvasSize.y, // canvas height
+      pan.x, // viewport offset x
+      pan.y, // viewport offset y
+      zoom, // viewport zoom
+      selectedCells.x, // square selection x
+      selectedCells.y, // square selection y
+      selectedCells.z, // selectedCells.z,
+      selectedCells.w, // selectedCells.w
     ]);
 
     pass.setPipeline(gridPipeline);
@@ -91,12 +97,12 @@ export const createRenderHandler = async (
     let index = 0;
 
     // DRAW ALPHA LAYER
-    pass.setBindGroup(0, gridBinder.createBind("bindValues", bindValues, 0));
+    pass.setBindGroup(0, gridBinder.createBind("bindValues", gridValues, 0));
     pass.setBindGroup(1, gridBinder.createBind("colors", alphaLayer, 1));
 
     pass.draw(vertices.length / 2, gridSize * gridSize);
 
-    bindValues[13] = 0;
+    gridValues[7] = 0;
 
     for (const layer of layerHandler.getList()) {
       const buffer = layerHandler.buffers.get(layer.id);
@@ -112,9 +118,9 @@ export const createRenderHandler = async (
         continue;
       }
 
-      bindValues[14] = layer.opacity;
+      gridValues[8] = layer.opacity;
 
-      pass.setBindGroup(0, gridBinder.createBind("bindValues", bindValues, 0));
+      pass.setBindGroup(0, gridBinder.createBind("bindValues", gridValues, 0));
       pass.setBindGroup(1, gridBinder.createBind("colors", buffer, 1));
 
       pass.draw(vertices.length / 2, gridSize * gridSize);
@@ -125,7 +131,7 @@ export const createRenderHandler = async (
     pass.setVertexBuffer(0, vertexBuffer);
 
     // DRAW UI
-    pass.setBindGroup(0, uiBinder.createBind("bindValues", bindValues, 0));
+    pass.setBindGroup(0, uiBinder.createBind("bindValues", uiValues, 0));
     pass.draw(vertices.length / 2, gridSize * gridSize);
 
     pass.end();
