@@ -205,7 +205,7 @@ export const initializeEditor = async () => {
   canvas.addEventListener("wheel", wheelHandler, { passive: false });
 
   const loop = () => {
-    pixel?.drawFrame(cellPosition, pan, zoom, selectedCells);
+    pixel?.render(cellPosition, pan, zoom, selectedCells);
     requestAnimationFrame(loop);
   };
 
