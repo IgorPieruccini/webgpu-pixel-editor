@@ -5,10 +5,8 @@
 // Export to fragment
 struct VertexOutput {
     @builtin(position) position: vec4f,
-    @location(0) @interpolate(flat) isHovering: i32,
-    @location(1) cellPos: vec2f,
-    @location(2) worldPos: vec3f,
-    @location(3) @interpolate(flat) isSelected: i32,
+    @location(0) cellPos: vec2f,
+    @location(1) worldPos: vec3f,
 };
 
 fn unpack_rgba(color: u32, opacity: f32) -> vec4<f32> {
@@ -44,15 +42,7 @@ fn vertexMain(@location(0) pos: vec2f, @builtin(instance_index) instance: u32) -
     let cellCoords = center;
     let zoomed = center * zoom;
 
-    var inverseMouseCellPos = vec2f(mouseCellPos.x, gridSize.y - 1 - mouseCellPos.y);
     var inverseOwnCell = vec2f(cellPos.x, gridSize.y - 1 - cellPos.y);
-    var _isHovering: bool = all(inverseMouseCellPos == cellPos);
-
-    if _isHovering == true {
-        out.isHovering = 1;
-    } else {
-        out.isHovering = 0;
-    }
 
     let panNorm = vec2f(
         (pan.x / canvasSize.x) * 2.0,
@@ -66,18 +56,6 @@ fn vertexMain(@location(0) pos: vec2f, @builtin(instance_index) instance: u32) -
     out.cellPos = inverseOwnCell;
     out.position = vec4f(corrected, 0, 1);
     out.worldPos = vec3f(pos, 1);
-    out.isSelected = 0;
-
-
-    if(
-    (inverseOwnCell.x >= selectionRect.x || inverseOwnCell.x >= selectionRect.z)
-    && (inverseOwnCell.x <= selectionRect.z || inverseOwnCell.x <= selectionRect.x)
-    && (inverseOwnCell.y >= selectionRect.y || inverseOwnCell.y >= selectionRect.w)
-    && (inverseOwnCell.y <= selectionRect.w || inverseOwnCell.y <= selectionRect.y)
-    ){
-       out.isSelected = 1;
-    }
-
 
     return out;
 }
@@ -85,10 +63,8 @@ fn vertexMain(@location(0) pos: vec2f, @builtin(instance_index) instance: u32) -
 @fragment
 fn fragmentMain(
     @builtin(position) fragCoord: vec4f,
-    @location(0) @interpolate(flat) isHovering: i32,
-    @location(1) cellPos: vec2f,
-    @location(2) worldPos: vec3f,
-    @location(3) @interpolate(flat) isSelected: i32
+    @location(0) cellPos: vec2f,
+    @location(1) worldPos: vec3f,
 ) -> @location(0)vec4f {
     let gridSize = vec2f(bindValues[0], bindValues[1]) ;
     let colorIndex = u32(cellPos.x + cellPos.y * gridSize.x);
@@ -117,24 +93,7 @@ fn fragmentMain(
                 return vec4f(0.9, 0.9, 0.9, 1.0);
            }
         }
-
     }
-
-    if (isSelected == 1) {
-       let bluesh = vec4f(0.95, 0.95, 0.95, 1.0);
-       return rgba * bluesh;
-    }
-
-    if isHovering == 1 {
-        if (worldPos.y >= 0.9)
-        | (worldPos.x >= 0.9)
-        | (worldPos.y <=  -0.9)
-        | (worldPos.x <= -0.9)
-        {
-            return vec4f(1.0, 1.0, 1.0, 1.0);
-        }
-    }
-
 
     if (color == 0) {
         return vec4f(1.0, 1.0, 1.0, 0.0);

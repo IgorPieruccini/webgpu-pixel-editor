@@ -81,21 +81,12 @@ fn fragmentMain(
     let colorIndex = u32(cellPos.x + cellPos.y * gridSize.x);
 
     if (isSelected == 1) {
-       let bluesh = vec4f(0.95, 0.95, 0.95, 1.0);
-       return rgba * bluesh;
+       return vec4f(0.95, 0.95, 0.95, 0.2);
     }
 
     if isHovering == 1 {
-        if (worldPos.y >= 0.9)
-        | (worldPos.x >= 0.9)
-        | (worldPos.y <=  -0.9)
-        | (worldPos.x <= -0.9)
-        {
-            return vec4f(1.0, 1.0, 1.0, 1.0);
-        }
+       return vec4f(1.0, 1.0, 1.0, 0.2);
     }
 
     return vec4f(1.0, 1.0, 1.0, 0.0);
-
-    return rgba;
 }

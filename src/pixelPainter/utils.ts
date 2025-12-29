@@ -1,4 +1,4 @@
-import type { RGB, RGBA } from "./types";
+import type { RGBA } from "./types";
 
 export const bind = (device: GPUDevice, pipeline: GPURenderPipeline) => {
   const createBind = <

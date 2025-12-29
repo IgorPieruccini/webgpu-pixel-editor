@@ -10,7 +10,7 @@ export const createPipeline = (
   const cellShadeModule = createShadeModule(device, shader);
 
   const cellPipeline = device.createRenderPipeline({
-    label: "Cell pipeline",
+    label: shader,
     layout: "auto",
     vertex: {
       module: cellShadeModule,

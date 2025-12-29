@@ -17,14 +17,22 @@ export const createRenderHandler = async (
   const { vertices, vertexBuffer, vertexBufferLayout } =
     createVertexBuffer(device);
 
-  const cellPipeline = createPipeline(
+  const gridPipeline = createPipeline(
     device,
     "grid",
     vertexBufferLayout,
     canvasFormat,
   );
 
-  const { createBind } = bind(device, cellPipeline);
+  const uiPipeline = createPipeline(
+    device,
+    "ui",
+    vertexBufferLayout,
+    canvasFormat,
+  );
+
+  const gridBinder = bind(device, gridPipeline);
+  const uiBinder = bind(device, uiPipeline);
 
   const render = (
     cellPos: { x: number; y: number },
@@ -77,16 +85,16 @@ export const createRenderHandler = async (
       1, // opacity
     ]);
 
-    pass.setPipeline(cellPipeline);
+    pass.setPipeline(gridPipeline);
     pass.setVertexBuffer(0, vertexBuffer);
 
     let index = 0;
 
     // DRAW ALPHA LAYER
-    pass.setBindGroup(0, createBind("bindValues", bindValues, 0));
-    pass.setBindGroup(1, createBind("colors", alphaLayer, 1));
+    pass.setBindGroup(0, gridBinder.createBind("bindValues", bindValues, 0));
+    pass.setBindGroup(1, gridBinder.createBind("colors", alphaLayer, 1));
 
-    pass.draw(vertices.length / 2, gridSize * gridSize); // 6 vertices and draw several times
+    pass.draw(vertices.length / 2, gridSize * gridSize);
 
     bindValues[13] = 0;
 
@@ -106,12 +114,19 @@ export const createRenderHandler = async (
 
       bindValues[14] = layer.opacity;
 
-      pass.setBindGroup(0, createBind("bindValues", bindValues, 0));
-      pass.setBindGroup(1, createBind("colors", buffer, 1));
+      pass.setBindGroup(0, gridBinder.createBind("bindValues", bindValues, 0));
+      pass.setBindGroup(1, gridBinder.createBind("colors", buffer, 1));
 
-      pass.draw(vertices.length / 2, gridSize * gridSize); // 6 vertices and draw several times
+      pass.draw(vertices.length / 2, gridSize * gridSize);
       index++;
     }
+
+    pass.setPipeline(uiPipeline);
+    pass.setVertexBuffer(0, vertexBuffer);
+
+    // DRAW UI
+    pass.setBindGroup(0, uiBinder.createBind("bindValues", bindValues, 0));
+    pass.draw(vertices.length / 2, gridSize * gridSize);
 
     pass.end();
     const commandBuffer = encoder.finish();
