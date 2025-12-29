@@ -1,6 +1,4 @@
-
 @group(0) @binding(0) var<storage, read> bindValues: array<f32>;
-@group(1) @binding(0) var<storage, read> colors: array<u32>;
 
 // Export to fragment
 struct VertexOutput {
@@ -10,17 +8,6 @@ struct VertexOutput {
     @location(2) worldPos: vec3f,
     @location(3) @interpolate(flat) isSelected: i32,
 };
-
-fn unpack_rgba(color: u32, opacity: f32) -> vec4<f32> {
-
-    let r = f32((color >> 16u) & 0xFFu) / 255.0;
-    let g = f32((color >> 8u) & 0xFFu) / 255.0;
-    let b = f32(color & 0xFFu) / 255.0;
-    let a = f32(color >> 24) / 255;
-    let layerOpacity = f32(opacity);
-
-    return vec4<f32>(r, g, b,  a * layerOpacity);
-}
 
 @vertex
 fn vertexMain(@location(0) pos: vec2f, @builtin(instance_index) instance: u32) -> VertexOutput {
@@ -92,33 +79,6 @@ fn fragmentMain(
 ) -> @location(0)vec4f {
     let gridSize = vec2f(bindValues[0], bindValues[1]) ;
     let colorIndex = u32(cellPos.x + cellPos.y * gridSize.x);
-    let color = colors[colorIndex];
-    let alphaLayer = bindValues[13];
-    let opacity = bindValues[14];
-    let rgba = unpack_rgba(color, opacity);
-
-    if(alphaLayer == 1) {
-        if (cellPos.x % 2 == 1) {
-            if (cellPos.y % 2 == 0) {
-                return vec4f(0.9, 0.9, 0.9, 1.0);
-            }
-
-            if (cellPos.y % 2 ==1) {
-                return vec4f(1, 1, 1, 1);
-            }
-        }
-
-        if(cellPos.x % 2 == 0) {
-            if (cellPos.y % 2 == 0) {
-                return vec4f(1, 1, 1, 1);
-            }
-
-            if (cellPos.y % 2 ==1) {
-                return vec4f(0.9, 0.9, 0.9, 1.0);
-           }
-        }
-
-    }
 
     if (isSelected == 1) {
        let bluesh = vec4f(0.95, 0.95, 0.95, 1.0);
@@ -135,10 +95,7 @@ fn fragmentMain(
         }
     }
 
-
-    if (color == 0) {
-        return vec4f(1.0, 1.0, 1.0, 0.0);
-    }
+    return vec4f(1.0, 1.0, 1.0, 0.0);
 
     return rgba;
 }

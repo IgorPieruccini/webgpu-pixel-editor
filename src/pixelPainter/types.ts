@@ -23,3 +23,5 @@ export type RGBA = {
   b: number;
   a: number;
 };
+
+export type ShaderType = "grid" | "ui";

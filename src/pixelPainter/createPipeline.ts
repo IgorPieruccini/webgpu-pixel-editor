@@ -1,10 +1,14 @@
+import { createShadeModule } from "./createShaderModule";
+import type { ShaderType } from "./types";
+
 export const createPipeline = (
   device: GPUDevice,
-  cellShadeModule: GPUShaderModule,
+  shader: ShaderType,
   vertexBufferLayout: GPUVertexBufferLayout,
   canvasFormat: GPUTextureFormat,
 ) => {
-  // The render pipeline controls how geometry is drawn, including things like which shaders are used, how to interpret data in vertex buffers, which kind of geometry should be rendered (lines, points, triangles...), and more!
+  const cellShadeModule = createShadeModule(device, shader);
+
   const cellPipeline = device.createRenderPipeline({
     label: "Cell pipeline",
     layout: "auto",

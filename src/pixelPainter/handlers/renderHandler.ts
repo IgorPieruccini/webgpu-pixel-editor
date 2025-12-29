@@ -1,6 +1,5 @@
 import { createVertexBuffer } from "../createBufferLayout";
 import { createPipeline } from "../createPipeline";
-import { createShadeModule } from "../createShaderModule";
 import { createLayerPreview } from "../layerPreview";
 import { bind } from "../utils";
 import { webGPUSetup } from "../webGPUSetup";
@@ -18,11 +17,9 @@ export const createRenderHandler = async (
   const { vertices, vertexBuffer, vertexBufferLayout } =
     createVertexBuffer(device);
 
-  const cellShadeModule = createShadeModule(device);
-
   const cellPipeline = createPipeline(
     device,
-    cellShadeModule,
+    "grid",
     vertexBufferLayout,
     canvasFormat,
   );
