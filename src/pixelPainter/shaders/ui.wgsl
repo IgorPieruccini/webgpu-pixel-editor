@@ -9,6 +9,10 @@ struct VertexOutput {
     @location(3) @interpolate(flat) isSelected: i32,
 };
 
+fn distance2D(a: vec2<f32>, b: vec2<f32>) -> f32 {
+    return length(b - a);
+}
+
 @vertex
 fn vertexMain(@location(0) pos: vec2f, @builtin(instance_index) instance: u32) -> VertexOutput {
     var out: VertexOutput;
@@ -34,6 +38,12 @@ fn vertexMain(@location(0) pos: vec2f, @builtin(instance_index) instance: u32) -
     var inverseMouseCellPos = vec2f(mouseCellPos.x, gridSize.y - 1 - mouseCellPos.y);
     var inverseOwnCell = vec2f(cellPos.x, gridSize.y - 1 - cellPos.y);
     var _isHovering: bool = all(inverseMouseCellPos == cellPos);
+
+    var dist = distance2D(inverseMouseCellPos, cellPos);
+
+    if (dist < bindValues[14]) {
+        _isHovering = true;
+    }
 
     if _isHovering == true {
         out.isHovering = 1;
@@ -79,6 +89,8 @@ fn fragmentMain(
 ) -> @location(0)vec4f {
     let gridSize = vec2f(bindValues[0], bindValues[1]) ;
     let colorIndex = u32(cellPos.x + cellPos.y * gridSize.x);
+
+
 
     if (isSelected == 1) {
        return vec4f(0.95, 0.95, 0.95, 0.2);

@@ -32,6 +32,8 @@ export const INITIAL_PIXEL_PAINTER: PixelPainterMethods = {
     setOpacity: () => {},
     getSelectedColor: () => 0,
     setSelectedColor: () => {},
+    getThickness: () => 1,
+    setThickness: () => {},
   },
   render: () => {},
 };

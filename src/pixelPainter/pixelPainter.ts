@@ -18,6 +18,7 @@ export const pixelPainter = async (
   const brush = createBrushHandler(layerHandler, gridSize);
   const { render } = await createRenderHandler(
     layerHandler,
+    brush,
     gridSize,
     canvasSize,
   );
@@ -43,6 +44,8 @@ export const pixelPainter = async (
       setOpacity: brush.setOpacity,
       getSelectedColor: brush.getSelectedColor,
       setSelectedColor: brush.setSelectedColor,
+      getThickness: brush.getThickness,
+      setThickness: brush.setThickness,
     },
     render,
   };

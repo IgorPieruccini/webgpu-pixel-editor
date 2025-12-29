@@ -1,14 +1,13 @@
-#tool-settings {
-    position: absolute;
-    top: 10px;
-    left: 80px;
-    gap: 18px;
-    height: 46px;
+#brush-thickness-container {
     display: flex;
+    gap: 8px;
     align-items: center;
-    label {
+    p {
         font-size: 12px;
-        margin: 0px;
+    }
+
+    input {
+        flex: 1;
     }
 }
 

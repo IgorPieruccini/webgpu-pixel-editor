@@ -12,7 +12,7 @@ export const BrushOpacitySlider = () => {
   };
 
   return (
-    <div id="brush-opacity-container">
+    <div id="brush-opacity-container" class="tool-input">
       <label for="layer-opacity-input">Layer opacity</label>
       <input
         id="brush-opacity-input"

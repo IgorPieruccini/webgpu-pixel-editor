@@ -3,10 +3,12 @@ import { createPipeline } from "../createPipeline";
 import { createLayerPreview } from "../layerPreview";
 import { bind } from "../utils";
 import { webGPUSetup } from "../webGPUSetup";
+import type { BrushHandler } from "./brushHandler";
 import type { LayerHandler } from "./layerHandler";
 
 export const createRenderHandler = async (
   layerHandler: LayerHandler,
+  brushHandler: BrushHandler,
   gridSize: number,
   canvasSize: { x: number; y: number },
 ) => {
@@ -89,6 +91,7 @@ export const createRenderHandler = async (
       selectedCells.y, // square selection y
       selectedCells.z, // selectedCells.z,
       selectedCells.w, // selectedCells.w
+      brushHandler.getThickness(), // brush thickness
     ]);
 
     pass.setPipeline(gridPipeline);

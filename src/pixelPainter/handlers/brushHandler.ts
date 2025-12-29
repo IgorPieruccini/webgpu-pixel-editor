@@ -22,6 +22,7 @@ export const createBrushHandler = (
 
   const [_getSelectedColor, _setSelectedColor] = createSignal(0xff00ff);
   const [getOpacity, setOpacity] = createSignal(100);
+  const [getThickness, setThickness] = createSignal(1);
 
   const setColor = (_color: number | string) => {
     if (typeof _color === "string") {
@@ -43,36 +44,63 @@ export const createBrushHandler = (
   };
 
   const paint = (cellPos: { x: number; y: number }) => {
-    const arrayIndex = cellPos.x + cellPos.y * gridSize;
+    const arrayIndex: number[] = [];
 
-    if (currentPaintedPixels.has(arrayIndex)) {
-      return;
+    const thickness = getThickness();
+
+    for (let y = -thickness; y <= thickness; y++) {
+      for (let x = -thickness; x <= thickness; x++) {
+        const _x = cellPos.x + x;
+        const _y = cellPos.y + y;
+        const i = _x + _y * gridSize;
+
+        const distance = Math.hypot(cellPos.x - _x, cellPos.y - _y);
+        if (distance < thickness) {
+          arrayIndex.push(i);
+        }
+      }
     }
 
-    let destColor =
-      layerHandler.getCurrentBuffer().at(arrayIndex) ?? 0xffffffff;
+    for (const i of arrayIndex) {
+      if (currentPaintedPixels.has(i)) {
+        continue;
+      }
 
-    const destRGBA =
-      destColor === 0
-        ? { r: 255, g: 255, b: 255, a: 0 }
-        : numberToRGBA(destColor);
+      let destColor = layerHandler.getCurrentBuffer().at(i) ?? 0xffffffff;
 
-    const sourceRGBA = numberToRGBA(_getSelectedColor());
-    sourceRGBA.a = getOpacity() / 100;
+      const destRGBA =
+        destColor === 0
+          ? { r: 255, g: 255, b: 255, a: 0 }
+          : numberToRGBA(destColor);
 
-    const blendedRGBA = alphaComposite(sourceRGBA, destRGBA);
+      const sourceRGBA = numberToRGBA(_getSelectedColor());
+      sourceRGBA.a = getOpacity() / 100;
 
-    const blendedHex = rgbaToHex(blendedRGBA);
+      const blendedRGBA = alphaComposite(sourceRGBA, destRGBA);
 
-    layerHandler.getCurrentBuffer()[arrayIndex] = blendedHex;
+      const blendedHex = rgbaToHex(blendedRGBA);
 
-    currentPaintedPixels.add(arrayIndex);
+      layerHandler.getCurrentBuffer()[i] = blendedHex;
+
+      currentPaintedPixels.add(i);
+    }
   };
 
   const erase = (cellPos: { x: number; y: number }) => {
-    const arrayIndex = cellPos.x + cellPos.y * gridSize;
-    layerHandler.getCurrentBuffer()[arrayIndex] = 0;
-    layerHandler.saveCurrentBuffer();
+    const thickness = getThickness();
+
+    for (let y = -thickness; y <= thickness; y++) {
+      for (let x = -thickness; x <= thickness; x++) {
+        const _x = cellPos.x + x;
+        const _y = cellPos.y + y;
+        const i = _x + _y * gridSize;
+
+        const distance = Math.hypot(cellPos.x - _x, cellPos.y - _y);
+        if (distance < thickness) {
+          layerHandler.getCurrentBuffer()[i] = 0;
+        }
+      }
+    }
   };
 
   const setSelectedColor = (color: number | string) => {
@@ -101,5 +129,7 @@ export const createBrushHandler = (
     setOpacity,
     getSelectedColor,
     setSelectedColor,
+    getThickness,
+    setThickness,
   };
 };
