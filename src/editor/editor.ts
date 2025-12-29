@@ -132,8 +132,8 @@ export const initializeEditor = async () => {
 
   window.addEventListener("keypress", (e) => {
     if (e.code === "KeyP") {
-      const color = pixel.getColorFrom(cellPosition);
-      pixel.setBrushColor(color);
+      const color = pixel.brush.getColor(cellPosition);
+      pixel.brush.setColor(color);
     }
     if (e.code === "KeyR") {
       setActiveTool(
@@ -146,7 +146,7 @@ export const initializeEditor = async () => {
     }
 
     if (e.code === "KeyL") {
-      pixel.addLayer();
+      pixel.layer.add();
     }
   });
 
