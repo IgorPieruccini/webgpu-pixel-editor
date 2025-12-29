@@ -1,15 +1,15 @@
-import { useProjectConfig } from "../projectConfig/projectConfigProvider";
+import { API } from "../projectConfig/projectConfigProvider";
 
 export const ColorPicker = () => {
-  const project = useProjectConfig();
+  const brush = API.brush();
 
   return (
     <input
       type="color"
       name="color"
-      value={project.pixel().getCurrentColor()}
+      value={brush().getSelectedColor("string")}
       onInput={(e) => {
-        project.pixel().setBrushColor(e.target.value);
+        brush().setSelectedColor(e.target.value);
       }}
     />
   );

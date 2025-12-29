@@ -2,7 +2,7 @@ import { pixelPainter } from "../pixelPainter/pixelPainter";
 import { ZOOM_SENSITIVITY } from "../constants";
 import { ACTIVATE_TOOL, INITIAL_PIXEL_PAINTER } from "./constant";
 import { createSignal } from "solid-js";
-import type { PixelPainterReturnType } from "../pixelPainter/types";
+import type { PixelPainterMethods } from "../pixelPainter/types";
 
 export const initializeEditor = async () => {
   const gridSize: number = 128;
@@ -12,7 +12,7 @@ export const initializeEditor = async () => {
   let pressingSpace = false;
   let isLeftMouseDown = false;
   let selectedCells = { x: -1, y: -1, z: -1, w: -1 };
-  let pixel: PixelPainterReturnType = INITIAL_PIXEL_PAINTER;
+  let pixel: PixelPainterMethods = INITIAL_PIXEL_PAINTER;
 
   const [activeTool, setActiveTool] = createSignal(ACTIVATE_TOOL.PAINT);
 
@@ -31,7 +31,7 @@ export const initializeEditor = async () => {
 
   const createNewPainter = async (
     name: string,
-  ): Promise<PixelPainterReturnType> => {
+  ): Promise<PixelPainterMethods> => {
     pixel = await pixelPainter(name, gridSize, {
       x: viewport.width,
       y: viewport.height,
@@ -58,11 +58,11 @@ export const initializeEditor = async () => {
 
     if (isLeftMouseDown && !pressingSpace) {
       if (activeTool() === ACTIVATE_TOOL.PAINT) {
-        pixel.paintPixel(cellPosition);
+        pixel.brush.paint(cellPosition);
       }
 
       if (activeTool() === ACTIVATE_TOOL.DELETE) {
-        pixel.deletePixel(cellPosition);
+        pixel.brush.erase(cellPosition);
       }
     }
 
@@ -74,11 +74,11 @@ export const initializeEditor = async () => {
 
   canvas.addEventListener("mousedown", (e) => {
     if (activeTool() === ACTIVATE_TOOL.PAINT) {
-      pixel.paintPixel(cellPosition);
+      pixel.brush.paint(cellPosition);
     }
 
     if (activeTool() === ACTIVATE_TOOL.DELETE) {
-      pixel.deletePixel(cellPosition);
+      pixel.brush.erase(cellPosition);
     }
 
     isLeftMouseDown = true;
@@ -108,7 +108,7 @@ export const initializeEditor = async () => {
       };
       for (let x = selection.x; x <= selection.z; x++) {
         for (let y = selection.y; y <= selection.w; y++) {
-          pixel.paintPixel({
+          pixel.brush.paint({
             x: x,
             y: y,
           });

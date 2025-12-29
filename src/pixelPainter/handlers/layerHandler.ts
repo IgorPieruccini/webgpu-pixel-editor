@@ -3,6 +3,8 @@ import type { Layer, Layers } from "../types";
 import { generateUUID } from "../../utils";
 import { localDataBase } from "../../storage";
 
+export type LayerHandler = Awaited<ReturnType<typeof createLayerHandler>>;
+
 export const createLayerHandler = async (
   projectName: string,
   gridSize: number,

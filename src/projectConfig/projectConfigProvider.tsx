@@ -106,6 +106,12 @@ const getLayers = () => {
   return () => context.pixel().layer;
 };
 
+const getBrush = () => {
+  const context = useContext(ProjectConfigContext);
+  return () => context.pixel().brush;
+};
+
 export const API = {
   layers: getLayers,
+  brush: getBrush,
 };

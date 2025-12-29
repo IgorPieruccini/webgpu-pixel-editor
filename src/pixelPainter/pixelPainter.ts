@@ -1,13 +1,13 @@
 /// <reference types="@webgpu/types" />
 
-import { createSignal } from "solid-js";
 import { createVertexBuffer } from "./createBufferLayout";
 import { createPipeline } from "./createPipeline";
 import { createShadeModule } from "./createShaderModule";
 import { createLayerPreview } from "./layerPreview";
-import { alphaComposite, bind, numberToRGBA, rgbaToHex } from "./utils";
+import { bind } from "./utils";
 import { webGPUSetup } from "./webGPUSetup";
 import { createLayerHandler } from "./handlers/layerHandler";
+import { createBrushHandler } from "./handlers/brushHandler";
 
 export const pixelPainter = async (
   projectName: string,
@@ -23,19 +23,9 @@ export const pixelPainter = async (
   }
 
   const layerHandler = await createLayerHandler(projectName, gridSize);
+  const brush = createBrushHandler(layerHandler, gridSize);
 
   const { drawPreview } = await createLayerPreview(gridSize);
-
-  const currentPaintedPixels = new Set<number>();
-  canvas.addEventListener("mouseup", () => {
-    currentPaintedPixels.clear();
-  });
-
-  // TODO: merge this two colors
-  let currentColorSelected: number = 0xff00ff;
-  const colorStore = createSignal("#ff00ff");
-
-  const [getBrushOpacity, setBrushOpacity] = createSignal(100);
 
   const { vertices, vertexBuffer, vertexBufferLayout } =
     createVertexBuffer(device);
@@ -141,58 +131,6 @@ export const pixelPainter = async (
     device.queue.submit([commandBuffer]);
   };
 
-  const setBrushColor = (_color: number | string) => {
-    if (typeof _color === "string") {
-      currentColorSelected = parseInt(_color.replace("#", ""), 16);
-      colorStore[1](_color);
-    }
-
-    if (typeof _color === "number") {
-      currentColorSelected = _color;
-      colorStore[1]("#" + currentColorSelected.toString(16).padStart(6, "0"));
-    }
-  };
-
-  const getColorFrom = (pos: { x: number; y: number }) => {
-    const i = pos.x + pos.y * gridSize;
-    const color = layerHandler.getCurrentBuffer()[i];
-    return color;
-  };
-
-  const paintPixel = (cellPos: { x: number; y: number }) => {
-    const arrayIndex = cellPos.x + cellPos.y * gridSize;
-
-    if (currentPaintedPixels.has(arrayIndex)) {
-      return;
-    }
-
-    let destColor =
-      layerHandler.getCurrentBuffer().at(arrayIndex) ?? 0xffffffff;
-
-    const destRGBA =
-      destColor === 0
-        ? { r: 255, g: 255, b: 255, a: 0 }
-        : numberToRGBA(destColor);
-
-    const sourceRGBA = numberToRGBA(currentColorSelected);
-    sourceRGBA.a = getBrushOpacity() / 100;
-
-    const blendedRGBA = alphaComposite(sourceRGBA, destRGBA);
-
-    const blendedHex = rgbaToHex(blendedRGBA);
-
-    layerHandler.getCurrentBuffer()[arrayIndex] = blendedHex;
-    layerHandler.saveCurrentBuffer();
-
-    currentPaintedPixels.add(arrayIndex);
-  };
-
-  const deletePixel = (cellPos: { x: number; y: number }) => {
-    const arrayIndex = cellPos.x + cellPos.y * gridSize;
-    layerHandler.getCurrentBuffer()[arrayIndex] = 0;
-    layerHandler.saveCurrentBuffer();
-  };
-
   return {
     layer: {
       add: layerHandler.add,
@@ -205,13 +143,16 @@ export const pixelPainter = async (
       getList: layerHandler.getList,
       getActive: layerHandler.getActive,
     },
+    brush: {
+      setColor: brush.setColor,
+      getColor: brush.getColor,
+      paint: brush.paint,
+      erase: brush.erase,
+      getOpacity: brush.getOpacity,
+      setOpacity: brush.setOpacity,
+      getSelectedColor: brush.getSelectedColor,
+      setSelectedColor: brush.setSelectedColor,
+    },
     drawFrame,
-    paintPixel,
-    deletePixel,
-    setBrushColor,
-    getColorFrom,
-    getCurrentColor: colorStore[0],
-    getBrushOpacity,
-    setBrushOpacity,
   };
 };

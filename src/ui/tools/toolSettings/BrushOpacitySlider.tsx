@@ -1,13 +1,13 @@
-import { useProjectConfig } from "../../../projectConfig/projectConfigProvider";
+import { API } from "../../../projectConfig/projectConfigProvider";
 import "./BrushOpacitySlider.css";
 
 export const BrushOpacitySlider = () => {
-  const projectConfig = useProjectConfig();
+  const brush = API.brush();
 
   const onBrushChangeOpacity = (e: InputEvent) => {
     if (e.target) {
       // @ts-expect-error - Figure out the correct type
-      projectConfig.pixel().setBrushOpacity(e.target.valueAsNumber);
+      brush().setOpacity(e.target.valueAsNumber);
     }
   };
 
@@ -19,10 +19,10 @@ export const BrushOpacitySlider = () => {
         type="range"
         min={0}
         max={100}
-        value={projectConfig.pixel().getBrushOpacity()}
+        value={brush().getOpacity()}
         onInput={onBrushChangeOpacity}
       />
-      <p>{Math.floor(projectConfig.pixel().getBrushOpacity())}%</p>
+      <p>{Math.floor(brush().getOpacity())}%</p>
     </div>
   );
 };
