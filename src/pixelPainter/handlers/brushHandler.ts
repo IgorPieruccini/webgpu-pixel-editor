@@ -43,9 +43,27 @@ export const createBrushHandler = (
     return color;
   };
 
-  const paint = (cellPos: { x: number; y: number }) => {
-    const arrayIndex: number[] = [];
+  const composeColors = (index: number) => {
+    let destColor = layerHandler.getCurrentBuffer().at(index) ?? 0xffffffff;
 
+    const destRGBA =
+      destColor === 0
+        ? { r: 255, g: 255, b: 255, a: 0 }
+        : numberToRGBA(destColor);
+
+    const sourceRGBA = numberToRGBA(_getSelectedColor());
+    sourceRGBA.a = getOpacity() / 100;
+
+    const blendedRGBA = alphaComposite(sourceRGBA, destRGBA);
+
+    const blendedHex = rgbaToHex(blendedRGBA);
+
+    layerHandler.getCurrentBuffer()[index] = blendedHex;
+
+    currentPaintedPixels.add(index);
+  };
+
+  const paint = (cellPos: { x: number; y: number }) => {
     const thickness = getThickness();
 
     for (let y = -thickness; y <= thickness; y++) {
@@ -54,35 +72,15 @@ export const createBrushHandler = (
         const _y = cellPos.y + y;
         const i = _x + _y * gridSize;
 
+        if (currentPaintedPixels.has(i)) {
+          continue;
+        }
+
         const distance = Math.hypot(cellPos.x - _x, cellPos.y - _y);
         if (distance < thickness) {
-          arrayIndex.push(i);
+          composeColors(i);
         }
       }
-    }
-
-    for (const i of arrayIndex) {
-      if (currentPaintedPixels.has(i)) {
-        continue;
-      }
-
-      let destColor = layerHandler.getCurrentBuffer().at(i) ?? 0xffffffff;
-
-      const destRGBA =
-        destColor === 0
-          ? { r: 255, g: 255, b: 255, a: 0 }
-          : numberToRGBA(destColor);
-
-      const sourceRGBA = numberToRGBA(_getSelectedColor());
-      sourceRGBA.a = getOpacity() / 100;
-
-      const blendedRGBA = alphaComposite(sourceRGBA, destRGBA);
-
-      const blendedHex = rgbaToHex(blendedRGBA);
-
-      layerHandler.getCurrentBuffer()[i] = blendedHex;
-
-      currentPaintedPixels.add(i);
     }
   };
 
@@ -93,11 +91,38 @@ export const createBrushHandler = (
       for (let x = -thickness; x <= thickness; x++) {
         const _x = cellPos.x + x;
         const _y = cellPos.y + y;
-        const i = _x + _y * gridSize;
+        const index = _x + _y * gridSize;
+
+        if (currentPaintedPixels.has(index)) {
+          continue;
+        }
 
         const distance = Math.hypot(cellPos.x - _x, cellPos.y - _y);
         if (distance < thickness) {
-          layerHandler.getCurrentBuffer()[i] = 0;
+          let destColor =
+            layerHandler.getCurrentBuffer().at(index) ?? 0xffffffff;
+
+          const destRGBA =
+            destColor === 0
+              ? { r: 255, g: 255, b: 255, a: 0 }
+              : numberToRGBA(destColor);
+
+          if (destRGBA.a === 0) {
+            continue;
+          }
+
+          const opacity = destRGBA.a - Math.fround(getOpacity() / 100);
+          const resultRGBA = { ...destRGBA, a: opacity >= 0 ? opacity : 0 };
+
+          if (resultRGBA.a === 0) {
+            layerHandler.getCurrentBuffer()[index] = 0;
+            currentPaintedPixels.add(index);
+            continue;
+          }
+
+          const blendedHex = rgbaToHex(resultRGBA);
+          layerHandler.getCurrentBuffer()[index] = blendedHex;
+          currentPaintedPixels.add(index);
         }
       }
     }
