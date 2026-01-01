@@ -9,10 +9,10 @@ export const editorInitialValue: EditorContextType = {
   createNewPainter: async () => INITIAL_PIXEL_PAINTER,
 };
 
-export const ProjectContext = createContext<Accessor<EditorContextType>>();
+export const editorContext = createContext<Accessor<EditorContextType>>();
 
-export function useProject() {
-  const context = useContext(ProjectContext);
+export function useEditor() {
+  const context = useContext(editorContext);
 
   return context;
 }

@@ -91,7 +91,7 @@ export const createRenderHandler = async (
       selectedCells.y, // square selection y
       selectedCells.z, // selectedCells.z,
       selectedCells.w, // selectedCells.w
-      brushHandler.getThickness(), // brush thickness
+      brushHandler.getDefaultThickness() ?? brushHandler.getThickness(), // brush thickness
     ]);
 
     pass.setPipeline(gridPipeline);

@@ -14,7 +14,22 @@ export const initializeEditor = async () => {
   let selectedCells = { x: -1, y: -1, z: -1, w: -1 };
   let pixel: PixelPainterMethods = INITIAL_PIXEL_PAINTER;
 
-  const [activeTool, setActiveTool] = createSignal(ACTIVATE_TOOL.PAINT);
+  const [activeTool, _setActiveTool] = createSignal(ACTIVATE_TOOL.PAINT);
+
+  const setActiveTool = (activeTool: number) => {
+    _setActiveTool(activeTool);
+
+    // When using paint selection tool (or perhaps other tools that will be implemented), these tools might not need
+    // custom brush thickness, so it's set to 1.
+    if (activeTool === ACTIVATE_TOOL.PAINT_SELECTION) {
+      pixel.brush.setDefaultThickness(1);
+    }
+
+    // And here we make sure the tools that needs the custom thickness are used by setting the default to null
+    if (activeTool !== ACTIVATE_TOOL.PAINT_SELECTION) {
+      pixel.brush.setDefaultThickness(null);
+    }
+  };
 
   const canvas = document.getElementById("main-canvas");
 

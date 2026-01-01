@@ -8,14 +8,14 @@ import { BsBrushFill, BsBrush } from "solid-icons/bs";
 import { FiMenu } from "solid-icons/fi";
 
 import "./index.css";
-import { useProject } from "../../editor/editortContext";
+import { useEditor } from "../../editor/editortContext";
 import { ACTIVATE_TOOL } from "../../editor/constant";
 import { MenuOptions } from "./menu/menuOptions";
 import { createSignal } from "solid-js";
 import { ColorPicker } from "../ColorPicker";
 
 export const Tools = () => {
-  const project = useProject();
+  const project = useEditor();
   const [isOpen, setIsOpen] = createSignal(false);
 
   return (

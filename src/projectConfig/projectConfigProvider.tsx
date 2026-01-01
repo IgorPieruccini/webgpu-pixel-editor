@@ -8,7 +8,7 @@ import {
   type Setter,
 } from "solid-js";
 import { initializeEditor } from "../editor/editor";
-import { ProjectContext, editorInitialValue } from "../editor/editortContext";
+import { editorContext, editorInitialValue } from "../editor/editortContext";
 import { type EditorContextType } from "../editor/types";
 import { useMenu } from "../ui/tools/menuProvider";
 import { INITIAL_PIXEL_PAINTER } from "../editor/constant";
@@ -89,9 +89,9 @@ export const ProjectConfigProvider = (props: ProjectConfigProviderProps) => {
         createNewProject: createOrOpenProject,
       }}
     >
-      <ProjectContext.Provider value={project}>
+      <editorContext.Provider value={project}>
         {props.children}
-      </ProjectContext.Provider>
+      </editorContext.Provider>
     </ProjectConfigContext.Provider>
   );
 };

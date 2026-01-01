@@ -46,6 +46,8 @@ export const pixelPainter = async (
       setSelectedColor: brush.setSelectedColor,
       getThickness: brush.getThickness,
       setThickness: brush.setThickness,
+      getDefaultThickness: brush.getDefaultThickness,
+      setDefaultThickness: brush.setDefaultThickness,
     },
     render,
   };

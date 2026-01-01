@@ -23,6 +23,9 @@ export const createBrushHandler = (
   const [_getSelectedColor, _setSelectedColor] = createSignal(0xff00ff);
   const [getOpacity, setOpacity] = createSignal(100);
   const [getThickness, setThickness] = createSignal(1);
+  const [getDefaultThickness, setDefaultThickness] = createSignal<
+    null | number
+  >(null);
 
   const setColor = (_color: number | string) => {
     if (typeof _color === "string") {
@@ -64,7 +67,7 @@ export const createBrushHandler = (
   };
 
   const paint = (cellPos: { x: number; y: number }) => {
-    const thickness = getThickness();
+    const thickness = getDefaultThickness() ?? getThickness();
 
     for (let y = -thickness; y <= thickness; y++) {
       for (let x = -thickness; x <= thickness; x++) {
@@ -85,7 +88,7 @@ export const createBrushHandler = (
   };
 
   const erase = (cellPos: { x: number; y: number }) => {
-    const thickness = getThickness();
+    const thickness = getDefaultThickness() ?? getThickness();
 
     for (let y = -thickness; y <= thickness; y++) {
       for (let x = -thickness; x <= thickness; x++) {
@@ -156,5 +159,7 @@ export const createBrushHandler = (
     setSelectedColor,
     getThickness,
     setThickness,
+    getDefaultThickness,
+    setDefaultThickness,
   };
 };
