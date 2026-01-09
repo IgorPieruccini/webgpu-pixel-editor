@@ -12,7 +12,7 @@ export const DuplicateLayerButton = ({
 
   const onDuplicate = (e: MouseEvent) => {
     layers().duplicate(layerId);
-    e.preventDefault();
+    e.stopPropagation();
   };
 
   return (
