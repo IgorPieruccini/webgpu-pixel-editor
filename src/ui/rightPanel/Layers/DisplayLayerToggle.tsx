@@ -15,7 +15,7 @@ export const DisplayLayerToggle = ({ layer }: DisplayLayerToggleProps) => {
   };
 
   return (
-    <button class="layer-display-toggle" onClick={onToggleDisplay}>
+    <button class="layer-btn-icon" onClick={onToggleDisplay}>
       {layer.display ? (
         <BiRegularShow size={16} />
       ) : (

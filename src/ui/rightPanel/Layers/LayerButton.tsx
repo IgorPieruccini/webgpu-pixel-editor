@@ -3,6 +3,7 @@ import type { Layer } from "../../../pixelPainter/types";
 import { DeleteLayerButton } from "./DeleteLayerButton";
 import { LayerTitle } from "./LayerTitle";
 import { DisplayLayerToggle } from "./DisplayLayerToggle";
+import { DuplicateLayerButton } from "./DuplicateLayerButton";
 import { API } from "../../../projectConfig/projectConfigProvider";
 
 type LayerButtonProps = {
@@ -38,6 +39,7 @@ export const LayerButton = ({ layer }: LayerButtonProps) => {
         <LayerTitle layerName={layer.name} />
 
         <div class="layer-opt-btn">
+          <DuplicateLayerButton />
           <DisplayLayerToggle layer={layer} />
           <DeleteLayerButton layerId={layer.id} />
         </div>

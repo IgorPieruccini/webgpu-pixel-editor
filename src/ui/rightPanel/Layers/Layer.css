@@ -4,7 +4,7 @@
     width: 100%;
 }
 
-.layer-delete-btn {
+.layer-btn-icon {
     width: 20px;
     height: 20px;
     background: none;
@@ -19,11 +19,4 @@
     display: flex;
     background: none;
     gap: 8px;
-}
-
-.layer-display-toggle {
-    width: 20px;
-    height: 20px;
-    background: none;
-    padding: 0;
 }

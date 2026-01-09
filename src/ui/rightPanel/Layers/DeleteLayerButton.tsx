@@ -14,7 +14,7 @@ export const DeleteLayerButton = ({ layerId }: DeleteLayerButtonProps) => {
   };
 
   return (
-    <button class="layer-delete-btn" onClick={onDelete}>
+    <button class="layer-btn-icon" onClick={onDelete}>
       <AiOutlineDelete />
     </button>
   );
