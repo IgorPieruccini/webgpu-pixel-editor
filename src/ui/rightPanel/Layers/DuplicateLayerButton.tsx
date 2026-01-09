@@ -10,8 +10,9 @@ export const DuplicateLayerButton = ({
 }: DuplicateLayerButtonProps) => {
   const layers = API.layers();
 
-  const onDuplicate = () => {
+  const onDuplicate = (e: MouseEvent) => {
     layers().duplicate(layerId);
+    e.preventDefault();
   };
 
   return (

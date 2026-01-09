@@ -261,16 +261,23 @@ export const createLayerHandler = async (
       ...targetBuffer,
     ]);
 
-    db.save(newBuffer, newLayer.id);
     buffers.set(newLayer.id, newBuffer);
+    db.save(newBuffer, newLayer.id);
 
-    setList([...layers, newLayer]);
+    const first = layers.slice(0, targetLayerIndex);
+    const second = layers.slice(targetLayerIndex, layers.length);
+    const newLayers = [...first, newLayer, ...second];
+
+    setList(newLayers);
     sort(newLayer.id, targetLayer.id);
 
     window.localStorage.setItem(
       `${projectName}-layers`,
-      JSON.stringify(getList()),
+      JSON.stringify(newLayers),
     );
+
+    setActive(newLayer);
+    setCurrentBuffer(newBuffer);
   };
 
   return {
