@@ -234,9 +234,49 @@ export const createLayerHandler = async (
     db.save(getCurrentBuffer(), getActive().id);
   };
 
+  const duplicate = (layerId: string) => {
+    const layers = getList();
+    const targetLayerIndex = layers.findIndex((layer) => layer.id === layerId);
+    const targetLayer = layers[targetLayerIndex];
+
+    if (!targetLayer) {
+      throw new Error(`Could not find layer with id ${layerId} to duplicate`);
+    }
+
+    const newLayer: Layer = {
+      ...targetLayer,
+      id: generateUUID(),
+      name: `${targetLayer.name} (copy)`,
+    };
+
+    const targetBuffer = buffers.get(targetLayer.id);
+
+    if (!targetBuffer) {
+      throw new Error(
+        `Could not find layer buffer linked to id ${layerId} to duplicate`,
+      );
+    }
+
+    const newBuffer: Uint32Array<ArrayBuffer> = new Uint32Array([
+      ...targetBuffer,
+    ]);
+
+    db.save(newBuffer, newLayer.id);
+    buffers.set(newLayer.id, newBuffer);
+
+    setList([...layers, newLayer]);
+    sort(newLayer.id, targetLayer.id);
+
+    window.localStorage.setItem(
+      `${projectName}-layers`,
+      JSON.stringify(getList()),
+    );
+  };
+
   return {
     add,
     remove,
+    duplicate,
     sort,
     rename,
     toggleDisplay,

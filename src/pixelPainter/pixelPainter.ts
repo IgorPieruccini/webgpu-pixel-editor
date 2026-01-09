@@ -27,6 +27,7 @@ export const pixelPainter = async (
     layer: {
       add: layerHandler.add,
       remove: layerHandler.remove,
+      duplicate: layerHandler.duplicate,
       sort: layerHandler.sort,
       rename: layerHandler.rename,
       toggleDisplay: layerHandler.toggleDisplay,

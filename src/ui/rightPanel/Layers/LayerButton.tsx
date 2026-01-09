@@ -39,7 +39,7 @@ export const LayerButton = ({ layer }: LayerButtonProps) => {
         <LayerTitle layerName={layer.name} />
 
         <div class="layer-opt-btn">
-          <DuplicateLayerButton />
+          <DuplicateLayerButton layerId={layer.id} />
           <DisplayLayerToggle layer={layer} />
           <DeleteLayerButton layerId={layer.id} />
         </div>
