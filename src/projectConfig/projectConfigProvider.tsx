@@ -58,14 +58,16 @@ export const ProjectConfigProvider = (props: ProjectConfigProviderProps) => {
           JSON.stringify({ name, gridSize }),
         );
         const projectsString = window.localStorage.getItem("projects");
-        const projectsName: Array<string> = projectsString
+        const projects: Array<ProjectType> = projectsString
           ? JSON.parse(projectsString)
           : null;
+
+        const projectsName = projects?.map((project) => project.name) || [];
 
         if (!projectsName?.includes(name)) {
           window.localStorage.setItem(
             "projects",
-            JSON.stringify([...(projectsName ?? []), { name, gridSize }]),
+            JSON.stringify([...(projects ?? []), { name, gridSize }]),
           );
         }
       });
