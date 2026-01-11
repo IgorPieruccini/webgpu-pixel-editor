@@ -3,11 +3,12 @@
 import { createLayerHandler } from "./handlers/layerHandler";
 import { createBrushHandler } from "./handlers/brushHandler";
 import { createRenderHandler } from "./handlers/renderHandler";
+import type { Vec2 } from "../editor/types";
 
 export const pixelPainter = async (
   projectName: string,
-  gridSize: number,
-  canvasSize: { x: number; y: number },
+  gridSize: Vec2,
+  canvasSize: Vec2,
 ) => {
   const canvas = document.querySelector<HTMLCanvasElement>("#" + "main-canvas");
   if (!canvas) {

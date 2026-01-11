@@ -7,9 +7,9 @@ import {
   type JSX,
   type Setter,
 } from "solid-js";
-import { initializeEditor } from "../editor/editor";
+import { initializeEditor, type EditorType } from "../editor/editor";
 import { editorContext, editorInitialValue } from "../editor/editortContext";
-import { type EditorContextType } from "../editor/types";
+import { type ProjectType } from "../editor/types";
 import { useMenu } from "../ui/tools/menuProvider";
 import { INITIAL_PIXEL_PAINTER } from "../editor/constant";
 import type { PixelPainterMethods } from "../pixelPainter/types";
@@ -17,7 +17,7 @@ import type { PixelPainterMethods } from "../pixelPainter/types";
 type ProjectConfigContextType = {
   projectName: Accessor<string>;
   setProjectName: Setter<string>;
-  createNewProject: (name: string) => void;
+  createNewProject: (project: ProjectType) => void;
   pixel: Accessor<PixelPainterMethods>;
 };
 
@@ -40,21 +40,23 @@ type ProjectConfigProviderProps = {
 
 export const ProjectConfigProvider = (props: ProjectConfigProviderProps) => {
   const [projectName, setProjectName] = createSignal("new-project");
-  const [project, setProject] =
-    createSignal<EditorContextType>(editorInitialValue);
+  const [project, setProject] = createSignal<EditorType>(editorInitialValue);
   const [pixel, setPixel] = createSignal<PixelPainterMethods>(
     INITIAL_PIXEL_PAINTER,
   );
 
   const menu = useMenu();
 
-  const createOrOpenProject = (name: string) => {
+  const createOrOpenProject = ({ name, gridSize }: ProjectType) => {
     project()
-      .createNewPainter(name)
+      .createNewPainter(name, gridSize)
       .then((value) => {
         setPixel(value);
         menu.openOption(-1);
-        window.localStorage.setItem("active_project", name);
+        window.localStorage.setItem(
+          "active_project",
+          JSON.stringify({ name, gridSize }),
+        );
         const projectsString = window.localStorage.getItem("projects");
         const projectsName: Array<string> = projectsString
           ? JSON.parse(projectsString)
@@ -63,7 +65,7 @@ export const ProjectConfigProvider = (props: ProjectConfigProviderProps) => {
         if (!projectsName?.includes(name)) {
           window.localStorage.setItem(
             "projects",
-            JSON.stringify([...(projectsName ?? []), name]),
+            JSON.stringify([...(projectsName ?? []), { name, gridSize }]),
           );
         }
       });
@@ -72,10 +74,19 @@ export const ProjectConfigProvider = (props: ProjectConfigProviderProps) => {
   onMount(() => {
     initializeEditor().then((result) => {
       setProject(result);
-      const activeProjectName = window.localStorage.getItem("active_project");
-      if (activeProjectName) {
-        setProjectName(activeProjectName);
-        createOrOpenProject(activeProjectName);
+      const activeProject = window.localStorage.getItem("active_project");
+      if (activeProject) {
+        const parsedActiveProject: ProjectType = JSON.parse(activeProject);
+
+        if (!parsedActiveProject.name || !parsedActiveProject.gridSize) {
+          throw new Error(
+            "Could not initialize project, data is corrupt, please open project manually",
+          );
+          // TODO: Show a toaster or a window to the user with the error message
+        }
+
+        setProjectName(parsedActiveProject.name);
+        createOrOpenProject(parsedActiveProject);
       }
     });
   });

@@ -1,9 +1,10 @@
+import type { Vec2 } from "../editor/types";
 import { createVertexBuffer } from "./createBufferLayout";
 import { createPipeline } from "./createPipeline";
 import { bind } from "./utils";
 import { webGPUSetup } from "./webGPUSetup";
 
-export const createLayerPreview = async (gridSize: number) => {
+export const createLayerPreview = async (gridSize: Vec2) => {
   const canvasSize = { x: 300, y: 300 };
 
   const { device, canvasFormat, context } = await webGPUSetup("preview-canvas");
@@ -39,8 +40,8 @@ export const createLayerPreview = async (gridSize: number) => {
     });
 
     const gridValues = new Float32Array([
-      gridSize, // grid width in cells
-      gridSize, // grid height in cells
+      gridSize.x, // grid width in cells
+      gridSize.y, // grid height in cells
       canvasSize.x, // canvas width
       canvasSize.y, // canvas height
       1, // viewport offset x
@@ -56,13 +57,13 @@ export const createLayerPreview = async (gridSize: number) => {
     // DRAW ALPHA_LAYER
     pass.setBindGroup(0, createBind("bindValues", gridValues, 0));
     pass.setBindGroup(1, createBind("colors", buffer, 1));
-    pass.draw(vertices.length / 2, gridSize * gridSize); // 6 vertices and draw several times
+    pass.draw(vertices.length / 2, gridSize.x * gridSize.y); // 6 vertices and draw several times
     gridValues[7] = 0;
 
     pass.setBindGroup(0, createBind("bindValues", gridValues, 0));
     pass.setBindGroup(1, createBind("colors", buffer, 1));
 
-    pass.draw(vertices.length / 2, gridSize * gridSize); // 6 vertices and draw several times
+    pass.draw(vertices.length / 2, gridSize.x * gridSize.y); // 6 vertices and draw several times
 
     pass.end();
     const commandBuffer = encoder.finish();

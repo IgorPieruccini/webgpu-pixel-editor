@@ -1,3 +1,4 @@
+import type { Vec2 } from "../../editor/types";
 import { createVertexBuffer } from "../createBufferLayout";
 import { createPipeline } from "../createPipeline";
 import { createLayerPreview } from "../layerPreview";
@@ -9,8 +10,8 @@ import type { LayerHandler } from "./layerHandler";
 export const createRenderHandler = async (
   layerHandler: LayerHandler,
   brushHandler: BrushHandler,
-  gridSize: number,
-  canvasSize: { x: number; y: number },
+  gridSize: Vec2,
+  canvasSize: Vec2,
 ) => {
   const { device, canvasFormat, context } = await webGPUSetup("main-canvas");
 
@@ -42,7 +43,7 @@ export const createRenderHandler = async (
     zoom: number,
     selectedCells: { x: number; y: number; z: number; w: number },
   ) => {
-    const alphaLayer = new Uint32Array(gridSize * gridSize);
+    const alphaLayer = new Uint32Array(gridSize.x * gridSize.x);
 
     if (layerHandler.buffers.size === 0) {
       return;
@@ -66,8 +67,8 @@ export const createRenderHandler = async (
     });
 
     const gridValues = new Float32Array([
-      gridSize, // grid width in cells
-      gridSize, // grid height in cells
+      gridSize.x, // grid width in cells
+      gridSize.y, // grid height in cells
       canvasSize.x, // canvas width
       canvasSize.y, // canvas height
       pan.x, // viewport offset x
@@ -78,8 +79,8 @@ export const createRenderHandler = async (
     ]);
 
     const uiValues = new Float32Array([
-      gridSize, // grid width in cells
-      gridSize, // grid height in cells
+      gridSize.x, // grid width in cells
+      gridSize.y, // grid height in cells
       cellPos.x, // the cell x position
       cellPos.y, // the cell y position
       canvasSize.x, // canvas width
@@ -103,7 +104,7 @@ export const createRenderHandler = async (
     pass.setBindGroup(0, gridBinder.createBind("bindValues", gridValues, 0));
     pass.setBindGroup(1, gridBinder.createBind("colors", alphaLayer, 1));
 
-    pass.draw(vertices.length / 2, gridSize * gridSize);
+    pass.draw(vertices.length / 2, gridSize.x * gridSize.y);
 
     gridValues[7] = 0;
 
@@ -126,7 +127,7 @@ export const createRenderHandler = async (
       pass.setBindGroup(0, gridBinder.createBind("bindValues", gridValues, 0));
       pass.setBindGroup(1, gridBinder.createBind("colors", buffer, 1));
 
-      pass.draw(vertices.length / 2, gridSize * gridSize);
+      pass.draw(vertices.length / 2, gridSize.x * gridSize.y);
       index++;
     }
 
@@ -135,7 +136,7 @@ export const createRenderHandler = async (
 
     // DRAW UI
     pass.setBindGroup(0, uiBinder.createBind("bindValues", uiValues, 0));
-    pass.draw(vertices.length / 2, gridSize * gridSize);
+    pass.draw(vertices.length / 2, gridSize.x * gridSize.y);
 
     pass.end();
     const commandBuffer = encoder.finish();

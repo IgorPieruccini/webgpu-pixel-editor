@@ -2,12 +2,13 @@ import { createSignal } from "solid-js";
 import type { Layer, Layers } from "../types";
 import { generateUUID } from "../../utils";
 import { localDataBase } from "../../storage";
+import type { Vec2 } from "../../editor/types";
 
 export type LayerHandler = Awaited<ReturnType<typeof createLayerHandler>>;
 
 export const createLayerHandler = async (
   projectName: string,
-  gridSize: number,
+  gridSize: Vec2,
 ) => {
   let stringLayers = window.localStorage.getItem(`${projectName}-layers`);
   if (!stringLayers) {
@@ -38,10 +39,10 @@ export const createLayerHandler = async (
       if (layerBuffer) {
         buffers.set(layer.id, layerBuffer);
       } else {
-        buffers.set(layer.id, new Uint32Array(gridSize * gridSize));
+        buffers.set(layer.id, new Uint32Array(gridSize.x * gridSize.y));
       }
     } catch {
-      buffers.set(layer.id, new Uint32Array(gridSize * gridSize));
+      buffers.set(layer.id, new Uint32Array(gridSize.x * gridSize.y));
     }
   }
 
@@ -75,7 +76,7 @@ export const createLayerHandler = async (
 
     setActive(layer);
 
-    const newBuffer = new Uint32Array(gridSize * gridSize);
+    const newBuffer = new Uint32Array(gridSize.x * gridSize.y);
 
     buffers.set(layer.id, newBuffer);
     setCurrentBuffer(newBuffer);

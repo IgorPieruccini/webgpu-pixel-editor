@@ -1,18 +1,22 @@
 import { pixelPainter } from "../pixelPainter/pixelPainter";
-import { ZOOM_SENSITIVITY } from "../constants";
+import { DEFAULT_GRID_SIZE, ZOOM_SENSITIVITY } from "../constants";
 import { ACTIVATE_TOOL, INITIAL_PIXEL_PAINTER } from "./constant";
 import { createSignal } from "solid-js";
 import type { PixelPainterMethods } from "../pixelPainter/types";
+import type { Vec2 } from "./types";
+
+export type EditorType = Awaited<ReturnType<typeof initializeEditor>>;
 
 export const initializeEditor = async () => {
-  const gridSize: number = 128;
   const cellPosition = { x: 0, y: 0 };
   const pan = { x: 0, y: 0 };
   let zoom = 1;
   let pressingSpace = false;
   let isLeftMouseDown = false;
   let selectedCells = { x: -1, y: -1, z: -1, w: -1 };
+
   let pixel: PixelPainterMethods = INITIAL_PIXEL_PAINTER;
+  let gridSize: Vec2 = DEFAULT_GRID_SIZE;
 
   const [activeTool, _setActiveTool] = createSignal(ACTIVATE_TOOL.PAINT);
 
@@ -46,7 +50,10 @@ export const initializeEditor = async () => {
 
   const createNewPainter = async (
     name: string,
+    grid: Vec2,
   ): Promise<PixelPainterMethods> => {
+    gridSize = grid;
+
     pixel = await pixelPainter(name, gridSize, {
       x: viewport.width,
       y: viewport.height,
@@ -192,10 +199,10 @@ export const initializeEditor = async () => {
     const worldY = my / zoom;
 
     // 3. world space (-1..1) → normalized 0..1 → grid index
-    const cellX = Math.floor((worldX + 1) * 0.5 * gridSize);
-    const cellY = Math.floor((worldY + 1) * 0.5 * gridSize);
+    const cellX = Math.floor((worldX + 1) * 0.5 * gridSize.x);
+    const cellY = Math.floor((worldY + 1) * 0.5 * gridSize.x);
 
-    return { x: cellX, y: gridSize - 1 - cellY };
+    return { x: cellX, y: gridSize.x - 1 - cellY };
   }
 
   const wheelHandler = (e: WheelEvent) => {

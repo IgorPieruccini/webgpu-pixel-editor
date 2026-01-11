@@ -7,7 +7,7 @@ export type BrushHandler = ReturnType<typeof createBrushHandler>;
 
 export const createBrushHandler = (
   layerHandler: LayerHandler,
-  gridSize: number,
+  gridSize: Vec2,
 ) => {
   const canvas = document.querySelector<HTMLCanvasElement>("#main-canvas");
   if (!canvas) {
@@ -38,7 +38,7 @@ export const createBrushHandler = (
   };
 
   const getColor = (pos: Vec2, format: "number" | "string" = "number") => {
-    const i = pos.x + pos.y * gridSize;
+    const i = pos.x + pos.y * gridSize.x;
     const color = layerHandler.getCurrentBuffer()[i];
     if (format === "string") {
       return `#${(color >> 0).toString(16).padStart(6, "0")}`;
@@ -73,7 +73,7 @@ export const createBrushHandler = (
       for (let x = -thickness; x <= thickness; x++) {
         const _x = cellPos.x + x;
         const _y = cellPos.y + y;
-        const i = _x + _y * gridSize;
+        const i = _x + _y * gridSize.x;
 
         if (currentPaintedPixels.has(i)) {
           continue;
@@ -94,7 +94,7 @@ export const createBrushHandler = (
       for (let x = -thickness; x <= thickness; x++) {
         const _x = cellPos.x + x;
         const _y = cellPos.y + y;
-        const index = _x + _y * gridSize;
+        const index = _x + _y * gridSize.x;
 
         if (currentPaintedPixels.has(index)) {
           continue;

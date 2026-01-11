@@ -10,9 +10,9 @@
 
 .menu-panel {
     background-color: #242424;
-    min-width: 200px;
+    min-width: 300px;
     display: flex;
-    gap: 4px;
+    gap: 16px;
     flex-direction: column;
     padding: 8px 8px 8px 8px;
 
@@ -29,5 +29,19 @@
         flex-direction: column;
         padding: 10px;
         overflow: auto; /* enables scrolling when content overflows */
+    }
+
+    #grid-size-container {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+    }
+
+    .grid-size-input {
+        display: flex;
+        gap: 8px;
+        input {
+            min-width: 128px;
+        }
     }
 }
