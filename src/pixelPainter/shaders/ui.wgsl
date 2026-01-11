@@ -23,6 +23,7 @@ fn vertexMain(@location(0) pos: vec2f, @builtin(instance_index) instance: u32) -
     let canvasSize = vec2f(bindValues[4], bindValues[5]);
 
     let aspectRatio = canvasSize.x / canvasSize.y;
+    let gridSizeRatio = gridSize.x / gridSize.y;
     let pan = vec2f(bindValues[6], bindValues[7]);
     let zoom:f32 = bindValues[8];
     let zoomScale = 1.0 / zoom;
@@ -58,7 +59,7 @@ fn vertexMain(@location(0) pos: vec2f, @builtin(instance_index) instance: u32) -
 
     let transformationApplied = vec2f(zoomed + panNorm);
 
-    let corrected = vec2f(transformationApplied.x / aspectRatio, transformationApplied.y);
+    let corrected = vec2f(transformationApplied.x / aspectRatio, transformationApplied.y / gridSizeRatio);
 
     out.cellPos = inverseOwnCell;
     out.position = vec4f(corrected, 0, 1);

@@ -183,6 +183,7 @@ export const initializeEditor = async () => {
     canvasOffset: { x: number; y: number },
   ) {
     const aspectRatio = viewport.width / viewport.height;
+    const gridRatio = gridSize.x / gridSize.y;
     const gap = (-viewport.width * aspectRatio) / 2 + viewport.width / 2;
 
     // 1. screen → clip space (-1..1)
@@ -196,13 +197,13 @@ export const initializeEditor = async () => {
 
     // 2. clip space → world space (undo shader transform)
     const worldX = mx / zoom;
-    const worldY = my / zoom;
+    const worldY = (my / zoom) * gridRatio;
 
     // 3. world space (-1..1) → normalized 0..1 → grid index
     const cellX = Math.floor((worldX + 1) * 0.5 * gridSize.x);
-    const cellY = Math.floor((worldY + 1) * 0.5 * gridSize.x);
+    const cellY = Math.floor((worldY + 1) * 0.5 * gridSize.y);
 
-    return { x: cellX, y: gridSize.x - 1 - cellY };
+    return { x: cellX, y: gridSize.y - 1 - cellY };
   }
 
   const wheelHandler = (e: WheelEvent) => {
