@@ -13,7 +13,7 @@ export const BrushThicknessSlider = () => {
 
   return (
     <div id="brush-thickness-container" class="tool-input">
-      <label for="layer-thickness-input">Layer Thickness</label>
+      <label for="layer-thickness-input">Thickness</label>
       <input
         id="brush-thickness-input"
         type="range"
