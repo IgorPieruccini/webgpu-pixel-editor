@@ -39,6 +39,8 @@ export const createLayerPreview = async (gridSize: Vec2) => {
       ],
     });
 
+    const zoom = gridSize.x / gridSize.y;
+
     const gridValues = new Float32Array([
       gridSize.x, // grid width in cells
       gridSize.y, // grid height in cells
@@ -46,7 +48,7 @@ export const createLayerPreview = async (gridSize: Vec2) => {
       canvasSize.y, // canvas height
       1, // viewport offset x
       1, // viewport offset y
-      1, // viewport zoom
+      zoom, // viewport zoom
       1, // 1 = is first layer, 0 = not first layer
       opacity, // layer opacity (start with full opacity)
     ]);

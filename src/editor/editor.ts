@@ -54,6 +54,8 @@ export const initializeEditor = async () => {
   ): Promise<PixelPainterMethods> => {
     gridSize = grid;
 
+    zoom = grid.x / grid.y;
+
     pixel = await pixelPainter(name, gridSize, {
       x: viewport.width,
       y: viewport.height,
