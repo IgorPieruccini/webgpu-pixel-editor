@@ -5,8 +5,10 @@ type LayerTitleProps = {
   layerName: string;
 };
 
+const MAX_LAYER_NAME_LENGTH = 25;
+
 export const LayerTitle = ({ layerName }: LayerTitleProps) => {
-  const [name, setName] = createSignal<string>(layerName);
+  const [getName, setName] = createSignal<string>(layerName);
   const [isEditing, setIsEditing] = createSignal<boolean>(false);
   const layersAPI = API.layers();
 
@@ -38,8 +40,16 @@ export const LayerTitle = ({ layerName }: LayerTitleProps) => {
   };
 
   const finishEditing = () => {
-    layersAPI().rename(name());
+    layersAPI().rename(getName());
     setIsEditing(false);
+  };
+
+  const getShortenName = () => {
+    const name = getName();
+    if (name.length > MAX_LAYER_NAME_LENGTH) {
+      return name.slice(0, MAX_LAYER_NAME_LENGTH - 3) + "...";
+    }
+    return name;
   };
 
   return (
@@ -47,13 +57,16 @@ export const LayerTitle = ({ layerName }: LayerTitleProps) => {
       {isEditing() ? (
         <input
           ref={autoFocus}
+          class="layer-title"
           type="text"
-          value={name()}
+          value={getName()}
           onInput={onTypeName}
           onBlur={finishEditing}
         />
       ) : (
-        <span onDblClick={onStartEditing}>{name()}</span>
+        <span class="layer-title" onDblClick={onStartEditing}>
+          {getShortenName()}
+        </span>
       )}
     </>
   );

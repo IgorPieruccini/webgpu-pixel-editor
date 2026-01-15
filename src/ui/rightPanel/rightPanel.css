@@ -1,5 +1,6 @@
 #right-panel {
     min-width: 300px;
+    max-width: 300px;
     position: absolute;
     gap: 8px;
     right: 0px;
