@@ -19,11 +19,11 @@ fn vertexMain(@location(0) pos: vec2f, @builtin(instance_index) instance: u32) -
     let i = f32(instance);
 
     let gridSize = vec2f(bindValues[0], bindValues[1]);
+    let gridSizeRatio = gridSize.x / gridSize.y;
     let mouseCellPos = vec2f(bindValues[2], bindValues[3]);
     let canvasSize = vec2f(bindValues[4], bindValues[5]);
 
     let aspectRatio = canvasSize.x / canvasSize.y;
-    let gridSizeRatio = gridSize.x / gridSize.y;
     let pan = vec2f(bindValues[6], bindValues[7]);
     let zoom:f32 = bindValues[8];
     let zoomScale = 1.0 / zoom;
@@ -54,7 +54,7 @@ fn vertexMain(@location(0) pos: vec2f, @builtin(instance_index) instance: u32) -
 
     let panNorm = vec2f(
         (pan.x / canvasSize.x) * 2.0,
-        (pan.y / canvasSize.y) * 2.0
+        (pan.y / canvasSize.y * gridSizeRatio) * 2.0
     );
 
     let transformationApplied = vec2f(zoomed + panNorm);
