@@ -12,7 +12,12 @@ export const RightPanel = () => {
 
   return (
     <div id="right-panel">
-      <p>{projectConfig.projectName()}</p>
+      <div id="project-title">
+        <span>{projectConfig.projectName()}</span>
+        <span>
+          {`${projectConfig.getProjectGridSize().x} x ${projectConfig.getProjectGridSize().y}`}
+        </span>
+      </div>
       <Layers />
       <div id="layer-preview">
         <p>Layer preview</p>

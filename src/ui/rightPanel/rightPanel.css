@@ -40,4 +40,9 @@
     #layer-preview {
         margin-top: 16px;
     }
+
+    #project-title {
+        display: flex;
+        justify-content: space-between;
+    }
 }

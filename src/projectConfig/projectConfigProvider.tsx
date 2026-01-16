@@ -9,14 +9,17 @@ import {
 } from "solid-js";
 import { initializeEditor, type EditorType } from "../editor/editor";
 import { editorContext, editorInitialValue } from "../editor/editortContext";
-import { type ProjectType } from "../editor/types";
+import { type ProjectType, type Vec2 } from "../editor/types";
 import { useMenu } from "../ui/tools/menuProvider";
 import { INITIAL_PIXEL_PAINTER } from "../editor/constant";
 import type { PixelPainterMethods } from "../pixelPainter/types";
+import { DEFAULT_GRID_SIZE } from "../constants";
 
 type ProjectConfigContextType = {
   projectName: Accessor<string>;
   setProjectName: Setter<string>;
+  setProjectGridSize: Setter<Vec2>;
+  getProjectGridSize: Accessor<Vec2>;
   createNewProject: (project: ProjectType) => void;
   pixel: Accessor<PixelPainterMethods>;
 };
@@ -26,6 +29,12 @@ const initialProjectConfig: ProjectConfigContextType = {
   projectName: () => "new project",
   setProjectName: () => {
     console.warn("not implemented");
+  },
+  setProjectGridSize: () => {
+    console.warn("not implemented");
+  },
+  getProjectGridSize: () => {
+    return DEFAULT_GRID_SIZE;
   },
   createNewProject: () => {
     console.warn("nt implemented");
@@ -40,6 +49,8 @@ type ProjectConfigProviderProps = {
 
 export const ProjectConfigProvider = (props: ProjectConfigProviderProps) => {
   const [projectName, setProjectName] = createSignal("new-project");
+  const [getProjectGridSize, setProjectGridSize] =
+    createSignal(DEFAULT_GRID_SIZE);
   const [project, setProject] = createSignal<EditorType>(editorInitialValue);
   const [pixel, setPixel] = createSignal<PixelPainterMethods>(
     INITIAL_PIXEL_PAINTER,
@@ -51,6 +62,9 @@ export const ProjectConfigProvider = (props: ProjectConfigProviderProps) => {
     project()
       .createNewPainter(name, gridSize)
       .then((value) => {
+        setProjectName(name);
+        setProjectGridSize(gridSize);
+
         setPixel(value);
         menu.openOption(-1);
         window.localStorage.setItem(
@@ -99,6 +113,8 @@ export const ProjectConfigProvider = (props: ProjectConfigProviderProps) => {
         pixel,
         projectName,
         setProjectName,
+        setProjectGridSize,
+        getProjectGridSize,
         createNewProject: createOrOpenProject,
       }}
     >
@@ -110,6 +126,11 @@ export const ProjectConfigProvider = (props: ProjectConfigProviderProps) => {
 };
 
 export const useProjectConfig = () => {
+  const context = useContext(ProjectConfigContext);
+  return context;
+};
+
+export const useProject = () => {
   const context = useContext(ProjectConfigContext);
   return context;
 };

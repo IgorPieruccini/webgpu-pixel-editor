@@ -17,7 +17,6 @@ export const NewProjectPanel = () => {
   const projectConfig = useProjectConfig();
 
   const onCreate = () => {
-    projectConfig.setProjectName(getProjectName());
     projectConfig.createNewProject({
       name: getProjectName(),
       gridSize: getGridSize(),
