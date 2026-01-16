@@ -4,6 +4,7 @@ import { ACTIVATE_TOOL, INITIAL_PIXEL_PAINTER } from "./constant";
 import { createSignal } from "solid-js";
 import type { PixelPainterMethods } from "../pixelPainter/types";
 import type { Vec2 } from "./types";
+import { calculateZoomFromGridAndCanvasSize } from "../utils";
 
 export type EditorType = Awaited<ReturnType<typeof initializeEditor>>;
 
@@ -54,7 +55,10 @@ export const initializeEditor = async () => {
   ): Promise<PixelPainterMethods> => {
     gridSize = grid;
 
-    zoom = grid.x / grid.y;
+    zoom = calculateZoomFromGridAndCanvasSize(gridSize, {
+      x: viewport.width,
+      y: viewport.height,
+    });
 
     pixel = await pixelPainter(name, gridSize, {
       x: viewport.width,

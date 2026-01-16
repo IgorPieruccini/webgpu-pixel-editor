@@ -35,7 +35,6 @@ export const NewProjectPanel = () => {
 
   const onFocusOut = (axis: keyof Vec2) => {
     const gridSize = { ...getGridSize() };
-    console.log({ gridSize });
 
     if (gridSize[axis] > MAX_GRID_SIZE) {
       gridSize[axis] = MAX_GRID_SIZE;

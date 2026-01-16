@@ -1,4 +1,6 @@
+import { LAYER_PREVIEW_SIZE } from "../../constants";
 import type { Vec2 } from "../../editor/types";
+import { calculateZoomFromGridAndCanvasSize } from "../../utils";
 import { createVertexBuffer } from "../createBufferLayout";
 import { createPipeline } from "../createPipeline";
 import { createLayerPreview } from "../layerPreview";
@@ -15,7 +17,10 @@ export const createRenderHandler = async (
 ) => {
   const { device, canvasFormat, context } = await webGPUSetup("main-canvas");
 
-  const { drawPreview } = await createLayerPreview(gridSize);
+  const { drawPreview } = await createLayerPreview(
+    gridSize,
+    calculateZoomFromGridAndCanvasSize(gridSize, LAYER_PREVIEW_SIZE),
+  );
 
   const { vertices, vertexBuffer, vertexBufferLayout } =
     createVertexBuffer(device);
