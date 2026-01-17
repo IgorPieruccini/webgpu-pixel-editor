@@ -1,5 +1,6 @@
 import { createSignal } from "solid-js";
 import "./DevTool.css";
+import { LayersTool } from "./LayersTool/LayersTool";
 
 export const DevTool = () => {
   const [getShow, setShow] = createSignal(false);
@@ -19,7 +20,7 @@ export const DevTool = () => {
             <button onClick={() => setShow(false)}>close</button>
           </div>
           <div id="content">
-            <p>Here goes all the devs tool</p>
+            <LayersTool />
           </div>
         </>
       )}

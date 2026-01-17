@@ -1,0 +1,20 @@
+#layers-tool {
+    display: flex;
+    flex-direction: column;
+    min-width: 356px;
+
+    .list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        max-height: 200px;
+        overflow-y: auto;
+    }
+
+    .layer-node {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+    }
+}
