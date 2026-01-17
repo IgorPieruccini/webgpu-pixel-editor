@@ -3,11 +3,17 @@
     flex-direction: column;
     min-width: 356px;
 
+    #layer-tool-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
     .list {
         display: flex;
         flex-direction: column;
         gap: 8px;
-        max-height: 200px;
+        max-height: 180px;
         overflow-y: auto;
     }
 

@@ -14,8 +14,12 @@ const serialize = (buffer: Uint32Array, gridSize: Vec2): number[] => {
   let index = 0;
 
   for (const color of buffer) {
-    if (color !== cColor) {
-      const rangeArray = [rangeStart, index - 1, RANGE_SEPARATOR];
+    if (color !== cColor || index === buffer.length - 1) {
+      const rangeArray = [
+        rangeStart,
+        index === buffer.length - 1 ? index : index - 1,
+        RANGE_SEPARATOR,
+      ];
       const colorRanges = colorMap.get(cColor) || [];
       colorMap.set(cColor, [...colorRanges, ...rangeArray]);
 
@@ -36,7 +40,7 @@ const serialize = (buffer: Uint32Array, gridSize: Vec2): number[] => {
   return [...colorDataArray, LAYER_DATA_SEPARATOR];
 };
 
-const deserialize = (data: number[]) => {
+const deserialize = (data: number[]): Uint32Array<ArrayBuffer> => {
   const version = data[0];
   console.log(
     "only one version exist for now, so nothing to do with it",
@@ -48,7 +52,7 @@ const deserialize = (data: number[]) => {
   // 4 is after the LAYER_DATA_SEPARATOR
   const dataLayer = data.slice(3, data.length);
 
-  const buffer: Uint32Array = new Uint32Array(
+  const buffer: Uint32Array<ArrayBuffer> = new Uint32Array(
     layerGridSize.x * layerGridSize.x,
   );
 

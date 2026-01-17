@@ -1,9 +1,11 @@
+import { AiOutlineDownload, AiOutlinePlus } from "solid-icons/ai";
 import {
   API,
   useProjectConfig,
 } from "../../../projectConfig/projectConfigProvider";
 import { serialization } from "../../../serialization";
 import "./LayersTool.css";
+import { TbFileImport } from "solid-icons/tb";
 
 export const LayersTool = () => {
   const layers = API.layers();
@@ -29,7 +31,7 @@ export const LayersTool = () => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `{${name}-${layerId}.px`;
+    link.download = `${name}-${layerId}.px`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -61,9 +63,7 @@ export const LayersTool = () => {
 
           const buffer = serialization.layer.deserialize(layerData);
 
-          console.log(buffer);
-
-          // TODO: Apply the loaded data to the layer with layerId
+          layers().setLayerBuffer(layerId, buffer);
         } catch (error) {
           console.error("Error parsing .px file:", error);
           alert("Invalid .px file format");
@@ -79,7 +79,12 @@ export const LayersTool = () => {
 
   return (
     <div id="layers-tool">
-      <h3>Layers tool</h3>
+      <div id="layer-tool-title">
+        <h3>Layers tool</h3>
+        <button>
+          <AiOutlinePlus />
+        </button>
+      </div>
       <div class="list">
         {layers()
           .getList()
@@ -88,8 +93,13 @@ export const LayersTool = () => {
               <div class="layer-node">
                 <span>{layer.name}</span>
                 <div class="layer-node">
-                  <button onClick={() => onDownload(layer.id)}>download</button>
-                  <button onClick={() => onUpload(layer.id)}>upload</button>
+                  <button onClick={() => onDownload(layer.id)}>
+                    <AiOutlineDownload />
+                  </button>
+
+                  <button onClick={() => onUpload(layer.id)}>
+                    <TbFileImport />
+                  </button>
                 </div>
               </div>
             );
