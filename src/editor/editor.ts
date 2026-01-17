@@ -4,6 +4,7 @@ import { ACTIVATE_TOOL, INITIAL_PIXEL_PAINTER } from "./constant";
 import { createSignal } from "solid-js";
 import type { PixelPainterMethods } from "../pixelPainter/types";
 import type { Vec2 } from "./types";
+import { calculateZoomFromGridAndCanvasSize } from "../utils";
 
 export type EditorType = Awaited<ReturnType<typeof initializeEditor>>;
 
@@ -53,6 +54,11 @@ export const initializeEditor = async () => {
     grid: Vec2,
   ): Promise<PixelPainterMethods> => {
     gridSize = grid;
+
+    zoom = calculateZoomFromGridAndCanvasSize(gridSize, {
+      x: viewport.width,
+      y: viewport.height,
+    });
 
     pixel = await pixelPainter(name, gridSize, {
       x: viewport.width,
@@ -183,6 +189,7 @@ export const initializeEditor = async () => {
     canvasOffset: { x: number; y: number },
   ) {
     const aspectRatio = viewport.width / viewport.height;
+    const gridRatio = gridSize.x / gridSize.y;
     const gap = (-viewport.width * aspectRatio) / 2 + viewport.width / 2;
 
     // 1. screen → clip space (-1..1)
@@ -196,13 +203,13 @@ export const initializeEditor = async () => {
 
     // 2. clip space → world space (undo shader transform)
     const worldX = mx / zoom;
-    const worldY = my / zoom;
+    const worldY = (my / zoom) * gridRatio;
 
     // 3. world space (-1..1) → normalized 0..1 → grid index
     const cellX = Math.floor((worldX + 1) * 0.5 * gridSize.x);
-    const cellY = Math.floor((worldY + 1) * 0.5 * gridSize.x);
+    const cellY = Math.floor((worldY + 1) * 0.5 * gridSize.y);
 
-    return { x: cellX, y: gridSize.x - 1 - cellY };
+    return { x: cellX, y: gridSize.y - 1 - cellY };
   }
 
   const wheelHandler = (e: WheelEvent) => {

@@ -1,12 +1,12 @@
 #right-panel {
     min-width: 300px;
-    position: absolute;
     gap: 8px;
     right: 0px;
     padding: 16px;
     display: flex;
     flex-direction: column;
     background-color: #242424;
+    flex: none;
 
     #layers {
         display: flex;
@@ -39,5 +39,10 @@
 
     #layer-preview {
         margin-top: 16px;
+    }
+
+    #project-title {
+        display: flex;
+        justify-content: space-between;
     }
 }

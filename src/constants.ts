@@ -11,3 +11,5 @@ export const MIN_GRID_SIZE = 8;
 export const MAX_GRID_SIZE = 1024;
 
 export const DEFAULT_GRID_SIZE: Vec2 = { x: 128, y: 128 };
+
+export const LAYER_PREVIEW_SIZE: Vec2 = { x: 300, y: 300 };

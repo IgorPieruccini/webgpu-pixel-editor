@@ -1,12 +1,11 @@
+import { LAYER_PREVIEW_SIZE } from "../constants";
 import type { Vec2 } from "../editor/types";
 import { createVertexBuffer } from "./createBufferLayout";
 import { createPipeline } from "./createPipeline";
 import { bind } from "./utils";
 import { webGPUSetup } from "./webGPUSetup";
 
-export const createLayerPreview = async (gridSize: Vec2) => {
-  const canvasSize = { x: 300, y: 300 };
-
+export const createLayerPreview = async (gridSize: Vec2, zoom: number) => {
   const { device, canvasFormat, context } = await webGPUSetup("preview-canvas");
 
   const { vertices, vertexBuffer, vertexBufferLayout } =
@@ -42,11 +41,11 @@ export const createLayerPreview = async (gridSize: Vec2) => {
     const gridValues = new Float32Array([
       gridSize.x, // grid width in cells
       gridSize.y, // grid height in cells
-      canvasSize.x, // canvas width
-      canvasSize.y, // canvas height
+      LAYER_PREVIEW_SIZE.x, // canvas width
+      LAYER_PREVIEW_SIZE.y, // canvas height
       1, // viewport offset x
       1, // viewport offset y
-      1, // viewport zoom
+      zoom, // viewport zoom
       1, // 1 = is first layer, 0 = not first layer
       opacity, // layer opacity (start with full opacity)
     ]);
