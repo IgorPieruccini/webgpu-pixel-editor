@@ -1,0 +1,32 @@
+#dev-tool {
+    font-size: 12px;
+    position: absolute;
+    width: 100%;
+    background-color: #333;
+    bottom: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    #header {
+        padding: 4px;
+        height: 32px;
+        background-color: black;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    #content {
+        display: flex;
+        padding: 8px;
+    }
+}
+
+.dev-tool-show {
+    height: 300px;
+}
+
+.dev-tool-hide {
+    height: 10;
+    background-color: transparent;
+}
