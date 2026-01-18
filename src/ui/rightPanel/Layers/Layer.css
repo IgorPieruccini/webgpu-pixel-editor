@@ -20,3 +20,13 @@
     background: none;
     gap: 8px;
 }
+
+.layer-title {
+    font-size: 12px;
+    max-width: 150px;
+}
+
+span.layer-title {
+    display: flex;
+    align-items: center;
+}
