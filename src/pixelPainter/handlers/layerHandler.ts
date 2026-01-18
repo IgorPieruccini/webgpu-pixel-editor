@@ -281,6 +281,17 @@ export const createLayerHandler = async (
     setCurrentBuffer(newBuffer);
   };
 
+  const getBufferById = (layerId: string): Uint32Array | undefined => {
+    return buffers.get(layerId);
+  };
+
+  const setLayerBuffer = (
+    layerId: string,
+    buffer: Uint32Array<ArrayBuffer>,
+  ) => {
+    buffers.set(layerId, buffer);
+  };
+
   return {
     add,
     remove,
@@ -295,5 +306,7 @@ export const createLayerHandler = async (
     saveCurrentBuffer,
     getCurrentBuffer,
     buffers,
+    getBufferById,
+    setLayerBuffer,
   };
 };

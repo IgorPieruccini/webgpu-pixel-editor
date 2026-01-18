@@ -36,6 +36,8 @@ export const pixelPainter = async (
       setOpacity: layerHandler.setOpacity,
       getList: layerHandler.getList,
       getActive: layerHandler.getActive,
+      getBufferById: layerHandler.getBufferById,
+      setLayerBuffer: layerHandler.setLayerBuffer,
     },
     brush: {
       setColor: brush.setColor,

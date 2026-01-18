@@ -22,6 +22,9 @@ export const INITIAL_PIXEL_PAINTER: PixelPainterMethods = {
       id: "",
     }),
     setOpacity: () => {},
+    getBufferById: () => undefined,
+    duplicate: () => {},
+    setLayerBuffer: () => {},
   },
   brush: {
     setColor: () => {},
