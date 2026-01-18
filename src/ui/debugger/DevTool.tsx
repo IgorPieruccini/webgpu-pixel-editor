@@ -1,6 +1,7 @@
 import { createSignal } from "solid-js";
 import "./DevTool.css";
 import { LayersTool } from "./LayersTool/LayersTool";
+import { ProjectTool } from "./LayersTool/ProjectTool";
 
 export const DevTool = () => {
   const [getShow, setShow] = createSignal(false);
@@ -21,6 +22,7 @@ export const DevTool = () => {
           </div>
           <div id="content">
             <LayersTool />
+            <ProjectTool />
           </div>
         </>
       )}

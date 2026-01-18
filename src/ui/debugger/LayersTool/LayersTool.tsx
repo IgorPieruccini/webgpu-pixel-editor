@@ -78,7 +78,7 @@ export const LayersTool = () => {
   };
 
   return (
-    <div id="layers-tool">
+    <div id="layers-tool" class="tool">
       <div id="layer-tool-title">
         <h3>Layers tool</h3>
         <button>

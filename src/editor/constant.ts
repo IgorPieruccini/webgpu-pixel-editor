@@ -25,6 +25,7 @@ export const INITIAL_PIXEL_PAINTER: PixelPainterMethods = {
     getBufferById: () => undefined,
     duplicate: () => {},
     setLayerBuffer: () => {},
+    buffers: new Map<string, Uint32Array<ArrayBuffer>>(),
   },
   brush: {
     setColor: () => {},
