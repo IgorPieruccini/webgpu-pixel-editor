@@ -291,10 +291,15 @@ export const createLayerHandler = async (
     buffer: Uint32Array<ArrayBuffer>,
   ) => {
     buffers.set(layerId, buffer);
+    db.save(buffer, layerId);
   };
 
   const load = (layers: Layers, buffers: Record<string, number[]>) => {
     setList(layers);
+    window.localStorage.setItem(
+      `${projectName}-layers`,
+      JSON.stringify(layers),
+    );
 
     for (const [id, buffer] of Object.entries(buffers)) {
       const deserializedBuffer = serialization.layer.deserialize(buffer);
