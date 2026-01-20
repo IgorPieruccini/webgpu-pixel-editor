@@ -3,6 +3,7 @@ import type { Layer, Layers } from "../types";
 import { generateUUID } from "../../utils";
 import { localDataBase } from "../../storage";
 import type { Vec2 } from "../../editor/types";
+import { serialization } from "../../serialization";
 
 export type LayerHandler = Awaited<ReturnType<typeof createLayerHandler>>;
 
@@ -292,6 +293,15 @@ export const createLayerHandler = async (
     buffers.set(layerId, buffer);
   };
 
+  const load = (layers: Layers, buffers: Record<string, number[]>) => {
+    setList(layers);
+
+    for (const [id, buffer] of Object.entries(buffers)) {
+      const deserializedBuffer = serialization.layer.deserialize(buffer);
+      setLayerBuffer(id, deserializedBuffer);
+    }
+  };
+
   return {
     add,
     remove,
@@ -308,5 +318,6 @@ export const createLayerHandler = async (
     buffers,
     getBufferById,
     setLayerBuffer,
+    load,
   };
 };

@@ -6,6 +6,7 @@ import {
   API,
   useProjectConfig,
 } from "../../../projectConfig/projectConfigProvider";
+import type { SerializedProject } from "../../../serialization/project";
 
 export const ProjectTool = () => {
   const project = useProjectConfig();
@@ -35,6 +36,42 @@ export const ProjectTool = () => {
     URL.revokeObjectURL(url);
   };
 
+  const importProject = () => {
+    // Create a file input element
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".json";
+
+    input.onchange = (event) => {
+      const file = (event.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+
+      // Check if the file has .px extension
+      if (!file.name.endsWith(".json")) {
+        alert("Please select a .px file");
+        return;
+      }
+
+      // Read the file content
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const content = e.target?.result as string;
+          const serializedProject: SerializedProject = JSON.parse(content);
+          project.createNewProject(serializedProject);
+        } catch (error) {
+          console.error("Error parsing .json file:", error);
+          alert("Invalid .json file format");
+        }
+      };
+
+      reader.readAsText(file);
+    };
+
+    // Trigger the file dialog
+    input.click();
+  };
+
   return (
     <div id="project-tool" class="tool">
       <h3>Project Tool</h3>
@@ -42,7 +79,7 @@ export const ProjectTool = () => {
         <button onClick={onDownloadProject}>
           <AiOutlineDownload />
         </button>
-        <button>
+        <button onClick={importProject}>
           <TbFileImport />
         </button>
       </div>

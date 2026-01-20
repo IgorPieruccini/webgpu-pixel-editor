@@ -14,13 +14,14 @@ import { useMenu } from "../ui/tools/menuProvider";
 import { INITIAL_PIXEL_PAINTER } from "../editor/constant";
 import type { PixelPainterMethods } from "../pixelPainter/types";
 import { DEFAULT_GRID_SIZE } from "../constants";
+import type { SerializedProject } from "../serialization/project";
 
 type ProjectConfigContextType = {
   projectName: Accessor<string>;
   setProjectName: Setter<string>;
   setProjectGridSize: Setter<Vec2>;
   getProjectGridSize: Accessor<Vec2>;
-  createNewProject: (project: ProjectType) => void;
+  createNewProject: (project: ProjectType & Partial<SerializedProject>) => void;
   pixel: Accessor<PixelPainterMethods>;
 };
 
@@ -37,7 +38,7 @@ const initialProjectConfig: ProjectConfigContextType = {
     return DEFAULT_GRID_SIZE;
   },
   createNewProject: () => {
-    console.warn("nt implemented");
+    console.warn("not implemented");
   },
 };
 
@@ -58,7 +59,12 @@ export const ProjectConfigProvider = (props: ProjectConfigProviderProps) => {
 
   const menu = useMenu();
 
-  const createOrOpenProject = ({ name, gridSize }: ProjectType) => {
+  const createOrOpenProject = ({
+    name,
+    gridSize,
+    layers,
+    buffers,
+  }: ProjectType & Partial<SerializedProject>): void => {
     project()
       .createNewPainter(name, gridSize)
       .then((value) => {
@@ -83,6 +89,10 @@ export const ProjectConfigProvider = (props: ProjectConfigProviderProps) => {
             "projects",
             JSON.stringify([...(projects ?? []), { name, gridSize }]),
           );
+        }
+
+        if (layers && buffers) {
+          value.layer.load(layers, buffers);
         }
       });
   };
