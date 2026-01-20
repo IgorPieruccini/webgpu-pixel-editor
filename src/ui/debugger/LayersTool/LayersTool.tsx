@@ -6,6 +6,7 @@ import {
 import { serialization } from "../../../serialization";
 import "./LayersTool.css";
 import { TbFileImport } from "solid-icons/tb";
+import { downloadFile, importFile } from "../../../utils";
 
 export const LayersTool = () => {
   const layers = API.layers();
@@ -19,62 +20,20 @@ export const LayersTool = () => {
       project.getProjectGridSize(),
     );
 
-    // Stringify the serialized layer buffer
-    const jsonString = JSON.stringify(serializedLayerBuffer);
     const name =
       layers()
         .getList()
         .find((layer) => layer.id === layerId)?.name || "layer";
 
-    // Create a blob and download it as "layer.px"
-    const blob = new Blob([jsonString], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `${name}-${layerId}.px`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    downloadFile(serializedLayerBuffer, name, "px");
   };
 
-  const onUpload = (layerId: string) => {
-    // Create a file input element
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = ".px";
-
-    input.onchange = (event) => {
-      const file = (event.target as HTMLInputElement).files?.[0];
-      if (!file) return;
-
-      // Check if the file has .px extension
-      if (!file.name.endsWith(".px")) {
-        alert("Please select a .px file");
-        return;
-      }
-
-      // Read the file content
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          const content = e.target?.result as string;
-          const layerData: number[] = JSON.parse(content);
-
-          const buffer = serialization.layer.deserialize(layerData);
-
-          layers().setLayerBuffer(layerId, buffer);
-        } catch (error) {
-          console.error("Error parsing .px file:", error);
-          alert("Invalid .px file format");
-        }
-      };
-
-      reader.readAsText(file);
-    };
-
-    // Trigger the file dialog
-    input.click();
+  const onImportFile = (layerId: string) => {
+    importFile((content: string) => {
+      const layerData: number[] = JSON.parse(content);
+      const buffer = serialization.layer.deserialize(layerData);
+      layers().setLayerBuffer(layerId, buffer);
+    });
   };
 
   return (
@@ -97,7 +56,7 @@ export const LayersTool = () => {
                     <AiOutlineDownload />
                   </button>
 
-                  <button onClick={() => onUpload(layer.id)}>
+                  <button onClick={() => onImportFile(layer.id)}>
                     <TbFileImport />
                   </button>
                 </div>
