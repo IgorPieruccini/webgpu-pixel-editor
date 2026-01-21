@@ -1,9 +1,10 @@
 import { createSignal } from "solid-js";
 import type { Layer, Layers } from "../types";
 import { generateUUID } from "../../utils";
-import { localDataBase } from "../../storage";
+import { localDataBase } from "../../storageDB";
 import type { Vec2 } from "../../editor/types";
 import { serialization } from "../../serialization";
+import { storageLocal } from "../../storageLocal";
 
 export type LayerHandler = Awaited<ReturnType<typeof createLayerHandler>>;
 
@@ -11,16 +12,9 @@ export const createLayerHandler = async (
   projectName: string,
   gridSize: Vec2,
 ) => {
-  let stringLayers = window.localStorage.getItem(`${projectName}-layers`);
-  if (!stringLayers) {
-    const layer: Layers = [
-      { id: generateUUID(), name: "Layer", display: true, opacity: 1 },
-    ];
-    stringLayers = JSON.stringify(layer);
-    window.localStorage.setItem(`${projectName}-layers`, stringLayers);
-  }
+  const stringLayers = storageLocal.createLayers(projectName);
 
-  const [getList, setList] = createSignal<Layers>(JSON.parse(stringLayers));
+  const [getList, setList] = createSignal<Layers>(stringLayers);
 
   const firstLayer = getList().at(0);
   if (!firstLayer) {
@@ -70,10 +64,7 @@ export const createLayerHandler = async (
     const _layers: Layers = [...layers, layer];
     setList(_layers);
 
-    window.localStorage.setItem(
-      `${projectName}-layers`,
-      JSON.stringify(_layers),
-    );
+    storageLocal.saveLayers(projectName, _layers);
 
     setActive(layer);
 
@@ -111,10 +102,7 @@ export const createLayerHandler = async (
     setList(_layers);
     buffers.delete(id);
 
-    window.localStorage.setItem(
-      `${projectName}-layers`,
-      JSON.stringify(_layers),
-    );
+    storageLocal.saveLayers(projectName, _layers);
   };
 
   const sort = (dragged: string, dropped: string) => {
@@ -141,10 +129,7 @@ export const createLayerHandler = async (
 
     setList(newLayers);
 
-    window.localStorage.setItem(
-      `${projectName}-layers`,
-      JSON.stringify(newLayers),
-    );
+    storageLocal.saveLayers(projectName, _layers);
   };
 
   const rename = (name: string) => {
@@ -159,10 +144,7 @@ export const createLayerHandler = async (
       return layer;
     });
 
-    window.localStorage.setItem(
-      `${projectName}-layers`,
-      JSON.stringify(_layers),
-    );
+    storageLocal.saveLayers(projectName, _layers);
 
     setList(_layers);
   };
@@ -182,10 +164,7 @@ export const createLayerHandler = async (
 
     setList(newLayers);
 
-    window.localStorage.setItem(
-      `${projectName}-layers`,
-      JSON.stringify(newLayers),
-    );
+    storageLocal.saveLayers(projectName, _layers);
   };
 
   const select = (layerId: string) => {
@@ -219,10 +198,7 @@ export const createLayerHandler = async (
 
     setList(newLayers);
 
-    window.localStorage.setItem(
-      `${projectName}-layers`,
-      JSON.stringify(newLayers),
-    );
+    storageLocal.saveLayers(projectName, newLayers);
 
     if (layerId === getActive().id) {
       setActive({
@@ -273,10 +249,7 @@ export const createLayerHandler = async (
     setList(newLayers);
     sort(newLayer.id, targetLayer.id);
 
-    window.localStorage.setItem(
-      `${projectName}-layers`,
-      JSON.stringify(newLayers),
-    );
+    storageLocal.saveLayers(projectName, newLayers);
 
     setActive(newLayer);
     setCurrentBuffer(newBuffer);
@@ -296,10 +269,8 @@ export const createLayerHandler = async (
 
   const load = (layers: Layers, buffers: Record<string, number[]>) => {
     setList(layers);
-    window.localStorage.setItem(
-      `${projectName}-layers`,
-      JSON.stringify(layers),
-    );
+
+    storageLocal.saveLayers(projectName, layers);
 
     for (const [id, buffer] of Object.entries(buffers)) {
       const deserializedBuffer = serialization.layer.deserialize(buffer);
