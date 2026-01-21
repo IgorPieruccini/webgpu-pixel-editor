@@ -3,6 +3,7 @@ import { createSignal, onMount } from "solid-js";
 import { useMenu } from "../tools/menuProvider";
 import { useProjectConfig } from "../../projectConfig/projectConfigProvider";
 import type { ProjectType } from "../../editor/types";
+import { storageLocal } from "../../storageLocal";
 
 export const MyProjects = () => {
   const [projects, setProjects] = createSignal<ProjectType[]>([]);
@@ -11,11 +12,8 @@ export const MyProjects = () => {
   const menu = useMenu();
 
   onMount(() => {
-    const projectsString = window.localStorage.getItem("projects");
-    if (projectsString) {
-      const projects = JSON.parse(projectsString);
-      setProjects(projects);
-    }
+    const projects = storageLocal.getProjects();
+    setProjects(projects);
   });
 
   const onOpenProject = (project: ProjectType) => {

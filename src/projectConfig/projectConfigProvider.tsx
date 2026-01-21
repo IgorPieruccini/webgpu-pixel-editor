@@ -15,6 +15,7 @@ import { INITIAL_PIXEL_PAINTER } from "../editor/constant";
 import type { PixelPainterMethods } from "../pixelPainter/types";
 import { DEFAULT_GRID_SIZE } from "../constants";
 import type { SerializedProject } from "../serialization/project";
+import { storageLocal } from "../storageLocal";
 
 type ProjectConfigContextType = {
   projectName: Accessor<string>;
@@ -68,28 +69,13 @@ export const ProjectConfigProvider = (props: ProjectConfigProviderProps) => {
     project()
       .createNewPainter(name, gridSize)
       .then((value) => {
-        setProjectName(name);
-        setProjectGridSize(gridSize);
-
         setPixel(value);
         menu.openOption(-1);
-        window.localStorage.setItem(
-          "active_project",
-          JSON.stringify({ name, gridSize }),
-        );
-        const projectsString = window.localStorage.getItem("projects");
-        const projects: Array<ProjectType> = projectsString
-          ? JSON.parse(projectsString)
-          : null;
 
-        const projectsName = projects?.map((project) => project.name) || [];
-
-        if (!projectsName?.includes(name)) {
-          window.localStorage.setItem(
-            "projects",
-            JSON.stringify([...(projects ?? []), { name, gridSize }]),
-          );
-        }
+        setProjectName(name);
+        setProjectGridSize(gridSize);
+        storageLocal.setActiveProject({ name, gridSize });
+        storageLocal.addProject({ name, gridSize });
 
         if (layers && buffers) {
           value.layer.load(layers, buffers);
@@ -100,7 +86,7 @@ export const ProjectConfigProvider = (props: ProjectConfigProviderProps) => {
   onMount(() => {
     initializeEditor().then((result) => {
       setProject(result);
-      const activeProject = window.localStorage.getItem("active_project");
+      const activeProject = storageLocal.getActiveProject();
       if (activeProject) {
         const parsedActiveProject: ProjectType = JSON.parse(activeProject);
 
