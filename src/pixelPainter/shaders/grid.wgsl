@@ -71,22 +71,22 @@ fn fragmentMain(
     let rgba = unpack_rgba(color, opacity);
 
     if(alphaLayer == 1) {
-        if (cellPos.x % 8 <= 3) {
-            if (cellPos.y % 8 > 3) {
+        if (cellPos.x % 24 <= 11) {
+            if (cellPos.y % 24 > 11) {
                 return vec4f(0.9, 0.9, 0.9, 1.0);
             }
 
-            if (cellPos.y % 8 <= 3) {
+            if (cellPos.y % 24 <= 11) {
                 return vec4f(1, 1, 1, 1);
             }
         }
 
-        if(cellPos.x % 8 > 3) {
-            if (cellPos.y % 8 > 3) {
+        if(cellPos.x % 24 > 11) {
+            if (cellPos.y % 24 > 11) {
                 return vec4f(1, 1, 1, 1);
             }
 
-            if (cellPos.y % 8 <= 3) {
+            if (cellPos.y % 24 <= 11) {
                 return vec4f(0.9, 0.9, 0.9, 1.0);
            }
         }
