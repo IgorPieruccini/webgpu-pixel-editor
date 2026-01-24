@@ -164,7 +164,7 @@ export const createLayerHandler = async (
 
     setList(newLayers);
 
-    storageLocal.saveLayers(projectName, _layers);
+    storageLocal.saveLayers(projectName, newLayers);
   };
 
   const select = (layerId: string) => {
