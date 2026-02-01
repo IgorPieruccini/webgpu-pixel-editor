@@ -1,7 +1,7 @@
 import { LAYER_PREVIEW_SIZE } from "../constants";
 import type { Vec2 } from "../editor/types";
 import { createTexturePipeline } from "./createPipeline";
-import { bindAlphaTexture, bindTexture } from "./utils";
+import { material } from "./material";
 import { webGPUSetup } from "./webGPUSetup";
 
 export const createLayerPreview = async (gridSize: Vec2, zoom: number) => {
@@ -10,8 +10,8 @@ export const createLayerPreview = async (gridSize: Vec2, zoom: number) => {
   const pixelPipeline = createTexturePipeline(device, "pixel");
   const alphaPipeline = createTexturePipeline(device, "alpha");
 
-  const layerTexture = bindTexture(device, pixelPipeline, gridSize);
-  const GPUBindAlpha = bindAlphaTexture(device, alphaPipeline);
+  const layerTexture = material.pixel(device, pixelPipeline, gridSize);
+  const GPUBindAlpha = material.alpha(device, alphaPipeline);
 
   const commonUniformBuffer = new Float32Array([
     0,

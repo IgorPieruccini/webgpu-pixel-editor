@@ -4,13 +4,9 @@ import { calculateZoomFromGridAndCanvasSize } from "../../utils";
 import { createVertexBuffer } from "../createBufferLayout";
 import { createPipeline, createTexturePipeline } from "../createPipeline";
 import { createLayerPreview } from "../layerPreview";
+import { material } from "../material";
+import type { BindPixelTexture } from "../material/pixel";
 import type { UniformBufferHandler } from "../uniformBuffersHandler";
-import {
-  bind,
-  bindAlphaTexture,
-  bindTexture,
-  type BindPixelTexture,
-} from "../utils";
 import { webGPUSetup } from "../webGPUSetup";
 import type { LayerHandler } from "./layerHandler";
 
@@ -43,12 +39,12 @@ export const createRenderHandler = async (
   const pixelPipeline = createTexturePipeline(device, "pixel");
   const alphaPipeline = createTexturePipeline(device, "alpha");
 
-  const GPUBindAlpha = bindAlphaTexture(device, alphaPipeline);
+  const GPUBindAlpha = material.alpha(device, alphaPipeline);
 
-  const GPUBindUi = bind(device, uiPipeline, "UI");
+  const GPUBindUi = material.ui(device, uiPipeline, "UI");
 
   const addLayerTexture = (layerId: string) => {
-    const _bindTexture = bindTexture(device, pixelPipeline, gridSize);
+    const _bindTexture = material.pixel(device, pixelPipeline, gridSize);
     pixelBindTextureMap.set(layerId, _bindTexture);
   };
 
