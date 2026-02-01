@@ -61,7 +61,7 @@ export const initializeEditor = async () => {
       y: viewport.height,
     });
 
-    pixel.render.setZoom(zoom);
+    pixel.render.setZoom(zoom - zoom * 0.3);
 
     return pixel;
   };
