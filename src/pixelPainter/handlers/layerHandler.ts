@@ -25,7 +25,7 @@ export const createLayerHandler = async (
 
   const [getActive, setActive] = createSignal<Layer>(firstLayer);
 
-  const buffers: Map<string, Uint32Array<ArrayBuffer>> = new Map();
+  const buffers: Map<string, Uint8Array<ArrayBuffer>> = new Map();
   const db = await localDataBase(projectName);
 
   for (const layer of getList()) {
@@ -34,10 +34,10 @@ export const createLayerHandler = async (
       if (layerBuffer) {
         buffers.set(layer.id, layerBuffer);
       } else {
-        buffers.set(layer.id, new Uint32Array(gridSize.x * gridSize.y));
+        buffers.set(layer.id, new Uint8Array(gridSize.x * gridSize.y * 4));
       }
     } catch {
-      buffers.set(layer.id, new Uint32Array(gridSize.x * gridSize.y));
+      buffers.set(layer.id, new Uint8Array(gridSize.x * gridSize.y * 4));
     }
   }
 
@@ -49,9 +49,9 @@ export const createLayerHandler = async (
   }
 
   const [getCurrentBuffer, setCurrentBuffer] =
-    createSignal<Uint32Array<ArrayBuffer>>(firstBuffer);
+    createSignal<Uint8Array<ArrayBuffer>>(firstBuffer);
 
-  const add = () => {
+  const add = (): string => {
     const layers = getList();
 
     const layer: Layer = {
@@ -68,18 +68,20 @@ export const createLayerHandler = async (
 
     setActive(layer);
 
-    const newBuffer = new Uint32Array(gridSize.x * gridSize.y);
+    const newBuffer = new Uint8Array(gridSize.x * gridSize.y * 4);
 
     buffers.set(layer.id, newBuffer);
     setCurrentBuffer(newBuffer);
+
+    return layer.id;
   };
 
-  const remove = (id: string) => {
+  const remove = (id: string): string | null => {
     const _layers = [...getList()];
 
     if (_layers.length === 1) {
       // At least one layer per project needs to exist
-      return;
+      return null;
     }
 
     const index = _layers.findIndex((layer) => layer.id === id);
@@ -103,6 +105,7 @@ export const createLayerHandler = async (
     buffers.delete(id);
 
     storageLocal.saveLayers(projectName, _layers);
+    return id;
   };
 
   const sort = (dragged: string, dropped: string) => {
@@ -212,7 +215,7 @@ export const createLayerHandler = async (
     db.save(getCurrentBuffer(), getActive().id);
   };
 
-  const duplicate = (layerId: string) => {
+  const duplicate = (layerId: string): string => {
     const layers = getList();
     const targetLayerIndex = layers.findIndex((layer) => layer.id === layerId);
     const targetLayer = layers[targetLayerIndex];
@@ -235,7 +238,7 @@ export const createLayerHandler = async (
       );
     }
 
-    const newBuffer: Uint32Array<ArrayBuffer> = new Uint32Array([
+    const newBuffer: Uint8Array<ArrayBuffer> = new Uint8Array([
       ...targetBuffer,
     ]);
 
@@ -253,21 +256,22 @@ export const createLayerHandler = async (
 
     setActive(newLayer);
     setCurrentBuffer(newBuffer);
+    return newLayer.id;
   };
 
-  const getBufferById = (layerId: string): Uint32Array | undefined => {
+  const getBufferById = (layerId: string): Uint8Array | undefined => {
     return buffers.get(layerId);
   };
 
-  const setLayerBuffer = (
-    layerId: string,
-    buffer: Uint32Array<ArrayBuffer>,
-  ) => {
+  const setLayerBuffer = (layerId: string, buffer: Uint8Array<ArrayBuffer>) => {
     buffers.set(layerId, buffer);
     db.save(buffer, layerId);
   };
 
-  const load = (layers: Layers, buffers: Record<string, number[]>) => {
+  const load = (
+    layers: Layers,
+    buffers: Record<string, number[]>,
+  ): string[] => {
     setList(layers);
 
     storageLocal.saveLayers(projectName, layers);
@@ -276,6 +280,8 @@ export const createLayerHandler = async (
       const deserializedBuffer = serialization.layer.deserialize(buffer);
       setLayerBuffer(id, deserializedBuffer);
     }
+
+    return layers.map((layer) => layer.id);
   };
 
   return {

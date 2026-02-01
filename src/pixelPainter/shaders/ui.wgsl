@@ -1,4 +1,26 @@
-@group(0) @binding(0) var<storage, read> bindValues: array<f32>;
+struct CommonValues {
+    panX: f32,
+    panY: f32,
+    canvasW: f32,
+    canvasH: f32,
+    gridX: f32,
+    gridY: f32,
+    zoom: f32,
+}
+
+struct UIParams {
+    mouseCellX: f32,
+    mouseCellY: f32,
+    selectionRectX: f32,
+    selectionRectY: f32,
+    selectionRectW: f32,
+    selectionRectH: f32,
+    brushThickness: f32,
+    selectionToolActivated: f32
+}
+
+@group(0) @binding(0) var<uniform> commonValues: CommonValues;
+@group(0) @binding(1) var<uniform> uiParams: UIParams;
 
 // Export to fragment
 struct VertexOutput {
@@ -18,17 +40,17 @@ fn vertexMain(@location(0) pos: vec2f, @builtin(instance_index) instance: u32) -
     var out: VertexOutput;
     let i = f32(instance);
 
-    let gridSize = vec2f(bindValues[0], bindValues[1]);
+    let gridSize = vec2f(commonValues.gridX, commonValues.gridY);
     let gridSizeRatio = gridSize.x / gridSize.y;
-    let mouseCellPos = vec2f(bindValues[2], bindValues[3]);
-    let canvasSize = vec2f(bindValues[4], bindValues[5]);
+    let mouseCellPos = vec2f(uiParams.mouseCellX, uiParams.mouseCellY);
+    let canvasSize = vec2f(commonValues.canvasW, commonValues.canvasH);
 
     let aspectRatio = canvasSize.x / canvasSize.y;
-    let pan = vec2f(bindValues[6], bindValues[7]);
-    let zoom:f32 = bindValues[8];
+    let pan = vec2f(commonValues.panX, commonValues.panY);
+    let zoom:f32 = commonValues.zoom;
     let zoomScale = 1.0 / zoom;
 
-    let selectionRect = vec4f(bindValues[9],  bindValues[10] , bindValues[11], bindValues[12] );
+    let selectionRect = vec4f(uiParams.selectionRectX,  uiParams.selectionRectY , uiParams.selectionRectW, uiParams.selectionRectH);
 
     let cellPos = vec2f(i % gridSize.x, floor(i / gridSize.x));
     let gridPos = (pos + 1) / gridSize - 1;
@@ -42,7 +64,7 @@ fn vertexMain(@location(0) pos: vec2f, @builtin(instance_index) instance: u32) -
 
     var dist = distance2D(inverseMouseCellPos, cellPos);
 
-    if (dist < bindValues[14]) {
+    if (dist < uiParams.brushThickness / 4 && uiParams.selectionToolActivated == 0) {
         _isHovering = true;
     }
 
@@ -52,14 +74,14 @@ fn vertexMain(@location(0) pos: vec2f, @builtin(instance_index) instance: u32) -
         out.isHovering = 0;
     }
 
-    let panNorm = vec2f(
-        (pan.x / canvasSize.x) * 2.0,
-        (pan.y / canvasSize.y * gridSizeRatio) * 2.0
+    let panVec2 = vec2f(
+           (pan.x / canvasSize.x / aspectRatio) * 2.0,
+           (pan.y / canvasSize.y * gridSizeRatio) * 2.0
     );
 
-    let transformationApplied = vec2f(zoomed + panNorm);
-
-    let corrected = vec2f(transformationApplied.x / aspectRatio, transformationApplied.y / gridSizeRatio);
+    let transformAspectRatio = vec2f(center.x / aspectRatio, center.y / gridSizeRatio);
+    let transformZoom = transformAspectRatio * zoom;
+    let corrected = transformZoom + panVec2;
 
     out.cellPos = inverseOwnCell;
     out.position = vec4f(corrected, 0, 1);
@@ -88,17 +110,15 @@ fn fragmentMain(
     @location(2) worldPos: vec3f,
     @location(3) @interpolate(flat) isSelected: i32
 ) -> @location(0)vec4f {
-    let gridSize = vec2f(bindValues[0], bindValues[1]) ;
+    let gridSize = vec2f(commonValues.gridX, commonValues.gridY) ;
     let colorIndex = u32(cellPos.x + cellPos.y * gridSize.x);
 
-
-
     if (isSelected == 1) {
-       return vec4f(0.95, 0.95, 0.95, 0.2);
+       return vec4f(0.95, 0.95, 0.95, 0.5);
     }
 
     if isHovering == 1 {
-       return vec4f(1.0, 1.0, 1.0, 0.2);
+       return vec4f(1.0, 1.0, 1.0, 0.5);
     }
 
     return vec4f(1.0, 1.0, 1.0, 0.0);

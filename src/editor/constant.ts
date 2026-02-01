@@ -8,8 +8,8 @@ export const ACTIVATE_TOOL = {
 
 export const INITIAL_PIXEL_PAINTER: PixelPainterMethods = {
   layer: {
-    add: () => {},
-    remove: () => {},
+    add: () => "",
+    remove: (id: string) => id,
     toggleDisplay: () => {},
     sort: () => {},
     rename: () => {},
@@ -23,9 +23,10 @@ export const INITIAL_PIXEL_PAINTER: PixelPainterMethods = {
     }),
     setOpacity: () => {},
     getBufferById: () => undefined,
-    duplicate: () => {},
+    duplicate: (id: string) => id,
     setLayerBuffer: () => {},
-    buffers: new Map<string, Uint32Array<ArrayBuffer>>(),
+    buffers: new Map<string, Uint8Array<ArrayBuffer>>(),
+    load: () => Promise.resolve(),
   },
   brush: {
     setColor: () => {},
@@ -38,8 +39,18 @@ export const INITIAL_PIXEL_PAINTER: PixelPainterMethods = {
     setSelectedColor: () => {},
     getThickness: () => 1,
     setThickness: () => {},
-    getDefaultThickness: () => 1,
-    setDefaultThickness: () => {},
   },
-  render: () => {},
+  render: {
+    draw: () => {},
+    setCanvasSize: () => {},
+    setPan: () => {},
+    setZoom: () => {},
+    setCellPos: () => {},
+    setSelectedCellsPosition: () => {},
+    setSelectedCellsSize: () => {},
+    getZoom: () => 1,
+    getCellPosition: () => ({ x: 0, y: 0 }),
+    getPan: () => ({ x: 0, y: 0 }),
+    getSelectedCellsRect: () => ({ x: 0, y: 0, w: 0, h: 0 }),
+  },
 };

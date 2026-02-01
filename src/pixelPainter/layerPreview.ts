@@ -1,29 +1,32 @@
 import { LAYER_PREVIEW_SIZE } from "../constants";
 import type { Vec2 } from "../editor/types";
-import { createVertexBuffer } from "./createBufferLayout";
-import { createPipeline } from "./createPipeline";
-import { bind } from "./utils";
+import { createTexturePipeline } from "./createPipeline";
+import { bindAlphaTexture, bindTexture } from "./utils";
 import { webGPUSetup } from "./webGPUSetup";
 
 export const createLayerPreview = async (gridSize: Vec2, zoom: number) => {
-  const { device, canvasFormat, context } = await webGPUSetup("preview-canvas");
+  const { device, context } = await webGPUSetup("preview-canvas");
 
-  const { vertices, vertexBuffer, vertexBufferLayout } =
-    createVertexBuffer(device);
+  const pixelPipeline = createTexturePipeline(device, "pixel");
+  const alphaPipeline = createTexturePipeline(device, "alpha");
 
-  const cellPipeline = createPipeline(
-    device,
-    "grid",
-    vertexBufferLayout,
-    canvasFormat,
-  );
+  const layerTexture = bindTexture(device, pixelPipeline, gridSize);
+  const GPUBindAlpha = bindAlphaTexture(device, alphaPipeline);
 
-  const { createBind } = bind(device, cellPipeline);
+  const commonUniformBuffer = new Float32Array([
+    0,
+    0,
+    LAYER_PREVIEW_SIZE.x,
+    LAYER_PREVIEW_SIZE.y,
+    gridSize.x,
+    gridSize.y,
+    zoom,
+  ]);
 
-  const drawPreview = (buffer: Uint32Array<ArrayBuffer>, opacity: number) => {
+  const drawPreview = (buffer: Uint8Array<ArrayBuffer>, opacity: number) => {
     // Provides an interface for recording GPU commands.
     const encoder = device.createCommandEncoder({
-      label: "Grid encoder",
+      label: "preview",
     });
 
     //Render passes are when all drawing operations in WebGPU happen.
@@ -33,37 +36,29 @@ export const createLayerPreview = async (gridSize: Vec2, zoom: number) => {
           view: context.getCurrentTexture().createView(),
           loadOp: "clear",
           storeOp: "store",
-          clearValue: { r: 0.13, g: 0.13, b: 0.13, a: 0 },
+          clearValue: { r: 0, g: 0, b: 0, a: 0 },
         },
       ],
     });
 
-    const gridValues = new Float32Array([
-      gridSize.x, // grid width in cells
-      gridSize.y, // grid height in cells
-      LAYER_PREVIEW_SIZE.x, // canvas width
-      LAYER_PREVIEW_SIZE.y, // canvas height
-      1, // viewport offset x
-      1, // viewport offset y
-      zoom, // viewport zoom
-      1, // 1 = is first layer, 0 = not first layer
-      opacity, // layer opacity (start with full opacity)
-    ]);
+    // DRAW ALPHA
+    pass.setPipeline(alphaPipeline);
 
-    pass.setPipeline(cellPipeline);
-    pass.setVertexBuffer(0, vertexBuffer);
+    GPUBindAlpha.writeAlphaUniforms(commonUniformBuffer);
+    pass.setBindGroup(0, GPUBindAlpha.bindGroup);
+    pass.draw(6);
 
-    // DRAW ALPHA_LAYER
-    pass.setBindGroup(0, createBind("bindValues", gridValues, 0));
-    pass.setBindGroup(1, createBind("colors", buffer, 1));
-    pass.draw(vertices.length / 2, gridSize.x * gridSize.y); // 6 vertices and draw several times
-    gridValues[7] = 0;
+    // DRAW PIXEL LAYER
+    pass.setPipeline(pixelPipeline);
 
-    pass.setBindGroup(0, createBind("bindValues", gridValues, 0));
-    pass.setBindGroup(1, createBind("colors", buffer, 1));
+    layerTexture.writeTexture(buffer);
+    layerTexture.writeUniforms(
+      commonUniformBuffer,
+      new Float32Array([opacity]),
+    );
 
-    pass.draw(vertices.length / 2, gridSize.x * gridSize.y); // 6 vertices and draw several times
-
+    pass.setBindGroup(0, layerTexture.bindGroup);
+    pass.draw(6);
     pass.end();
     const commandBuffer = encoder.finish();
     device.queue.submit([commandBuffer]);

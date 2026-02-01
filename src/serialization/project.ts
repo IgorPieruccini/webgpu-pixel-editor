@@ -10,7 +10,7 @@ export type SerializedProject = {
 };
 
 export const getSerializedBuffers = (
-  buffers: Map<string, Uint32Array<ArrayBuffer>>,
+  buffers: Map<string, Uint8Array<ArrayBuffer>>,
   gridSize: Vec2,
 ): Record<string, number[]> => {
   let serialized: Record<string, number[]> = {};
@@ -27,7 +27,7 @@ export const serialize = (
   name: string,
   gridSize: Vec2,
   layers: Layers,
-  buffers: Map<string, Uint32Array<ArrayBuffer>>,
+  buffers: Map<string, Uint8Array<ArrayBuffer>>,
 ): SerializedProject => {
   const serializedBuffers = getSerializedBuffers(buffers, gridSize);
 

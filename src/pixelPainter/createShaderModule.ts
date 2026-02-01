@@ -1,11 +1,20 @@
-import grid from "./shaders/grid.wgsl";
 import ui from "./shaders/ui.wgsl";
+import pixel from "./shaders/pixel.wgsl";
+import alpha from "./shaders/alpha.wgsl";
 
-export const createShadeModule = (device: GPUDevice, type: "grid" | "ui") => {
-  const shaderCode = type === "grid" ? grid : ui;
+const shaders = {
+  ui,
+  pixel,
+  alpha,
+};
+
+import type { ShaderType } from "./types";
+
+export const createShadeModule = (device: GPUDevice, type: ShaderType) => {
+  const shaderCode = shaders[type];
 
   const cellShaderModule = device.createShaderModule({
-    label: "Cell shader",
+    label: `${type}-shader`,
     code: shaderCode,
   });
 

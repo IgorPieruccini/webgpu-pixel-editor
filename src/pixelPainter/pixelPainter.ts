@@ -1,9 +1,9 @@
-/// <reference types="@webgpu/types" />
-
 import { createLayerHandler } from "./handlers/layerHandler";
 import { createBrushHandler } from "./handlers/brushHandler";
 import { createRenderHandler } from "./handlers/renderHandler";
 import type { Vec2 } from "../editor/types";
+import { createUniformBufferHandler } from "./uniformBuffersHandler";
+import { createMiddlewareHandler } from "./handlers/middlewareHandler";
 
 export const pixelPainter = async (
   projectName: string,
@@ -16,19 +16,28 @@ export const pixelPainter = async (
   }
 
   const layerHandler = await createLayerHandler(projectName, gridSize);
-  const brush = createBrushHandler(layerHandler, gridSize);
-  const { render } = await createRenderHandler(
+  const brushHandler = createBrushHandler(layerHandler, gridSize);
+  const uniformBufferHandler = createUniformBufferHandler(canvasSize, gridSize);
+  const renderHandler = await createRenderHandler(
     layerHandler,
-    brush,
+    uniformBufferHandler,
     gridSize,
-    canvasSize,
   );
+
+  const middlewareHandler = createMiddlewareHandler(
+    brushHandler,
+    uniformBufferHandler,
+    renderHandler,
+    layerHandler,
+  );
+
+  middlewareHandler.loadLayers();
 
   return {
     layer: {
-      add: layerHandler.add,
-      remove: layerHandler.remove,
-      duplicate: layerHandler.duplicate,
+      add: middlewareHandler.addLayer,
+      remove: middlewareHandler.removeLayer,
+      duplicate: middlewareHandler.duplicateLayer,
       sort: layerHandler.sort,
       rename: layerHandler.rename,
       toggleDisplay: layerHandler.toggleDisplay,
@@ -39,22 +48,35 @@ export const pixelPainter = async (
       getBufferById: layerHandler.getBufferById,
       setLayerBuffer: layerHandler.setLayerBuffer,
       buffers: layerHandler.buffers,
-      load: layerHandler.load,
+      load: middlewareHandler.loadLayers,
     },
     brush: {
-      setColor: brush.setColor,
-      getColor: brush.getColor,
-      paint: brush.paint,
-      erase: brush.erase,
-      getOpacity: brush.getOpacity,
-      setOpacity: brush.setOpacity,
-      getSelectedColor: brush.getSelectedColor,
-      setSelectedColor: brush.setSelectedColor,
-      getThickness: brush.getThickness,
-      setThickness: brush.setThickness,
-      getDefaultThickness: brush.getDefaultThickness,
-      setDefaultThickness: brush.setDefaultThickness,
+      setColor: brushHandler.setColor,
+      getColor: brushHandler.getColor,
+      paint: brushHandler.paint,
+      erase: brushHandler.erase,
+      getOpacity: brushHandler.getOpacity,
+      setOpacity: brushHandler.setOpacity,
+      getSelectedColor: brushHandler.getSelectedColor,
+      setSelectedColor: brushHandler.setSelectedColor,
+      getThickness: brushHandler.getThickness,
+      setThickness: middlewareHandler.setBrushThickness,
     },
-    render,
+    render: {
+      draw: renderHandler.draw,
+      setZoom: uniformBufferHandler.updateZoom,
+      setPan: uniformBufferHandler.updatePan,
+      setCanvasSize: uniformBufferHandler.updateCanvasSize,
+      setCellPos: uniformBufferHandler.updateCellPos,
+      setSelectedCellsSize: uniformBufferHandler.updateSelectedCellsSize,
+      setSelectedCellsPosition:
+        uniformBufferHandler.updateSelectedCellsPosition,
+      getZoom: uniformBufferHandler.zoom,
+      getCellPosition: uniformBufferHandler.cellPosition,
+      getPan: uniformBufferHandler.pan,
+      getSelectedCellsRect: uniformBufferHandler.selectedCellsRect,
+      setSelectionTool: uniformBufferHandler.setSelectionTool,
+      isSelectionToolEnabled: uniformBufferHandler.isSelectionToolEnabled,
+    },
   };
 };

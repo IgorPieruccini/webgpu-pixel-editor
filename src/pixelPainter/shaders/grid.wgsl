@@ -66,31 +66,8 @@ fn fragmentMain(
     let gridSize = vec2f(bindValues[0], bindValues[1]) ;
     let colorIndex = u32(cellPos.x + cellPos.y * gridSize.x);
     let color = colors[colorIndex];
-    let alphaLayer = bindValues[7];
-    let opacity = bindValues[8];
+    let opacity = bindValues[7];
     let rgba = unpack_rgba(color, opacity);
-
-    if(alphaLayer == 1) {
-        if (cellPos.x % 24 <= 11) {
-            if (cellPos.y % 24 > 11) {
-                return vec4f(0.9, 0.9, 0.9, 1.0);
-            }
-
-            if (cellPos.y % 24 <= 11) {
-                return vec4f(1, 1, 1, 1);
-            }
-        }
-
-        if(cellPos.x % 24 > 11) {
-            if (cellPos.y % 24 > 11) {
-                return vec4f(1, 1, 1, 1);
-            }
-
-            if (cellPos.y % 24 <= 11) {
-                return vec4f(0.9, 0.9, 0.9, 1.0);
-           }
-        }
-    }
 
     if (color == 0) {
         return vec4f(1.0, 1.0, 1.0, 0.0);

@@ -2,19 +2,27 @@ import { LAYER_PREVIEW_SIZE } from "../../constants";
 import type { Vec2 } from "../../editor/types";
 import { calculateZoomFromGridAndCanvasSize } from "../../utils";
 import { createVertexBuffer } from "../createBufferLayout";
-import { createPipeline } from "../createPipeline";
+import { createPipeline, createTexturePipeline } from "../createPipeline";
 import { createLayerPreview } from "../layerPreview";
-import { bind } from "../utils";
+import type { UniformBufferHandler } from "../uniformBuffersHandler";
+import {
+  bind,
+  bindAlphaTexture,
+  bindTexture,
+  type BindPixelTexture,
+} from "../utils";
 import { webGPUSetup } from "../webGPUSetup";
-import type { BrushHandler } from "./brushHandler";
 import type { LayerHandler } from "./layerHandler";
+
+export type RenderHandler = Awaited<ReturnType<typeof createRenderHandler>>;
 
 export const createRenderHandler = async (
   layerHandler: LayerHandler,
-  brushHandler: BrushHandler,
+  uniformBufferHandler: UniformBufferHandler,
   gridSize: Vec2,
-  canvasSize: Vec2,
 ) => {
+  const pixelBindTextureMap = new Map<string, BindPixelTexture>();
+
   const { device, canvasFormat, context } = await webGPUSetup("main-canvas");
 
   const { drawPreview } = await createLayerPreview(
@@ -25,13 +33,6 @@ export const createRenderHandler = async (
   const { vertices, vertexBuffer, vertexBufferLayout } =
     createVertexBuffer(device);
 
-  const gridPipeline = createPipeline(
-    device,
-    "grid",
-    vertexBufferLayout,
-    canvasFormat,
-  );
-
   const uiPipeline = createPipeline(
     device,
     "ui",
@@ -39,24 +40,30 @@ export const createRenderHandler = async (
     canvasFormat,
   );
 
-  const gridBinder = bind(device, gridPipeline);
-  const uiBinder = bind(device, uiPipeline);
+  const pixelPipeline = createTexturePipeline(device, "pixel");
+  const alphaPipeline = createTexturePipeline(device, "alpha");
 
-  const render = (
-    cellPos: { x: number; y: number },
-    pan: { x: number; y: number },
-    zoom: number,
-    selectedCells: { x: number; y: number; z: number; w: number },
-  ) => {
-    const alphaLayer = new Uint32Array(gridSize.x * gridSize.x);
+  const GPUBindAlpha = bindAlphaTexture(device, alphaPipeline);
 
+  const GPUBindUi = bind(device, uiPipeline, "UI");
+
+  const addLayerTexture = (layerId: string) => {
+    const _bindTexture = bindTexture(device, pixelPipeline, gridSize);
+    pixelBindTextureMap.set(layerId, _bindTexture);
+  };
+
+  const removeLayerTexture = (layerId: string) => {
+    pixelBindTextureMap.delete(layerId);
+  };
+
+  const draw = () => {
     if (layerHandler.buffers.size === 0) {
       return;
     }
 
     // Provides an interface for recording GPU commands.
     const encoder = device.createCommandEncoder({
-      label: "Grid encoder",
+      label: "Encoder",
     });
 
     //Render passes are when all drawing operations in WebGPU happen.
@@ -71,52 +78,25 @@ export const createRenderHandler = async (
       ],
     });
 
-    const gridValues = new Float32Array([
-      gridSize.x, // grid width in cells
-      gridSize.y, // grid height in cells
-      canvasSize.x, // canvas width
-      canvasSize.y, // canvas height
-      pan.x, // viewport offset x
-      pan.y, // viewport offset y
-      zoom, // viewport zoom
-      1, // 1 = is first layer, 0 = not first layer
-      1, // layer opacity (start with full opacity)
-    ]);
-
-    const uiValues = new Float32Array([
-      gridSize.x, // grid width in cells
-      gridSize.y, // grid height in cells
-      cellPos.x, // the cell x position
-      cellPos.y, // the cell y position
-      canvasSize.x, // canvas width
-      canvasSize.y, // canvas height
-      pan.x, // viewport offset x
-      pan.y, // viewport offset y
-      zoom, // viewport zoom
-      selectedCells.x, // square selection x
-      selectedCells.y, // square selection y
-      selectedCells.z, // selectedCells.z,
-      selectedCells.w, // selectedCells.w
-      brushHandler.getDefaultThickness() ?? brushHandler.getThickness(), // brush thickness
-    ]);
-
-    pass.setPipeline(gridPipeline);
-    pass.setVertexBuffer(0, vertexBuffer);
-
-    let index = 0;
-
     // DRAW ALPHA LAYER
-    pass.setBindGroup(0, gridBinder.createBind("bindValues", gridValues, 0));
-    pass.setBindGroup(1, gridBinder.createBind("colors", alphaLayer, 1));
+    pass.setPipeline(alphaPipeline);
+    GPUBindAlpha.writeAlphaUniforms(uniformBufferHandler.commonUniforms);
+    pass.setBindGroup(0, GPUBindAlpha.bindGroup);
+    pass.draw(6);
 
-    pass.draw(vertices.length / 2, gridSize.x * gridSize.y);
-
-    gridValues[7] = 0;
+    // DRAW PIXEL LAYERS
+    pass.setPipeline(pixelPipeline);
 
     for (const layer of layerHandler.getList()) {
       const buffer = layerHandler.buffers.get(layer.id);
       if (!buffer) {
         throw new Error(`Layer buffer with id ${layer.id} not found`);
+      }
+
+      const layerTexture = pixelBindTextureMap.get(layer.id);
+
+      if (!layerTexture) {
+        throw new Error(`Layer texture with id ${layer.id} not found`);
       }
 
       if (layer.id === layerHandler.getActive().id) {
@@ -127,20 +107,25 @@ export const createRenderHandler = async (
         continue;
       }
 
-      gridValues[8] = layer.opacity;
+      // Write texture and uniforms for this layer
+      layerTexture.writeTexture(buffer);
+      layerTexture.writeUniforms(
+        uniformBufferHandler.commonUniforms,
+        new Float32Array([layer.opacity]),
+      );
+      pass.setBindGroup(0, layerTexture.bindGroup);
 
-      pass.setBindGroup(0, gridBinder.createBind("bindValues", gridValues, 0));
-      pass.setBindGroup(1, gridBinder.createBind("colors", buffer, 1));
-
-      pass.draw(vertices.length / 2, gridSize.x * gridSize.y);
-      index++;
+      pass.draw(6);
     }
 
+    // DRAW UI
     pass.setPipeline(uiPipeline);
     pass.setVertexBuffer(0, vertexBuffer);
-
-    // DRAW UI
-    pass.setBindGroup(0, uiBinder.createBind("bindValues", uiValues, 0));
+    pass.setBindGroup(0, GPUBindUi.bindGroup);
+    GPUBindUi.writeBuffer(
+      uniformBufferHandler.commonUniforms,
+      uniformBufferHandler.uiUniforms,
+    );
     pass.draw(vertices.length / 2, gridSize.x * gridSize.y);
 
     pass.end();
@@ -149,6 +134,8 @@ export const createRenderHandler = async (
   };
 
   return {
-    render,
+    draw,
+    addLayerTexture,
+    removeLayerTexture,
   };
 };
