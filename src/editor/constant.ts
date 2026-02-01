@@ -52,5 +52,7 @@ export const INITIAL_PIXEL_PAINTER: PixelPainterMethods = {
     getCellPosition: () => ({ x: 0, y: 0 }),
     getPan: () => ({ x: 0, y: 0 }),
     getSelectedCellsRect: () => ({ x: 0, y: 0, w: 0, h: 0 }),
+    setSelectionTool: () => {},
+    isSelectionToolEnabled: () => false,
   },
 };
