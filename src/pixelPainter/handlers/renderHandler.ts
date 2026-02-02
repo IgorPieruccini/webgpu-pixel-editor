@@ -44,8 +44,11 @@ export const createRenderHandler = async (
   const GPUBindUi = material.ui(device, uiPipeline, "UI");
 
   const addLayerTexture = (layerId: string) => {
-    const _bindTexture = material.pixel(device, pixelPipeline, gridSize);
-    pixelBindTextureMap.set(layerId, _bindTexture);
+    if (!pixelBindTextureMap.has(layerId)) {
+      const _bindTexture = material.pixel(device, pixelPipeline, gridSize);
+      pixelBindTextureMap.set(layerId, _bindTexture);
+      return;
+    }
   };
 
   const removeLayerTexture = (layerId: string) => {

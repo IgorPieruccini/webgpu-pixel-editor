@@ -78,7 +78,7 @@ export const ProjectConfigProvider = (props: ProjectConfigProviderProps) => {
         storageLocal.addProject({ name, gridSize });
 
         if (layers && buffers) {
-          value.layer.load(layers, buffers);
+          value.layer.load();
         }
       });
   };

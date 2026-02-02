@@ -1,3 +1,4 @@
+import type { Layers } from "../types";
 import type { UniformBufferHandler } from "../uniformBuffersHandler";
 import type { BrushHandler } from "./brushHandler";
 import type { LayerHandler } from "./layerHandler";
@@ -9,10 +10,12 @@ export const createMiddlewareHandler = (
   renderHandler: RenderHandler,
   layerHandler: LayerHandler,
 ) => {
-  const loadLayers = () => {
-    const layersId = layerHandler.getList().map((layer) => layer.id);
-    for (const id of layersId) {
-      renderHandler.addLayerTexture(id);
+  const loadLayers = (layers?: Layers) => {
+    const curLayers = layers ?? layerHandler.getList();
+
+    for (const layer of curLayers) {
+      renderHandler.addLayerTexture(layer.id);
+      layerHandler.set(layer);
     }
   };
 
