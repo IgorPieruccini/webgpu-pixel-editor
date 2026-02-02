@@ -76,6 +76,20 @@ export const createLayerHandler = async (
     return layer.id;
   };
 
+  const set = (layer: Layer) => {
+    const layers = getList();
+    const index = layers.findIndex((l) => l.id === layer.id);
+    if (index === -1) {
+      throw new Error(`Layer with id ${layer.id} not found`);
+    }
+
+    const _layers: Layers = [...layers];
+    _layers[index] = layer;
+    setList(_layers);
+
+    storageLocal.saveLayers(projectName, _layers);
+  };
+
   const remove = (id: string): string | null => {
     const _layers = [...getList()];
 
@@ -286,6 +300,7 @@ export const createLayerHandler = async (
 
   return {
     add,
+    set,
     remove,
     duplicate,
     sort,

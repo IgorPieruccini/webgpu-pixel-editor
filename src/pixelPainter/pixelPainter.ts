@@ -4,6 +4,7 @@ import { createRenderHandler } from "./handlers/renderHandler";
 import type { Vec2 } from "../editor/types";
 import { createUniformBufferHandler } from "./uniformBuffersHandler";
 import { createMiddlewareHandler } from "./handlers/middlewareHandler";
+import { createHistoryChangeHandler } from "./handlers/historyChangeHandler";
 
 export const pixelPainter = async (
   projectName: string,
@@ -21,6 +22,11 @@ export const pixelPainter = async (
   const renderHandler = await createRenderHandler(
     layerHandler,
     uniformBufferHandler,
+    gridSize,
+  );
+  const historyChangeHandler = createHistoryChangeHandler(
+    layerHandler,
+    projectName,
     gridSize,
   );
 
@@ -49,11 +55,16 @@ export const pixelPainter = async (
       setLayerBuffer: layerHandler.setLayerBuffer,
       buffers: layerHandler.buffers,
       load: middlewareHandler.loadLayers,
+      set: layerHandler.set,
     },
     brush: {
       setColor: brushHandler.setColor,
       getColor: brushHandler.getColor,
-      paint: brushHandler.paint,
+      paint: (cellPos: Vec2) => {
+        console.log("Painting at", cellPos);
+        historyChangeHandler.addAction(() => brushHandler.paint(cellPos));
+        brushHandler.paint(cellPos);
+      },
       erase: brushHandler.erase,
       getOpacity: brushHandler.getOpacity,
       setOpacity: brushHandler.setOpacity,
@@ -77,6 +88,10 @@ export const pixelPainter = async (
       getSelectedCellsRect: uniformBufferHandler.selectedCellsRect,
       setSelectionTool: uniformBufferHandler.setSelectionTool,
       isSelectionToolEnabled: uniformBufferHandler.isSelectionToolEnabled,
+    },
+    history: {
+      undo: historyChangeHandler.undo,
+      redo: historyChangeHandler.redo,
     },
   };
 };

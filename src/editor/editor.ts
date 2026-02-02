@@ -141,13 +141,10 @@ export const initializeEditor = async () => {
       };
       for (let x = selection.x; x <= selection.w; x++) {
         for (let y = selection.y; y <= selection.h; y++) {
-          pixel.brush.paint(
-            {
-              x: x * 4,
-              y: y * 4,
-            },
-            pixel.render.isSelectionToolEnabled() ? 1 : undefined,
-          );
+          pixel.brush.paint({
+            x: x * 4,
+            y: y * 4,
+          });
         }
       }
 
@@ -159,6 +156,16 @@ export const initializeEditor = async () => {
   window.addEventListener("keydown", (e) => {
     if (e.code === "Space" && !pressingSpace) {
       pressingSpace = true;
+    }
+
+    if ((e.ctrlKey || e.metaKey) && e.key === "z") {
+      e.preventDefault();
+      pixel.history.undo();
+    }
+
+    if ((e.ctrlKey || e.metaKey) && e.key === "Z") {
+      e.preventDefault();
+      pixel.history.redo();
     }
   });
 
