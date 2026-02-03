@@ -280,6 +280,9 @@ export const createLayerHandler = async (
   const setLayerBuffer = (layerId: string, buffer: Uint8Array<ArrayBuffer>) => {
     buffers.set(layerId, buffer);
     db.save(buffer, layerId);
+    if (layerId === getActive().id) {
+      setCurrentBuffer(buffer);
+    }
   };
 
   const load = (
