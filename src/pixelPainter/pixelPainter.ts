@@ -17,16 +17,20 @@ export const pixelPainter = async (
   }
 
   const layerHandler = await createLayerHandler(projectName, gridSize);
-  const brushHandler = createBrushHandler(layerHandler, gridSize);
+  const historyChangeHandler = createHistoryChangeHandler(
+    layerHandler,
+    projectName,
+    gridSize,
+  );
+  const brushHandler = createBrushHandler(
+    layerHandler,
+    historyChangeHandler,
+    gridSize,
+  );
   const uniformBufferHandler = createUniformBufferHandler(canvasSize, gridSize);
   const renderHandler = await createRenderHandler(
     layerHandler,
     uniformBufferHandler,
-    gridSize,
-  );
-  const historyChangeHandler = createHistoryChangeHandler(
-    layerHandler,
-    projectName,
     gridSize,
   );
 
@@ -35,6 +39,7 @@ export const pixelPainter = async (
     uniformBufferHandler,
     renderHandler,
     layerHandler,
+    historyChangeHandler,
   );
 
   middlewareHandler.loadLayers();
@@ -60,11 +65,7 @@ export const pixelPainter = async (
     brush: {
       setColor: brushHandler.setColor,
       getColor: brushHandler.getColor,
-      paint: (cellPos: Vec2) => {
-        console.log("Painting at", cellPos);
-        historyChangeHandler.addAction(() => brushHandler.paint(cellPos));
-        brushHandler.paint(cellPos);
-      },
+      paint: brushHandler.paint,
       erase: brushHandler.erase,
       getOpacity: brushHandler.getOpacity,
       setOpacity: brushHandler.setOpacity,

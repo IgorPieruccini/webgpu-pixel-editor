@@ -141,10 +141,13 @@ export const initializeEditor = async () => {
       };
       for (let x = selection.x; x <= selection.w; x++) {
         for (let y = selection.y; y <= selection.h; y++) {
-          pixel.brush.paint({
-            x: x * 4,
-            y: y * 4,
-          });
+          pixel.brush.paint(
+            {
+              x: x * 4,
+              y: y * 4,
+            },
+            1,
+          );
         }
       }
 

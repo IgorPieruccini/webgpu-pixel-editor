@@ -1,6 +1,7 @@
 import type { Layers } from "../types";
 import type { UniformBufferHandler } from "../uniformBuffersHandler";
 import type { BrushHandler } from "./brushHandler";
+import type { HistoryChangeHandler } from "./historyChangeHandler";
 import type { LayerHandler } from "./layerHandler";
 import type { RenderHandler } from "./renderHandler";
 
@@ -9,6 +10,7 @@ export const createMiddlewareHandler = (
   uniformBufferHandler: UniformBufferHandler,
   renderHandler: RenderHandler,
   layerHandler: LayerHandler,
+  historyChangeHandler: HistoryChangeHandler,
 ) => {
   const loadLayers = (layers?: Layers) => {
     const curLayers = layers ?? layerHandler.getList();
@@ -17,6 +19,8 @@ export const createMiddlewareHandler = (
       renderHandler.addLayerTexture(layer.id);
       layerHandler.set(layer);
     }
+
+    historyChangeHandler.addMilestone();
   };
 
   const addLayer = () => {

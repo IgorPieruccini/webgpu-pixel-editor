@@ -2,92 +2,85 @@ import type { Vec2 } from "../../editor/types";
 import { serialization } from "../../serialization";
 import type { SerializedProject } from "../../serialization/project";
 import type { LayerHandler } from "./layerHandler";
+import * as jsondiffpatch from "jsondiffpatch";
 
-const MILESTONE_FREQUENCY = 10;
-type historyAction = () => void;
+export type HistoryChangeHandler = ReturnType<
+  typeof createHistoryChangeHandler
+>;
+
+type HistoryDiffItem = Array<jsondiffpatch.Delta>;
 
 export const createHistoryChangeHandler = (
   layerHandler: LayerHandler,
   projectName: string,
   gridSize: Vec2,
 ) => {
-  const historyActions = Array<historyAction>();
-  const milestones = Array<SerializedProject>();
-
+  const historyDiff: HistoryDiffItem = [];
   let historyIndex = 0;
 
-  const addAction = (action: historyAction): void => {
-    if (historyIndex < historyActions.length) {
-      historyActions.splice(historyIndex);
-    }
+  const jsondiffpatchInstance = jsondiffpatch.create();
+  let currentProject: SerializedProject | null = null;
 
-    const count = milestones.length + historyIndex;
-
-    const isMilestone = count !== 0 && count % MILESTONE_FREQUENCY === 0;
-    console.log({ isMilestone });
-
-    if (isMilestone) {
-      milestones.push(
-        serialization.project.serialize(
-          projectName,
-          gridSize,
-          layerHandler.getList(),
-          layerHandler.buffers,
-        ),
-      );
-      return;
-    }
-
-    historyActions.push(action);
-
-    historyIndex++;
-
-    console.log("Added action, history index:", historyIndex);
-    console.log(historyActions.length);
-    console.log(milestones.length);
+  const getSerializedProject = (): SerializedProject => {
+    return serialization.project.serialize(
+      projectName,
+      gridSize,
+      layerHandler.getList(),
+      layerHandler.buffers,
+    );
   };
 
-  const loadFromSerializedProject = (
-    serializedProject: SerializedProject,
-  ): void => {
-    layerHandler.load(serializedProject.layers, serializedProject.buffers);
+  const addMilestone = (): void => {
+    const serializedProject = getSerializedProject();
+    currentProject = serializedProject;
+  };
+
+  const addAction = (): void => {
+    if (historyIndex < historyDiff.length && historyIndex > 0) {
+      historyDiff.splice(historyIndex);
+    }
+    const serializedProject = getSerializedProject();
+    const diff = jsondiffpatchInstance.diff(currentProject, serializedProject);
+    currentProject = serializedProject;
+
+    historyDiff.push(diff);
+    historyIndex++;
   };
 
   const undo = (): void => {
     if (historyIndex === 0) return;
 
-    const currentMilestoneIndex = Math.floor(
-      historyIndex / MILESTONE_FREQUENCY,
-    );
+    historyIndex--;
 
-    const milestone = milestones.at(currentMilestoneIndex - 1);
-    if (milestone) {
-      loadFromSerializedProject(milestone);
+    if (!historyDiff[historyIndex]) {
+      console.log("No diff found for this index, cannot undo");
+      return;
     }
 
-    const actionsToReplay = historyActions.slice(
-      currentMilestoneIndex * MILESTONE_FREQUENCY,
-      historyIndex - 1,
-    );
+    jsondiffpatchInstance.unpatch(currentProject, historyDiff[historyIndex]);
 
-    actionsToReplay.forEach((action) => {
-      console.log(action);
-      action();
-    });
-
-    historyIndex--;
+    if (currentProject) {
+      layerHandler.load(currentProject.layers, currentProject.buffers);
+    }
   };
 
   const redo = (): void => {
-    if (historyIndex >= historyActions.length) return;
-
-    const action = historyActions[historyIndex];
-    action();
-
     historyIndex++;
+
+    if (historyIndex > historyDiff.length) {
+      historyIndex = historyDiff.length;
+      return;
+    }
+
+    jsondiffpatchInstance.patch(currentProject, historyDiff[historyIndex]);
+
+    if (currentProject) {
+      layerHandler.load(currentProject.layers, currentProject.buffers);
+    }
   };
 
   return {
+    addMilestone,
     addAction,
     undo,
     redo,
