@@ -1,5 +1,9 @@
 import { pixelPainter } from "../pixelPainter/pixelPainter";
-import { DEFAULT_GRID_SIZE, ZOOM_SENSITIVITY } from "../constants";
+import {
+  DEFAULT_GRID_SIZE,
+  ZOOM_SENSITIVITY,
+  BYTES_PER_PIXEL,
+} from "../constants";
 import { ACTIVATE_TOOL, INITIAL_PIXEL_PAINTER } from "./constant";
 import { createSignal } from "solid-js";
 import type { PixelPainterMethods } from "../pixelPainter/types";
@@ -88,11 +92,17 @@ export const initializeEditor = async () => {
 
     if (isLeftMouseDown && !pressingSpace) {
       if (activeTool() === ACTIVATE_TOOL.PAINT) {
-        pixel.brush.paint({ x: cell.x * 4, y: cell.y * 4 });
+        pixel.brush.paint({
+          x: cell.x * BYTES_PER_PIXEL,
+          y: cell.y * BYTES_PER_PIXEL,
+        });
       }
 
       if (activeTool() === ACTIVATE_TOOL.DELETE) {
-        pixel.brush.erase({ x: cell.x * 4, y: cell.y * 4 });
+        pixel.brush.erase({
+          x: cell.x * BYTES_PER_PIXEL,
+          y: cell.y * BYTES_PER_PIXEL,
+        });
       }
     }
 
@@ -108,11 +118,17 @@ export const initializeEditor = async () => {
     );
 
     if (activeTool() === ACTIVATE_TOOL.PAINT) {
-      pixel.brush.paint({ x: cell.x * 4, y: cell.y * 4 });
+      pixel.brush.paint({
+        x: cell.x * BYTES_PER_PIXEL,
+        y: cell.y * BYTES_PER_PIXEL,
+      });
     }
 
     if (activeTool() === ACTIVATE_TOOL.DELETE) {
-      pixel.brush.erase({ x: cell.x * 4, y: cell.y * 4 });
+      pixel.brush.erase({
+        x: cell.x * BYTES_PER_PIXEL,
+        y: cell.y * BYTES_PER_PIXEL,
+      });
     }
 
     isLeftMouseDown = true;
@@ -143,8 +159,8 @@ export const initializeEditor = async () => {
         for (let y = selection.y; y <= selection.h; y++) {
           pixel.brush.paint(
             {
-              x: x * 4,
-              y: y * 4,
+              x: x * BYTES_PER_PIXEL,
+              y: y * BYTES_PER_PIXEL,
             },
             1,
           );

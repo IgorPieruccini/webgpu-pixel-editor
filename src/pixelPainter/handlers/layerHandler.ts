@@ -5,6 +5,7 @@ import { localDataBase } from "../../storageDB";
 import type { Vec2 } from "../../editor/types";
 import { serialization } from "../../serialization";
 import { storageLocal } from "../../storageLocal";
+import { BYTES_PER_PIXEL } from "../../constants";
 
 export type LayerHandler = Awaited<ReturnType<typeof createLayerHandler>>;
 
@@ -34,10 +35,16 @@ export const createLayerHandler = async (
       if (layerBuffer) {
         buffers.set(layer.id, layerBuffer);
       } else {
-        buffers.set(layer.id, new Uint8Array(gridSize.x * gridSize.y * 4));
+        buffers.set(
+          layer.id,
+          new Uint8Array(gridSize.x * gridSize.y * BYTES_PER_PIXEL),
+        );
       }
     } catch {
-      buffers.set(layer.id, new Uint8Array(gridSize.x * gridSize.y * 4));
+      buffers.set(
+        layer.id,
+        new Uint8Array(gridSize.x * gridSize.y * BYTES_PER_PIXEL),
+      );
     }
   }
 
@@ -68,7 +75,7 @@ export const createLayerHandler = async (
 
     setActive(layer);
 
-    const newBuffer = new Uint8Array(gridSize.x * gridSize.y * 4);
+    const newBuffer = new Uint8Array(gridSize.x * gridSize.y * BYTES_PER_PIXEL);
 
     buffers.set(layer.id, newBuffer);
     setCurrentBuffer(newBuffer);

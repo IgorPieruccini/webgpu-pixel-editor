@@ -1,4 +1,5 @@
 import type { Vec2 } from "../editor/types";
+import { BYTES_PER_PIXEL } from "../constants";
 
 const CUR_VERSION = 0.1;
 
@@ -19,21 +20,25 @@ const serialize = (buffer: Uint8Array, gridSize: Vec2): number[] => {
     return ((a << 24) | (r << 16) | (g << 8) | b) >>> 0;
   };
 
-  const totalPixels = gridSize.x * gridSize.y * 4;
-  const totalPixelCount = totalPixels / 4;
+  const totalPixels = gridSize.x * gridSize.y * BYTES_PER_PIXEL;
+  const totalPixelCount = totalPixels / BYTES_PER_PIXEL;
   let cColor = getPixelColor(0);
   let rangeStart = 0;
 
-  for (let pixelIndex = 0; pixelIndex < totalPixels; pixelIndex += 4) {
+  for (
+    let pixelIndex = 0;
+    pixelIndex < totalPixels;
+    pixelIndex += BYTES_PER_PIXEL
+  ) {
     const color = getPixelColor(pixelIndex);
     if (color !== cColor) {
-      const rangeEnd = pixelIndex / 4 - 1;
+      const rangeEnd = pixelIndex / BYTES_PER_PIXEL - 1;
       const rangeArray = [rangeStart, rangeEnd, RANGE_SEPARATOR];
       const colorRanges = colorMap.get(cColor) || [];
       colorMap.set(cColor, [...colorRanges, ...rangeArray]);
 
       cColor = color;
-      rangeStart = pixelIndex / 4;
+      rangeStart = pixelIndex / BYTES_PER_PIXEL;
     }
   }
 
@@ -62,7 +67,7 @@ const deserialize = (data: number[]): Uint8Array<ArrayBuffer> => {
   const dataLayer = data.slice(3, data.length);
 
   const buffer: Uint8Array<ArrayBuffer> = new Uint8Array(
-    layerGridSize.x * layerGridSize.y * 4,
+    layerGridSize.x * layerGridSize.y * BYTES_PER_PIXEL,
   );
 
   const paintRange = (color: number, start: number, end: number) => {
@@ -72,7 +77,7 @@ const deserialize = (data: number[]): Uint8Array<ArrayBuffer> => {
     const a = (color >>> 24) & 0xff;
 
     for (let pixelIndex = start; pixelIndex <= end; pixelIndex++) {
-      const baseIndex = pixelIndex * 4;
+      const baseIndex = pixelIndex * BYTES_PER_PIXEL;
       buffer[baseIndex] = r;
       buffer[baseIndex + 1] = g;
       buffer[baseIndex + 2] = b;

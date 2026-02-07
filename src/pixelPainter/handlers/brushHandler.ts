@@ -3,6 +3,7 @@ import type { Vec2 } from "../../editor/types";
 import type { LayerHandler } from "./layerHandler";
 import { alphaComposite, numberToRGBA, rgbaToHex } from "../utils";
 import type { HistoryChangeHandler } from "./historyChangeHandler";
+import { BYTES_PER_PIXEL, RGBA_OFFSET } from "../../constants";
 
 export type BrushHandler = ReturnType<typeof createBrushHandler>;
 
@@ -55,10 +56,10 @@ export const createBrushHandler = (
   const composeColors = (index: number) => {
     index;
     const curBuffer = layerHandler.getCurrentBuffer();
-    const _r = curBuffer[index + 0];
-    const _g = curBuffer[index + 1];
-    const _b = curBuffer[index + 2];
-    const _a = curBuffer[index + 3] / 255;
+    const _r = curBuffer[index + RGBA_OFFSET.RED];
+    const _g = curBuffer[index + RGBA_OFFSET.GREEN];
+    const _b = curBuffer[index + RGBA_OFFSET.BLUE];
+    const _a = curBuffer[index + RGBA_OFFSET.ALPHA] / 255;
 
     const destRGBA = { r: _r, g: _g, b: _b, a: _a };
 
@@ -74,10 +75,10 @@ export const createBrushHandler = (
     const b = (rgba >>> 8) & 0xff;
     const a = rgba & 0xff;
 
-    layerHandler.getCurrentBuffer()[index + 0] = r;
-    layerHandler.getCurrentBuffer()[index + 1] = g;
-    layerHandler.getCurrentBuffer()[index + 2] = b;
-    layerHandler.getCurrentBuffer()[index + 3] = a;
+    layerHandler.getCurrentBuffer()[index + RGBA_OFFSET.RED] = r;
+    layerHandler.getCurrentBuffer()[index + RGBA_OFFSET.GREEN] = g;
+    layerHandler.getCurrentBuffer()[index + RGBA_OFFSET.BLUE] = b;
+    layerHandler.getCurrentBuffer()[index + RGBA_OFFSET.ALPHA] = a;
 
     currentPaintedPixels.add(index);
   };
@@ -94,8 +95,8 @@ export const createBrushHandler = (
 
     for (let y = -thickness; y <= thickness; y++) {
       for (let x = -thickness; x <= thickness; x++) {
-        const _x = cellPos.x + x * 4;
-        const _y = cellPos.y + y * 4;
+        const _x = cellPos.x + x * BYTES_PER_PIXEL;
+        const _y = cellPos.y + y * BYTES_PER_PIXEL;
         const i = _x + _y * gridSize.x;
 
         if (!forcePaint && currentPaintedPixels.has(i)) {
@@ -117,8 +118,8 @@ export const createBrushHandler = (
 
     for (let y = -thickness; y <= thickness; y++) {
       for (let x = -thickness; x <= thickness; x++) {
-        const _x = cellPos.x + x * 4;
-        const _y = cellPos.y + y * 4;
+        const _x = cellPos.x + x * BYTES_PER_PIXEL;
+        const _y = cellPos.y + y * BYTES_PER_PIXEL;
         const index = _x + _y * gridSize.x;
 
         if (currentPaintedPixels.has(index)) {
@@ -128,10 +129,10 @@ export const createBrushHandler = (
         const distance = Math.hypot(cellPos.x - _x, cellPos.y - _y);
         if (distance < thickness) {
           const curBuffer = layerHandler.getCurrentBuffer();
-          const _r = curBuffer[index + 0];
-          const _g = curBuffer[index + 1];
-          const _b = curBuffer[index + 2];
-          const _a = curBuffer[index + 3] / 255;
+          const _r = curBuffer[index + RGBA_OFFSET.RED];
+          const _g = curBuffer[index + RGBA_OFFSET.GREEN];
+          const _b = curBuffer[index + RGBA_OFFSET.BLUE];
+          const _a = curBuffer[index + RGBA_OFFSET.ALPHA] / 255;
 
           const destRGBA = { r: _r, g: _g, b: _b, a: _a };
 
@@ -143,13 +144,14 @@ export const createBrushHandler = (
           const resultRGBA = { ...destRGBA, a: opacity >= 0 ? opacity : 0 };
 
           if (resultRGBA.a === 0) {
-            layerHandler.getCurrentBuffer()[index + 3] = 0;
+            layerHandler.getCurrentBuffer()[index + RGBA_OFFSET.ALPHA] = 0;
             currentPaintedPixels.add(index);
             continue;
           }
 
           const blendedHex = rgbaToHex(resultRGBA);
-          layerHandler.getCurrentBuffer()[index + 3] = blendedHex;
+          layerHandler.getCurrentBuffer()[index + RGBA_OFFSET.ALPHA] =
+            blendedHex;
           currentPaintedPixels.add(index);
         }
       }
