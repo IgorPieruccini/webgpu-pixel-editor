@@ -2,11 +2,13 @@ import { createSignal } from "solid-js";
 import type { Vec2 } from "../../editor/types";
 import type { LayerHandler } from "./layerHandler";
 import { alphaComposite, numberToRGBA, rgbaToHex } from "../utils";
+import type { HistoryChangeHandler } from "./historyChangeHandler";
 
 export type BrushHandler = ReturnType<typeof createBrushHandler>;
 
 export const createBrushHandler = (
   layerHandler: LayerHandler,
+  historyChangeHandler: HistoryChangeHandler,
   gridSize: Vec2,
 ) => {
   const canvas = document.querySelector<HTMLCanvasElement>("#main-canvas");
@@ -16,14 +18,19 @@ export const createBrushHandler = (
 
   const currentPaintedPixels = new Set<number>();
   canvas.addEventListener("mouseup", () => {
-    currentPaintedPixels.clear();
+    clearCurrentPaintedPixels();
     layerHandler.saveCurrentBuffer();
+    historyChangeHandler.addAction();
   });
 
   // Default color: magenta RGB (0xff00ff), will be converted to ABGR when set
   const [_getSelectedColor, _setSelectedColor] = createSignal(0xff00ff);
   const [getOpacity, setOpacity] = createSignal(100);
   const [getThickness, setThickness] = createSignal(1);
+
+  const clearCurrentPaintedPixels = () => {
+    currentPaintedPixels.clear();
+  };
 
   const setColor = (_color: number | string) => {
     if (typeof _color === "string") {
@@ -78,7 +85,11 @@ export const createBrushHandler = (
   const paint = (
     cellPos: { x: number; y: number },
     defaultThickness?: number,
-  ) => {
+    forcePaint = false,
+  ): boolean => {
+    // We use this variable to check if we applied paint in at least one pixel,
+    // so we can decide whether to add the paint action to the history or not
+    let hasAppliedPaint = false;
     const thickness = defaultThickness ?? getThickness();
 
     for (let y = -thickness; y <= thickness; y++) {
@@ -87,16 +98,18 @@ export const createBrushHandler = (
         const _y = cellPos.y + y * 4;
         const i = _x + _y * gridSize.x;
 
-        if (currentPaintedPixels.has(i)) {
+        if (!forcePaint && currentPaintedPixels.has(i)) {
           continue;
         }
 
         const distance = Math.hypot(cellPos.x - _x, cellPos.y - _y);
         if (distance < thickness) {
           composeColors(i);
+          hasAppliedPaint = true;
         }
       }
     }
+    return hasAppliedPaint;
   };
 
   const erase = (cellPos: { x: number; y: number }) => {
@@ -172,5 +185,6 @@ export const createBrushHandler = (
     setSelectedColor,
     getThickness,
     setThickness,
+    clearCurrentPaintedPixels,
   };
 };
