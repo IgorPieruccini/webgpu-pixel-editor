@@ -1,6 +1,7 @@
 import { serialization } from ".";
 import type { Vec2 } from "../editor/types";
 import type { Layers } from "../pixelPainter/types";
+import { API } from "../projectConfig/projectConfigProvider";
 
 export type SerializedProject = {
   name: string;
@@ -29,6 +30,7 @@ export const serialize = (
   layers: Layers,
   buffers: Map<string, Uint8Array<ArrayBuffer>>,
 ): SerializedProject => {
+  const layerAPI = API.layers();
   const serializedBuffers = getSerializedBuffers(buffers, gridSize);
 
   const project = {
@@ -37,6 +39,8 @@ export const serialize = (
     layers,
     buffers: serializedBuffers,
   };
+
+  layerAPI().load(layers, serializedBuffers);
 
   return project;
 };

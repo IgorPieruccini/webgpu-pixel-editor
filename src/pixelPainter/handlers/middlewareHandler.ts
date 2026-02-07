@@ -12,32 +12,32 @@ export const createMiddlewareHandler = (
   layerHandler: LayerHandler,
   historyChangeHandler: HistoryChangeHandler,
 ) => {
-  const loadLayers = (layers?: Layers) => {
+  const loadTextureLayers = (layers?: Layers) => {
     const curLayers = layers ?? layerHandler.getList();
 
     for (const layer of curLayers) {
       renderHandler.addLayerTexture(layer.id);
-      layerHandler.set(layer);
     }
-
-    historyChangeHandler.addMilestone();
   };
 
   const addLayer = () => {
     const id = layerHandler.add();
     renderHandler.addLayerTexture(id);
+    historyChangeHandler.addAction();
     return id;
   };
 
   const removeLayer = (id: string) => {
     layerHandler.remove(id);
     renderHandler.removeLayerTexture(id);
+    historyChangeHandler.addAction();
     return id;
   };
 
   const duplicateLayer = (id: string) => {
     const layerId = layerHandler.duplicate(id);
     renderHandler.addLayerTexture(layerId);
+    historyChangeHandler.addAction();
     return layerId;
   };
 
@@ -47,7 +47,7 @@ export const createMiddlewareHandler = (
   };
 
   return {
-    loadLayers,
+    loadTextureLayers,
     addLayer,
     removeLayer,
     duplicateLayer,

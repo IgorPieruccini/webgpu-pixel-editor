@@ -26,12 +26,13 @@ export const INITIAL_PIXEL_PAINTER: PixelPainterMethods = {
     duplicate: (id: string) => id,
     setLayerBuffer: () => {},
     buffers: new Map<string, Uint8Array<ArrayBuffer>>(),
-    load: () => Promise.resolve(),
+    load: () => [],
+    set: () => {},
   },
   brush: {
     setColor: () => {},
     getColor: () => 0,
-    paint: () => {},
+    paint: () => false,
     erase: () => {},
     getOpacity: () => 1,
     setOpacity: () => {},
@@ -54,5 +55,9 @@ export const INITIAL_PIXEL_PAINTER: PixelPainterMethods = {
     getSelectedCellsRect: () => ({ x: 0, y: 0, w: 0, h: 0 }),
     setSelectionTool: () => {},
     isSelectionToolEnabled: () => false,
+  },
+  history: {
+    undo: () => {},
+    redo: () => {},
   },
 };

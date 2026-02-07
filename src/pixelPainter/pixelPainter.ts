@@ -17,17 +17,21 @@ export const pixelPainter = async (
   }
 
   const layerHandler = await createLayerHandler(projectName, gridSize);
+
   const historyChangeHandler = createHistoryChangeHandler(
     layerHandler,
     projectName,
     gridSize,
   );
+
   const brushHandler = createBrushHandler(
     layerHandler,
     historyChangeHandler,
     gridSize,
   );
+
   const uniformBufferHandler = createUniformBufferHandler(canvasSize, gridSize);
+
   const renderHandler = await createRenderHandler(
     layerHandler,
     uniformBufferHandler,
@@ -42,7 +46,8 @@ export const pixelPainter = async (
     historyChangeHandler,
   );
 
-  middlewareHandler.loadLayers();
+  middlewareHandler.loadTextureLayers();
+  historyChangeHandler.addMilestone();
 
   return {
     layer: {
@@ -59,7 +64,7 @@ export const pixelPainter = async (
       getBufferById: layerHandler.getBufferById,
       setLayerBuffer: layerHandler.setLayerBuffer,
       buffers: layerHandler.buffers,
-      load: middlewareHandler.loadLayers,
+      load: layerHandler.load,
       set: layerHandler.set,
     },
     brush: {
