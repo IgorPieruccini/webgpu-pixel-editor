@@ -294,33 +294,35 @@ export const createLayerHandler = async (
 
   const load = (
     serializedLayers: Layers,
-    serializedBuffers: Record<string, number[]>,
+    serializedBuffer: Record<string, number[]>,
   ): string[] => {
-    setList(serializedLayers);
+    // Detach from any external references (e.g. history undo/redo patches)
+    const layerCopy: Layers = JSON.parse(JSON.stringify(serializedLayers));
+    setList(layerCopy);
 
-    storageLocal.saveLayers(projectName, serializedLayers);
+    storageLocal.saveLayers(projectName, layerCopy);
 
-    for (const [id, buffer] of Object.entries(serializedBuffers)) {
+    for (const [id, buffer] of Object.entries(serializedBuffer)) {
       const deserializedBuffer = serialization.layer.deserialize(buffer);
       setLayerBuffer(id, deserializedBuffer);
     }
 
-    const activeLayerIsPresent = serializedLayers.find(
+    const activeLayerIsPresent = layerCopy.find(
       (layer) => layer.id === getActive().id,
     );
 
     if (!activeLayerIsPresent) {
-      setActive(serializedLayers[0]);
-      const buffer = buffers.get(serializedLayers[0].id);
+      setActive(layerCopy[0]);
+      const buffer = buffers.get(layerCopy[0].id);
       if (!buffer) {
         throw new Error(
-          `Could not find buffer corresponded to id: ${serializedLayers[0].id}`,
+          `Could not find buffer corresponded to id: ${layerCopy[0].id}`,
         );
       }
       setCurrentBuffer(buffer);
     }
 
-    return serializedLayers.map((layer) => layer.id);
+    return layerCopy.map((layer) => layer.id);
   };
 
   return {
