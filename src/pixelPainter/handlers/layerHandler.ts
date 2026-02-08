@@ -293,19 +293,34 @@ export const createLayerHandler = async (
   };
 
   const load = (
-    layers: Layers,
-    buffers: Record<string, number[]>,
+    serializedLayers: Layers,
+    serializedBuffers: Record<string, number[]>,
   ): string[] => {
-    setList(layers);
+    setList(serializedLayers);
 
-    storageLocal.saveLayers(projectName, layers);
+    storageLocal.saveLayers(projectName, serializedLayers);
 
-    for (const [id, buffer] of Object.entries(buffers)) {
+    for (const [id, buffer] of Object.entries(serializedBuffers)) {
       const deserializedBuffer = serialization.layer.deserialize(buffer);
       setLayerBuffer(id, deserializedBuffer);
     }
 
-    return layers.map((layer) => layer.id);
+    const activeLayerIsPresent = serializedLayers.find(
+      (layer) => layer.id === getActive().id,
+    );
+
+    if (!activeLayerIsPresent) {
+      setActive(serializedLayers[0]);
+      const buffer = buffers.get(serializedLayers[0].id);
+      if (!buffer) {
+        throw new Error(
+          `Could not find buffer corresponded to id: ${serializedLayers[0].id}`,
+        );
+      }
+      setCurrentBuffer(buffer);
+    }
+
+    return serializedLayers.map((layer) => layer.id);
   };
 
   return {
