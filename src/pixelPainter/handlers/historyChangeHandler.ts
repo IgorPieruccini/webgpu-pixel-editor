@@ -1,6 +1,6 @@
 import type { Vec2 } from "../../editor/types";
 import { serialization } from "../../serialization";
-import type { SerializedProject } from "../../serialization/project";
+import { type SerializedProject } from "../../serialization/project";
 import type { LayerHandler } from "./layerHandler";
 import * as jsondiffpatch from "jsondiffpatch";
 

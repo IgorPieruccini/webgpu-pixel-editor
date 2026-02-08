@@ -30,17 +30,22 @@ export const serialize = (
   layers: Layers,
   buffers: Map<string, Uint8Array<ArrayBuffer>>,
 ): SerializedProject => {
-  const layerAPI = API.layers();
   const serializedBuffers = getSerializedBuffers(buffers, gridSize);
+
+  // We need to make a deep copy of the buffers and layers to avoid issues with mutable data when applying the project
+  const copyBuffers: Record<string, number[]> = JSON.parse(
+    JSON.stringify(serializedBuffers),
+  );
+  // Make sure to return a new object and not a reference to the original layers,
+  // to avoid issues with mutable data when applying the project
+  const copyLayer = JSON.parse(JSON.stringify(layers));
 
   const project = {
     name,
     gridSize,
-    layers,
-    buffers: serializedBuffers,
+    layers: copyLayer,
+    buffers: copyBuffers,
   };
-
-  layerAPI().load(layers, serializedBuffers);
 
   return project;
 };
