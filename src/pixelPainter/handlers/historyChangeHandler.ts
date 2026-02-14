@@ -4,6 +4,7 @@ import { serialization } from "../../serialization";
 import { type SerializedProject } from "../../serialization/project";
 import type { LayerHandler } from "./layerHandler";
 import * as jsondiffpatch from "jsondiffpatch";
+import { storageLocal } from "../../storageLocal";
 
 const SNAPSHOT_INTERVAL = 5;
 
@@ -26,6 +27,8 @@ type Diff = {
 type SerializedProjectSnapshot = {
   type: "snapshot";
   project: SerializedProject;
+  buffers: Map<string, Uint8Array<ArrayBuffer>>;
+  layerDiff: LayerDiff | null;
 };
 
 type HistoryDiffItem = Array<Diff | SerializedProjectSnapshot>;
@@ -107,6 +110,24 @@ const patchPortionOfBuffer = (
   }
 };
 
+const copyLayersBuffer = (
+  buffers: Map<string, Uint8Array<ArrayBuffer>>,
+): Map<string, Uint8Array<ArrayBuffer>> => {
+  const copy = new Map<string, Uint8Array<ArrayBuffer>>();
+
+  buffers.forEach((buffer, key) => {
+    const copiedBuffer = new Uint8Array(buffer.length);
+    copiedBuffer.set(buffer);
+    copy.set(key, copiedBuffer);
+  });
+
+  return copy;
+};
+
+const copyProject = (project: SerializedProject): SerializedProject => {
+  return structuredClone(project);
+};
+
 export const createHistoryChangeHandler = (
   layerHandler: LayerHandler,
   projectName: string,
@@ -118,23 +139,27 @@ export const createHistoryChangeHandler = (
   const jsondiffpatchInstance = jsondiffpatch.create();
   let currentProject: SerializedProject | null = null;
 
-  const getSerializedProject = (
-    includeBuffers: boolean = false,
-  ): SerializedProject => {
+  const getSerializedProject = (): SerializedProject => {
     return serialization.project.serialize(
       projectName,
       gridSize,
       layerHandler.getList(),
-      // We need to pass an empty buffer map here because we don't want to include the buffers in the diff,
-      // as they are handled separately in the layerDiff.
-      includeBuffers ? layerHandler.buffers : emptyBufferMap,
+      emptyBufferMap,
     );
   };
 
-  const addSnapshot = (): SerializedProject => {
-    const serializedProject = getSerializedProject(true);
+  const addSnapshot = () => {
+    const serializedProject = getSerializedProject();
     currentProject = serializedProject;
-    return serializedProject;
+
+    historyDiff.push({
+      type: "snapshot",
+      project: currentProject,
+      buffers: copyLayersBuffer(layerHandler.buffers),
+      layerDiff: null,
+    });
+
+    historyIndex++;
   };
 
   const addAction = (paintedPixels?: Set<number>): void => {
@@ -142,21 +167,17 @@ export const createHistoryChangeHandler = (
       historyDiff.splice(historyIndex);
     }
 
-    const isSnapshot = historyIndex % SNAPSHOT_INTERVAL === 0;
-
-    if (isSnapshot && currentProject) {
-      const serializedProject = addSnapshot();
-      historyDiff.push({
-        type: "snapshot",
-        project: serializedProject,
-      });
-      historyIndex++;
-      return;
-    }
-
     const serializedProject = getSerializedProject();
 
     const diff = jsondiffpatchInstance.diff(currentProject, serializedProject);
+
+    const isSnapshot = historyIndex % SNAPSHOT_INTERVAL === 0;
+
+    if (isSnapshot) {
+      addSnapshot();
+      return;
+    }
+
     currentProject = serializedProject;
 
     let paintedBuffer: Uint8Array<ArrayBuffer> | null = null;
@@ -188,7 +209,7 @@ export const createHistoryChangeHandler = (
   };
 
   const undo = (): void => {
-    if (historyIndex === 0) return;
+    if (historyIndex === 1) return;
 
     historyIndex--;
 
@@ -206,16 +227,25 @@ export const createHistoryChangeHandler = (
 
     for (const change of replaySteps) {
       if (change.type === "snapshot") {
-        currentProject = change.project;
-        layerHandler.load(currentProject.layers, currentProject.buffers);
+        currentProject = copyProject(change.project);
+
+        layerHandler.setList(currentProject.layers);
+        storageLocal.saveLayers(projectName, currentProject.layers);
+        const bufferEntries = Array.from(change.buffers.entries());
+        for (const [key, buffer] of bufferEntries) {
+          const copiedBuffer = new Uint8Array(buffer.length);
+          copiedBuffer.set(buffer);
+          layerHandler.setLayerBuffer(key, copiedBuffer);
+        }
       }
 
       if (change.type === "diff") {
-        jsondiffpatchInstance.unpatch(currentProject, change.diff);
-
-        if (currentProject) {
-          layerHandler.load(currentProject.layers, currentProject.buffers);
+        if (!currentProject) {
+          console.log("No project found while undoing diff");
+          return;
         }
+
+        jsondiffpatchInstance.unpatch(currentProject, change.diff);
 
         if (change.layerDiff) {
           const buffer = layerHandler.getBufferById(change.layerDiff.id);
@@ -226,6 +256,7 @@ export const createHistoryChangeHandler = (
             return;
           }
 
+          console.log("Applying layer diff for layer id", change.layerDiff.id);
           patchPortionOfBuffer(
             buffer,
             change.layerDiff.bounds.tl,
