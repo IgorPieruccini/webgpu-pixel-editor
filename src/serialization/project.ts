@@ -1,7 +1,6 @@
 import { serialization } from ".";
 import type { Vec2 } from "../editor/types";
 import type { Layers } from "../pixelPainter/types";
-import { API } from "../projectConfig/projectConfigProvider";
 
 export type SerializedProject = {
   name: string;

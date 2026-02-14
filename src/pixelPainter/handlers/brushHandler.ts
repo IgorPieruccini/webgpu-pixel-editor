@@ -19,9 +19,9 @@ export const createBrushHandler = (
 
   const currentPaintedPixels = new Set<number>();
   canvas.addEventListener("mouseup", () => {
-    clearCurrentPaintedPixels();
     layerHandler.saveCurrentBuffer();
-    historyChangeHandler.addAction();
+    historyChangeHandler.addAction(currentPaintedPixels);
+    clearCurrentPaintedPixels();
   });
 
   // Default color: magenta RGB (0xff00ff), will be converted to ABGR when set

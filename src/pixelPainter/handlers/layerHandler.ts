@@ -280,7 +280,9 @@ export const createLayerHandler = async (
     return newLayer.id;
   };
 
-  const getBufferById = (layerId: string): Uint8Array | undefined => {
+  const getBufferById = (
+    layerId: string,
+  ): Uint8Array<ArrayBuffer> | undefined => {
     return buffers.get(layerId);
   };
 
