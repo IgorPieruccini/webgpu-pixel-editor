@@ -30,7 +30,7 @@ export const createHistoryChangeHandler = (
     );
   };
 
-  const addMilestone = (): void => {
+  const addSnapshot = (): void => {
     const serializedProject = getSerializedProject();
     currentProject = serializedProject;
   };
@@ -80,7 +80,7 @@ export const createHistoryChangeHandler = (
   };
 
   return {
-    addMilestone,
+    addSnapshot,
     addAction,
     undo,
     redo,

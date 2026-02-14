@@ -47,7 +47,7 @@ export const pixelPainter = async (
   );
 
   middlewareHandler.loadTextureLayers();
-  historyChangeHandler.addMilestone();
+  historyChangeHandler.addSnapshot();
 
   return {
     layer: {
