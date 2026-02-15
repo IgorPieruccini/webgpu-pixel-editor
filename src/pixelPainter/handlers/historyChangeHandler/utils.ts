@@ -1,7 +1,10 @@
 import { BYTES_PER_PIXEL } from "../../../constants";
 import type { Vec2 } from "../../../editor/types";
 import type { SerializedProject } from "../../../serialization/project";
-import type { HistoryDiffItem } from "./types";
+import { storageLocal } from "../../../storageLocal";
+import type { LayerHandler } from "../layerHandler";
+import type { Diff, LayerDiff, SerializedProjectSnapshot } from "./types";
+import * as jsondiffpatch from "jsondiffpatch";
 
 export const getPortionOfBuffer = (
   buffer: Uint8Array<ArrayBuffer>,
@@ -95,4 +98,68 @@ export const copyLayersBuffer = (
 
 export const copyProject = (project: SerializedProject): SerializedProject => {
   return structuredClone(project);
+};
+
+export const undoLayerDiff = (
+  layerDiff: LayerDiff,
+  layerHandler: LayerHandler,
+  gridSize: Vec2,
+) => {
+  const buffer = layerHandler.getBufferById(layerDiff.id);
+
+  if (!buffer) {
+    return;
+  }
+
+  patchPortionOfBuffer(
+    buffer,
+    layerDiff.bounds.tl,
+    layerDiff.bounds.br,
+    layerDiff.binary,
+    gridSize,
+  );
+
+  layerHandler.setLayerBuffer(layerDiff.id, buffer);
+};
+
+export const undoDiff = (
+  project: SerializedProject,
+  change: Diff,
+  jsondiffpatchInstance: jsondiffpatch.DiffPatcher,
+  layerHandler: LayerHandler,
+  gridSize: Vec2,
+) => {
+  if (!project) {
+    return;
+  }
+
+  jsondiffpatchInstance.unpatch(project, change.diff);
+
+  if (change.layerDiff) {
+    undoLayerDiff(change.layerDiff, layerHandler, gridSize);
+  }
+};
+
+export const undoSnapshot = (
+  project: SerializedProject,
+  change: SerializedProjectSnapshot,
+  layerHandler: LayerHandler,
+  gridSize: Vec2,
+) => {
+  project = copyProject(change.project);
+
+  layerHandler.setList(project.layers);
+  storageLocal.saveLayers(project.name, project.layers);
+
+  const bufferEntries = Array.from(change.buffers.entries());
+
+  for (const [key, buffer] of bufferEntries) {
+    const copiedBuffer = new Uint8Array(buffer.length);
+    copiedBuffer.set(buffer);
+    layerHandler.setLayerBuffer(key, copiedBuffer);
+  }
+
+  if (change.layerDiff) {
+    undoLayerDiff(change.layerDiff, layerHandler, gridSize);
+  }
 };

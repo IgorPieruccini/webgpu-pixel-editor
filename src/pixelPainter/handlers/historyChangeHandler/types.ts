@@ -8,13 +8,15 @@ export type LayerDiff = {
   bounds: { tl: Vec2; br: Vec2 };
 };
 
-type Diff = {
+export type Diff = {
+  index: number;
   type: "diff";
   diff: jsondiffpatch.Delta;
   layerDiff: LayerDiff | null;
 };
 
-type SerializedProjectSnapshot = {
+export type SerializedProjectSnapshot = {
+  index: number;
   type: "snapshot";
   project: SerializedProject;
   buffers: Map<string, Uint8Array<ArrayBuffer>>;

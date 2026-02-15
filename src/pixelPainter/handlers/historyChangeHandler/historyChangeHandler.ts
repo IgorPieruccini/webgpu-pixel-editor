@@ -3,14 +3,14 @@ import { serialization } from "../../../serialization";
 import { type SerializedProject } from "../../../serialization/project";
 import type { LayerHandler } from "../layerHandler";
 import * as jsondiffpatch from "jsondiffpatch";
-import { storageLocal } from "../../../storageLocal";
 import type { HistoryDiffItem, LayerDiff } from "./types";
 import {
   copyLayersBuffer,
-  copyProject,
   getBoundsOfPaintedPixels,
   getPortionOfBuffer,
-  patchPortionOfBuffer,
+  undoDiff,
+  undoLayerDiff,
+  undoSnapshot,
 } from "./utils";
 
 const SNAPSHOT_INTERVAL = 5;
@@ -86,10 +86,11 @@ export const createHistoryChangeHandler = (
     currentProject = serializedProject;
 
     historyDiff.push({
+      index: historyIndex,
       type: "snapshot",
       project: serializedProject,
       buffers: copyLayersBuffer(layerHandler.buffers),
-      layerDiff: layerDiff ?? null,
+      layerDiff: layerDiff,
     });
 
     historyIndex++;
@@ -112,6 +113,7 @@ export const createHistoryChangeHandler = (
     currentProject = project;
 
     historyDiff.push({
+      index: historyIndex,
       type: "diff",
       diff,
       layerDiff,
@@ -130,55 +132,42 @@ export const createHistoryChangeHandler = (
       return;
     }
 
-    const currentSnapshot = Math.floor(historyIndex / SNAPSHOT_INTERVAL);
+    let currentSnapshot = Math.floor(historyIndex / SNAPSHOT_INTERVAL);
+    const isAtSnapshot = historyIndex % SNAPSHOT_INTERVAL === 0;
+    if (isAtSnapshot) {
+      currentSnapshot = Math.floor((historyIndex - 1) / SNAPSHOT_INTERVAL);
+    }
 
     const replaySteps = historyDiff.slice(
       currentSnapshot * SNAPSHOT_INTERVAL,
       historyIndex,
     );
 
+    console.log("replay steps", replaySteps);
+
+    if (!currentProject) {
+      return;
+    }
+
     for (const change of replaySteps) {
       if (change.type === "snapshot") {
-        currentProject = copyProject(change.project);
-
-        layerHandler.setList(currentProject.layers);
-        storageLocal.saveLayers(projectName, currentProject.layers);
-        const bufferEntries = Array.from(change.buffers.entries());
-        for (const [key, buffer] of bufferEntries) {
-          const copiedBuffer = new Uint8Array(buffer.length);
-          copiedBuffer.set(buffer);
-          layerHandler.setLayerBuffer(key, copiedBuffer);
+        if (change.index >= historyIndex) {
+          if (change.layerDiff) {
+            undoLayerDiff(change.layerDiff, layerHandler, gridSize);
+          }
+        } else {
+          undoSnapshot(currentProject, change, layerHandler, gridSize);
         }
       }
 
       if (change.type === "diff") {
-        if (!currentProject) {
-          console.log("No project found while undoing diff");
-          return;
-        }
-
-        jsondiffpatchInstance.unpatch(currentProject, change.diff);
-
-        if (change.layerDiff) {
-          const buffer = layerHandler.getBufferById(change.layerDiff.id);
-          if (!buffer) {
-            console.log(
-              `No buffer found for layer id ${change.layerDiff.id}, cannot apply layer diff`,
-            );
-            return;
-          }
-
-          console.log("Applying layer diff for layer id", change.layerDiff.id);
-          patchPortionOfBuffer(
-            buffer,
-            change.layerDiff.bounds.tl,
-            change.layerDiff.bounds.br,
-            change.layerDiff.binary,
-            gridSize,
-          );
-
-          layerHandler.setLayerBuffer(change.layerDiff.id, buffer);
-        }
+        undoDiff(
+          currentProject,
+          change,
+          jsondiffpatchInstance,
+          layerHandler,
+          gridSize,
+        );
       }
     }
   };
