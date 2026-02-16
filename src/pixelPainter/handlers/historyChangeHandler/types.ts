@@ -1,5 +1,4 @@
 import type { Vec2 } from "../../../editor/types";
-import type { SerializedProject } from "../../../serialization/project";
 import type * as jsondiffpatch from "jsondiffpatch";
 
 export type LayerDiff = {
@@ -18,7 +17,7 @@ export type Diff = {
 export type SerializedProjectSnapshot = {
   index: number;
   type: "snapshot";
-  project: SerializedProject;
+  diff: jsondiffpatch.Delta;
   buffers: Map<string, Uint8Array<ArrayBuffer>>;
   layerDiff: LayerDiff | null;
 };

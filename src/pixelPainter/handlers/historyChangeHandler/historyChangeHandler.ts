@@ -6,12 +6,12 @@ import * as jsondiffpatch from "jsondiffpatch";
 import type { HistoryDiffItem, LayerDiff } from "./types";
 import {
   copyLayersBuffer,
+  copyProject,
   getBoundsOfPaintedPixels,
   getPortionOfBuffer,
-  undoDiff,
   undoLayerDiff,
-  undoSnapshot,
 } from "./utils";
+import { storageLocal } from "../../../storageLocal";
 
 const SNAPSHOT_INTERVAL = 5;
 
@@ -83,16 +83,18 @@ export const createHistoryChangeHandler = (
     layerDiff: LayerDiff | null = null,
   ) => {
     const serializedProject = project ?? getSerializedProject();
-    currentProject = serializedProject;
+
+    const diff = jsondiffpatchInstance.diff(currentProject, serializedProject);
 
     historyDiff.push({
       index: historyIndex,
       type: "snapshot",
-      project: serializedProject,
+      diff,
       buffers: copyLayersBuffer(layerHandler.buffers),
       layerDiff: layerDiff,
     });
 
+    currentProject = serializedProject;
     historyIndex++;
   };
 
@@ -132,6 +134,26 @@ export const createHistoryChangeHandler = (
       return;
     }
 
+    const cureDiff = historyDiff[historyIndex];
+    jsondiffpatchInstance.unpatch(currentProject, cureDiff.diff);
+    if (currentProject) {
+      const project = copyProject(currentProject);
+      layerHandler.setList(project.layers);
+      storageLocal.saveLayers(project.name, project.layers);
+
+      const activeLayer = layerHandler.getActive();
+      if (activeLayer) {
+        const layers = layerHandler.getList();
+        const activeLayerInProject = layers.find(
+          (layer) => layer.id === activeLayer.id,
+        );
+
+        if (!activeLayerInProject) {
+          layerHandler.setActive(layers[layers.length - 1]);
+        }
+      }
+    }
+
     let currentSnapshot = Math.floor(historyIndex / SNAPSHOT_INTERVAL);
     const isAtSnapshot = historyIndex % SNAPSHOT_INTERVAL === 0;
     if (isAtSnapshot) {
@@ -142,8 +164,6 @@ export const createHistoryChangeHandler = (
       currentSnapshot * SNAPSHOT_INTERVAL,
       historyIndex,
     );
-
-    console.log("replay steps", replaySteps);
 
     if (!currentProject) {
       return;
@@ -156,18 +176,24 @@ export const createHistoryChangeHandler = (
             undoLayerDiff(change.layerDiff, layerHandler, gridSize);
           }
         } else {
-          undoSnapshot(currentProject, change, layerHandler, gridSize);
+          const bufferEntries = Array.from(change.buffers.entries());
+
+          for (const [key, buffer] of bufferEntries) {
+            const copiedBuffer = new Uint8Array(buffer.length);
+            copiedBuffer.set(buffer);
+            layerHandler.setLayerBuffer(key, copiedBuffer);
+          }
+
+          if (change.layerDiff) {
+            undoLayerDiff(change.layerDiff, layerHandler, gridSize);
+          }
         }
       }
 
       if (change.type === "diff") {
-        undoDiff(
-          currentProject,
-          change,
-          jsondiffpatchInstance,
-          layerHandler,
-          gridSize,
-        );
+        if (change.layerDiff) {
+          undoLayerDiff(change.layerDiff, layerHandler, gridSize);
+        }
       }
     }
   };
