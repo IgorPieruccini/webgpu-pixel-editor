@@ -9,6 +9,44 @@ import { BYTES_PER_PIXEL } from "../../constants";
 
 export type LayerHandler = Awaited<ReturnType<typeof createLayerHandler>>;
 
+/**
+ * Creates a layer handler for managing layers in a pixel painting project.
+ *
+ * @description The layer handler provides comprehensive layer management functionality including
+ * creating, removing, duplicating, reordering layers, and managing their buffers and properties.
+ * It integrates with local storage and IndexedDB for persistence, and manages the active layer
+ * state and pixel buffers for each layer.
+ *
+ * @param projectName - The name of the project for storage identification
+ * @param gridSize - The dimensions of the pixel grid (width and height)
+ *
+ * @returns An object containing methods for layer management and state access;
+ *
+ * @throws {Error} Throws if no layers exist in the project
+ * @throws {Error} Throws if the first layer buffer cannot be accessed
+ * @throws {Error} Throws if layer operations reference non-existent layers
+ *
+ * @example
+ * ```typescript
+ * const layerHandler = await createLayerHandler("myProject", { x: 800, y: 600 });
+ *
+ * // Add a new layer
+ * const newLayerId = layerHandler.add();
+ *
+ * // Select a layer
+ * layerHandler.select(newLayerId);
+ *
+ * // Set layer properties
+ * layerHandler.setOpacity(newLayerId, 0.8);
+ * layerHandler.rename("Background Layer");
+ *
+ * // Duplicate a layer
+ * const duplicatedId = layerHandler.duplicate(newLayerId);
+ *
+ * // Save current work
+ * layerHandler.saveCurrentBuffer();
+ * ```
+ */
 export const createLayerHandler = async (
   projectName: string,
   gridSize: Vec2,
