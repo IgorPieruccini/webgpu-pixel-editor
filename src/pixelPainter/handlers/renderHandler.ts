@@ -12,6 +12,19 @@ import type { LayerHandler } from "./layerHandler";
 
 export type RenderHandler = Awaited<ReturnType<typeof createRenderHandler>>;
 
+/**
+ * Create and initialize the render handler for the main canvas.
+ *
+ * The render handler is responsible for:
+ * - Setting up GPU pipelines, buffers, and textures.
+ * - Drawing the alpha layer, pixel layers, and UI to the canvas.
+ * - Managing per-layer GPU textures (add/remove).
+ *
+ * @param {LayerHandler} layerHandler - Handles layer buffers, order, visibility, and active layer info.
+ * @param {UniformBufferHandler} uniformBufferHandler - Provides access to common and UI uniform buffers.
+ * @param {Vec2} gridSize - The width and height of the pixel grid to render.
+ * @returns {Promise<RenderHandler>} Resolves to an object exposing draw, addLayerTexture, and removeLayerTexture methods.
+ */
 export const createRenderHandler = async (
   layerHandler: LayerHandler,
   uniformBufferHandler: UniformBufferHandler,
