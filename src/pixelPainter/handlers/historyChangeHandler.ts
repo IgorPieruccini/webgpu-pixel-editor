@@ -220,8 +220,13 @@ export const createHistoryChangeHandler = (
 
     const currentSnapshot = Math.floor(historyIndex / SNAPSHOT_INTERVAL);
 
+
+    let start = currentSnapshot * SNAPSHOT_INTERVAL;
+    if (start === historyIndex) {
+      start -= SNAPSHOT_INTERVAL;
+    }
     const replaySteps = historyDiff.slice(
-      currentSnapshot * SNAPSHOT_INTERVAL,
+      start,
       historyIndex,
     );
 
@@ -230,13 +235,14 @@ export const createHistoryChangeHandler = (
         currentProject = copyProject(change.project);
 
         layerHandler.setList(currentProject.layers);
-        storageLocal.saveLayers(projectName, currentProject.layers);
         const bufferEntries = Array.from(change.buffers.entries());
         for (const [key, buffer] of bufferEntries) {
           const copiedBuffer = new Uint8Array(buffer.length);
           copiedBuffer.set(buffer);
           layerHandler.setLayerBuffer(key, copiedBuffer);
         }
+
+        storageLocal.saveLayers(projectName, currentProject.layers);
       }
 
       if (change.type === "diff") {
@@ -245,6 +251,7 @@ export const createHistoryChangeHandler = (
           return;
         }
 
+        // If change diff is undefined, don't call the patch
         jsondiffpatchInstance.unpatch(currentProject, change.diff);
 
         if (change.layerDiff) {
