@@ -1,5 +1,5 @@
 import { AiOutlineDownload } from "solid-icons/ai";
-import { TbFileImport } from "solid-icons/tb";
+import { FiFilePlus } from 'solid-icons/fi'
 import "./ProjectTool.css";
 import { serialization } from "../../../serialization";
 import {
@@ -80,7 +80,7 @@ export const ProjectTool = () => {
           <AiOutlineDownload />
         </button>
         <button onClick={importProject}>
-          <TbFileImport />
+          <FiFilePlus />
         </button>
       </div>
     </div>

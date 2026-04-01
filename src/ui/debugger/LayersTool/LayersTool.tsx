@@ -5,7 +5,7 @@ import {
 } from "../../../projectConfig/projectConfigProvider";
 import { serialization } from "../../../serialization";
 import "./LayersTool.css";
-import { TbFileImport } from "solid-icons/tb";
+import { FiFilePlus } from 'solid-icons/fi'
 import { downloadFile, importFile } from "../../../utils";
 
 export const LayersTool = () => {
@@ -57,7 +57,7 @@ export const LayersTool = () => {
                   </button>
 
                   <button onClick={() => onImportFile(layer.id)}>
-                    <TbFileImport />
+                    <FiFilePlus />
                   </button>
                 </div>
               </div>
