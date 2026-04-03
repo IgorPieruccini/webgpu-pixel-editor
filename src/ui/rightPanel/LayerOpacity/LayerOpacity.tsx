@@ -13,6 +13,14 @@ export const LayerOpacity = () => {
     }
   };
 
+  const onFinishChange = (e: Event) => {
+    if (e.target) {
+      const activeLayerId = layersAPI().getActive().id;
+      //@ts-expect-error - fix input type
+      layersAPI().setOpacity(activeLayerId, e.target.valueAsNumber / 100 ?? 1, true);
+    }
+  }
+
   return (
     <div id="layer-opacity-container">
       <label for="layer-opacity-input">Layer opacity</label>
@@ -24,6 +32,7 @@ export const LayerOpacity = () => {
           max={100}
           value={layersAPI().getActive().opacity * 100}
           onInput={onChangeOpacity}
+          onChange={onFinishChange}
         />
         <p>{Math.floor(layersAPI().getActive().opacity * 100)}%</p>
       </div>

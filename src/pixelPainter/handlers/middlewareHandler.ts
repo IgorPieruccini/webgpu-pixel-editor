@@ -1,7 +1,7 @@
 import type { Layers } from "../types";
 import type { UniformBufferHandler } from "../uniformBuffersHandler";
 import type { BrushHandler } from "./brushHandler";
-import type { HistoryChangeHandler } from "./historyChangeHandler";
+import type { HistoryChangeHandler } from "./historyChangeHandleold";
 import type { LayerHandler } from "./layerHandler";
 import type { RenderHandler } from "./renderHandler";
 
@@ -46,9 +46,11 @@ export const createMiddlewareHandler = (
     uniformBufferHandler.updateBrushThickness(value);
   };
 
-  const setOpacity = (layerId: string, opacity: number) => {
+  const setOpacity = (layerId: string, opacity: number, registerHistoryChange: boolean = false) => {
     layerHandler.setOpacity(layerId, opacity)
-    historyChangeHandler.addAction({ captureCurrentBuffer: true })
+    if (registerHistoryChange) {
+      historyChangeHandler.addAction({ captureCurrentBuffer: true });
+    }
 
   }
 
