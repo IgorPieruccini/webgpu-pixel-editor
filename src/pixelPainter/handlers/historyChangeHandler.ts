@@ -5,12 +5,18 @@ import { type SerializedProject } from "../../serialization/project";
 import type { LayerHandler } from "./layerHandler";
 import * as jsondiffpatch from "jsondiffpatch";
 import { storageLocal } from "../../storageLocal";
+import type { RenderHandler } from "./renderHandler";
 
 const SNAPSHOT_INTERVAL = 5;
 
 export type HistoryChangeHandler = ReturnType<
   typeof createHistoryChangeHandler
 >;
+
+type AddActionProps = {
+  captureCurrentBuffer?: boolean,
+  paintedPixels?: Set<number>,
+}
 
 type LayerDiff = {
   id: string;
@@ -22,6 +28,7 @@ type Diff = {
   type: "diff";
   diff: jsondiffpatch.Delta;
   layerDiff: LayerDiff | null;
+  bufferDiff: { id: string, buffer: Uint8Array<ArrayBuffer> } | null
 };
 
 type SerializedProjectSnapshot = {
@@ -116,13 +123,20 @@ const copyLayersBuffer = (
   const copy = new Map<string, Uint8Array<ArrayBuffer>>();
 
   buffers.forEach((buffer, key) => {
-    const copiedBuffer = new Uint8Array(buffer.length);
-    copiedBuffer.set(buffer);
+    const copiedBuffer = copyLayerBuffer(buffer);
     copy.set(key, copiedBuffer);
   });
 
   return copy;
 };
+
+const copyLayerBuffer = (
+  buffer: Uint8Array<ArrayBuffer>
+): Uint8Array<ArrayBuffer> => {
+  const copiedBuffer = new Uint8Array(buffer.length);
+  copiedBuffer.set(buffer);
+  return copiedBuffer;
+}
 
 const copyProject = (project: SerializedProject): SerializedProject => {
   return structuredClone(project);
@@ -130,6 +144,7 @@ const copyProject = (project: SerializedProject): SerializedProject => {
 
 export const createHistoryChangeHandler = (
   layerHandler: LayerHandler,
+  renderHandler: RenderHandler,
   projectName: string,
   gridSize: Vec2,
 ) => {
@@ -162,7 +177,14 @@ export const createHistoryChangeHandler = (
     historyIndex++;
   };
 
-  const addAction = (paintedPixels?: Set<number>): void => {
+  const addAction = (props: AddActionProps | undefined): void => {
+    let captureCurrentBuffer = false;
+    let paintedPixels = undefined;
+    if (props) {
+      captureCurrentBuffer = props.captureCurrentBuffer ?? false;
+      paintedPixels = props.paintedPixels
+    }
+
     if (historyIndex < historyDiff.length && historyIndex > 0) {
       historyDiff.splice(historyIndex);
     }
@@ -183,6 +205,9 @@ export const createHistoryChangeHandler = (
     let paintedBuffer: Uint8Array<ArrayBuffer> | null = null;
     let bounds: { tl: Vec2; br: Vec2 } | null = null;
     if (paintedPixels) {
+      if (paintedPixels.size === 0) {
+        throw new Error('Can not get bounds of painted pixels if the painted pixels size is equal 0');
+      }
       bounds = getBoundsOfPaintedPixels(paintedPixels, gridSize);
       paintedBuffer = getPortionOfBuffer(
         layerHandler.getCurrentBuffer(),
@@ -192,6 +217,19 @@ export const createHistoryChangeHandler = (
       );
     }
 
+    let bufferDiff: Diff['bufferDiff'] | null = null;
+    if (captureCurrentBuffer) {
+      const currentLayer = layerHandler.getActive();
+      const currentBuffer = layerHandler.getBufferById(currentLayer.id)
+      if (currentBuffer) {
+        bufferDiff = {
+          id: currentLayer.id,
+          buffer: copyLayerBuffer(currentBuffer)
+        };
+      }
+    }
+
+    console.log("adding diff", diff)
     historyDiff.push({
       type: "diff",
       diff,
@@ -203,7 +241,10 @@ export const createHistoryChangeHandler = (
             bounds: bounds,
           }
           : null,
+      bufferDiff: bufferDiff
     });
+
+    console.log(historyDiff);
 
     historyIndex++;
   };
@@ -230,6 +271,7 @@ export const createHistoryChangeHandler = (
       historyIndex,
     );
 
+    console.log('replaySteps', replaySteps)
     for (const change of replaySteps) {
       if (change.type === "snapshot") {
         currentProject = copyProject(change.project);
@@ -252,7 +294,16 @@ export const createHistoryChangeHandler = (
         }
 
         // If change diff is undefined, don't call the patch
-        jsondiffpatchInstance.unpatch(currentProject, change.diff);
+        if (change.diff) {
+          jsondiffpatchInstance.patch(currentProject, change.diff);
+          layerHandler.setList([...currentProject.layers]);
+          const bufferDiff = change.bufferDiff;
+          if (bufferDiff) {
+            layerHandler.setLayerBuffer(bufferDiff.id, bufferDiff.buffer)
+            renderHandler.addLayerTexture(bufferDiff.id);
+          }
+          storageLocal.saveLayers(projectName, currentProject.layers);
+        }
 
         if (change.layerDiff) {
           const buffer = layerHandler.getBufferById(change.layerDiff.id);

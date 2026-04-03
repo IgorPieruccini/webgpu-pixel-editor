@@ -334,9 +334,8 @@ export const createLayerHandler = async (
 
   const load = (
     serializedLayers: Layers,
-    serializedBuffer: Record<string, number[]>,
+    serializedBuffer: Record<string, number[]> | Record<string, Uint8Array<ArrayBuffer>>
   ): string[] => {
-    // Detach from any external references (e.g. history undo/redo patches)
     const layerCopy: Layers = JSON.parse(JSON.stringify(serializedLayers));
     setList(layerCopy);
 
@@ -377,13 +376,13 @@ export const createLayerHandler = async (
     setOpacity,
     getList,
     setList,
+    setLayerBuffer,
     getActive,
     setActive,
     saveCurrentBuffer,
     getCurrentBuffer,
     buffers,
     getBufferById,
-    setLayerBuffer,
     load,
   };
 };

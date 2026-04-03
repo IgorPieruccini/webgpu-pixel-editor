@@ -23,21 +23,21 @@ export const createMiddlewareHandler = (
   const addLayer = () => {
     const id = layerHandler.add();
     renderHandler.addLayerTexture(id);
-    historyChangeHandler.addAction();
+    historyChangeHandler.addAction({ captureCurrentBuffer: true });
     return id;
   };
 
   const removeLayer = (id: string) => {
     layerHandler.remove(id);
     renderHandler.removeLayerTexture(id);
-    historyChangeHandler.addAction();
+    historyChangeHandler.addAction({ captureCurrentBuffer: false });
     return id;
   };
 
   const duplicateLayer = (id: string) => {
     const layerId = layerHandler.duplicate(id);
     renderHandler.addLayerTexture(layerId);
-    historyChangeHandler.addAction();
+    historyChangeHandler.addAction({ captureCurrentBuffer: true });
     return layerId;
   };
 

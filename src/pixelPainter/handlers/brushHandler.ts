@@ -49,7 +49,7 @@ export const createBrushHandler = (
   const currentPaintedPixels = new Set<number>();
   canvas.addEventListener("mouseup", () => {
     layerHandler.saveCurrentBuffer();
-    historyChangeHandler.addAction(currentPaintedPixels);
+    historyChangeHandler.addAction({ paintedPixels: currentPaintedPixels });
     clearCurrentPaintedPixels();
   });
 

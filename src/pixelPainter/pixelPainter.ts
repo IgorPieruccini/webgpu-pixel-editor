@@ -18,8 +18,18 @@ export const pixelPainter = async (
 
   const layerHandler = await createLayerHandler(projectName, gridSize);
 
+
+  const uniformBufferHandler = createUniformBufferHandler(canvasSize, gridSize);
+
+  const renderHandler = await createRenderHandler(
+    layerHandler,
+    uniformBufferHandler,
+    gridSize,
+  );
+
   const historyChangeHandler = createHistoryChangeHandler(
     layerHandler,
+    renderHandler,
     projectName,
     gridSize,
   );
@@ -30,13 +40,6 @@ export const pixelPainter = async (
     gridSize,
   );
 
-  const uniformBufferHandler = createUniformBufferHandler(canvasSize, gridSize);
-
-  const renderHandler = await createRenderHandler(
-    layerHandler,
-    uniformBufferHandler,
-    gridSize,
-  );
 
   const middlewareHandler = createMiddlewareHandler(
     brushHandler,
