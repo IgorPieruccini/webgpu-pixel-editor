@@ -327,8 +327,8 @@ export const createLayerHandler = async (
   const setLayerBuffer = (layerId: string, buffer: Uint8Array<ArrayBuffer>) => {
     buffers.set(layerId, buffer);
     db.save(buffer, layerId);
+    setCurrentBuffer(buffer);
     if (layerId === getActive().id) {
-      setCurrentBuffer(buffer);
     }
   };
 
@@ -364,6 +364,10 @@ export const createLayerHandler = async (
     return layerCopy.map((layer) => layer.id);
   };
 
+  const getLayerById = (id: string) => {
+    return getList().find(l => l.id === id);
+  }
+
   return {
     add,
     set,
@@ -376,6 +380,7 @@ export const createLayerHandler = async (
     setOpacity,
     getList,
     setList,
+    getLayerById,
     setLayerBuffer,
     getActive,
     setActive,

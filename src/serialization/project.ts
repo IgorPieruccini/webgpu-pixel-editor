@@ -7,6 +7,7 @@ export type SerializedProject = {
   gridSize: Vec2;
   layers: Layers;
   buffers: Record<string, number[]>;
+  activeLayer?: string
 };
 
 export const getSerializedBuffers = (
@@ -28,6 +29,7 @@ export const serialize = (
   gridSize: Vec2,
   layers: Layers,
   buffers: Map<string, Uint8Array<ArrayBuffer>>,
+  activeLayer?: string
 ): SerializedProject => {
   const serializedBuffers = getSerializedBuffers(buffers, gridSize);
 
@@ -39,11 +41,12 @@ export const serialize = (
   // to avoid issues with mutable data when applying the project
   const copyLayer = JSON.parse(JSON.stringify(layers));
 
-  const project = {
+  const project: SerializedProject = {
     name,
     gridSize,
     layers: copyLayer,
     buffers: copyBuffers,
+    activeLayer
   };
 
   return project;
