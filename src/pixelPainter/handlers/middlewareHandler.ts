@@ -46,9 +46,16 @@ export const createMiddlewareHandler = (
     uniformBufferHandler.updateBrushThickness(value);
   };
 
+  const setOpacity = (layerId: string, opacity: number) => {
+    layerHandler.setOpacity(layerId, opacity)
+    historyChangeHandler.addAction({ captureCurrentBuffer: true })
+
+  }
+
   return {
     loadTextureLayers,
     addLayer,
+    setOpacity,
     removeLayer,
     duplicateLayer,
     setBrushThickness,

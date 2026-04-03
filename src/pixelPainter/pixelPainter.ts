@@ -61,7 +61,7 @@ export const pixelPainter = async (
       rename: layerHandler.rename,
       toggleDisplay: layerHandler.toggleDisplay,
       select: layerHandler.select,
-      setOpacity: layerHandler.setOpacity,
+      setOpacity: middlewareHandler.setOpacity,
       getList: layerHandler.getList,
       getActive: layerHandler.getActive,
       getBufferById: layerHandler.getBufferById,

@@ -230,7 +230,6 @@ export const createHistoryChangeHandler = (
       }
     }
 
-    console.log("adding diff", diff)
     historyDiff.push({
       type: "diff",
       diff,
@@ -245,7 +244,6 @@ export const createHistoryChangeHandler = (
       bufferDiff: bufferDiff
     });
 
-    console.log(historyDiff);
 
     historyIndex++;
   };
@@ -272,18 +270,25 @@ export const createHistoryChangeHandler = (
       historyIndex,
     );
 
-    console.log('replaySteps', replaySteps)
     for (const change of replaySteps) {
       if (change.type === "snapshot") {
         currentProject = copyProject(change.project);
 
-        layerHandler.setList(currentProject.layers);
+        layerHandler.setList([...currentProject.layers]);
         const bufferEntries = Array.from(change.buffers.entries());
         for (const [key, buffer] of bufferEntries) {
           const copiedBuffer = new Uint8Array(buffer.length);
           copiedBuffer.set(buffer);
           layerHandler.setLayerBuffer(key, copiedBuffer);
         }
+        const activeLayer = layerHandler.getActive();
+        if (activeLayer) {
+          const updatedLayer = change.project.layers.find(l => activeLayer.id === l.id);
+          if (updatedLayer) {
+            layerHandler.setActive(updatedLayer);
+          }
+        }
+
 
         storageLocal.saveLayers(projectName, currentProject.layers);
       }
@@ -297,12 +302,17 @@ export const createHistoryChangeHandler = (
         // If change diff is undefined, don't call the patch
         if (change.diff) {
           jsondiffpatchInstance.patch(currentProject, change.diff);
-          layerHandler.setList([...currentProject.layers]);
+          const copiedProject = [...currentProject.layers];
+          layerHandler.setList(copiedProject);
           const bufferDiff = change.bufferDiff;
           if (bufferDiff) {
             const copiedBuffer = copyBuffer(bufferDiff.buffer)
             layerHandler.setLayerBuffer(bufferDiff.id, copiedBuffer)
             renderHandler.addLayerTexture(bufferDiff.id);
+            const layer = copiedProject.find(l => l.id === bufferDiff.id);
+            if (layer) {
+              layerHandler.setActive(layer)
+            }
           }
           storageLocal.saveLayers(projectName, [...currentProject.layers]);
         }
@@ -316,7 +326,6 @@ export const createHistoryChangeHandler = (
             return;
           }
 
-          console.log("Applying layer diff for layer id", change.layerDiff.id);
           patchPortionOfBuffer(
             buffer,
             change.layerDiff.bounds.tl,
