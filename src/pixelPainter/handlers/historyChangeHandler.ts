@@ -123,14 +123,14 @@ const copyLayersBuffer = (
   const copy = new Map<string, Uint8Array<ArrayBuffer>>();
 
   buffers.forEach((buffer, key) => {
-    const copiedBuffer = copyLayerBuffer(buffer);
+    const copiedBuffer = copyBuffer(buffer);
     copy.set(key, copiedBuffer);
   });
 
   return copy;
 };
 
-const copyLayerBuffer = (
+const copyBuffer = (
   buffer: Uint8Array<ArrayBuffer>
 ): Uint8Array<ArrayBuffer> => {
   const copiedBuffer = new Uint8Array(buffer.length);
@@ -222,9 +222,10 @@ export const createHistoryChangeHandler = (
       const currentLayer = layerHandler.getActive();
       const currentBuffer = layerHandler.getBufferById(currentLayer.id)
       if (currentBuffer) {
+        const copiedBuffer = copyBuffer(currentBuffer);
         bufferDiff = {
           id: currentLayer.id,
-          buffer: copyLayerBuffer(currentBuffer)
+          buffer: copiedBuffer
         };
       }
     }
@@ -299,10 +300,11 @@ export const createHistoryChangeHandler = (
           layerHandler.setList([...currentProject.layers]);
           const bufferDiff = change.bufferDiff;
           if (bufferDiff) {
-            layerHandler.setLayerBuffer(bufferDiff.id, bufferDiff.buffer)
+            const copiedBuffer = copyBuffer(bufferDiff.buffer)
+            layerHandler.setLayerBuffer(bufferDiff.id, copiedBuffer)
             renderHandler.addLayerTexture(bufferDiff.id);
           }
-          storageLocal.saveLayers(projectName, currentProject.layers);
+          storageLocal.saveLayers(projectName, [...currentProject.layers]);
         }
 
         if (change.layerDiff) {
