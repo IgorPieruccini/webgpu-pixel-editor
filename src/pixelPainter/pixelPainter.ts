@@ -4,7 +4,7 @@ import { createRenderHandler } from "./handlers/renderHandler";
 import type { Vec2 } from "../editor/types";
 import { createUniformBufferHandler } from "./uniformBuffersHandler";
 import { createMiddlewareHandler } from "./handlers/middlewareHandler";
-import { createHistoryChangeHandler } from "./handlers/historyChangeHandler";
+import { createHistoryChangeHandler } from "./handlers/historyChangeHandler/historyChangeHandler";
 
 export const pixelPainter = async (
   projectName: string,
