@@ -1,48 +1,63 @@
 #right-panel {
-    min-width: 300px;
-    gap: 8px;
-    right: 0px;
-    padding: 16px;
+  min-width: 300px;
+  gap: 8px;
+  right: 0px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  background-color: #242424;
+  flex: none;
+
+  #layers {
     display: flex;
     flex-direction: column;
-    background-color: #242424;
-    flex: none;
+    justify-content: space-between;
+    gap: 8px;
+    height: 400px;
 
-    #layers {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        gap: 8px;
-        height: 400px;
-
-        #layer-slider {
-            display: flex;
-            flex-direction: column;
-            justify-content: start;
-            gap: 8px;
-            max-height: 400px;
-            overflow-y: auto;
-        }
+    #layer-slider {
+      display: flex;
+      flex-direction: column;
+      justify-content: start;
+      gap: 8px;
+      max-height: 400px;
+      overflow-y: auto;
     }
+  }
 
-    .active-layer {
-        background-color: #402d53;
+  .active-layer {
+    background-color: #402d53;
+  }
+
+  .left-container {
+    display: flex;
+    align-items: center;
+    gap: 8px
+  }
+
+  button {
+    max-height: 42px;
+
+    p {
+      margin: 0;
     }
+  }
 
-    button {
-        max-height: 42px;
+  #layer-preview {
+    margin-top: 16px;
+  }
 
-        p {
-            margin: 0;
-        }
-    }
+  #project-title {
+    display: flex;
+    justify-content: space-between;
+  }
 
-    #layer-preview {
-        margin-top: 16px;
-    }
-
-    #project-title {
-        display: flex;
-        justify-content: space-between;
-    }
+  #export {
+    width: 32px;
+    height: 32px;
+    padding: 0px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 }
