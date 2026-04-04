@@ -4,6 +4,10 @@ import { createTexturePipeline } from "./createPipeline";
 import { material } from "./material";
 import { webGPUSetup } from "./webGPUSetup";
 
+
+export type LayerPreviewHandler = Awaited<ReturnType<typeof createLayerPreview>>;
+
+
 export const createLayerPreview = async (gridSize: Vec2, zoom: number) => {
   const { device, context } = await webGPUSetup("preview-canvas");
 

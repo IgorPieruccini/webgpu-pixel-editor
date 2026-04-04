@@ -1,4 +1,5 @@
-export const webGPUSetup = async (canvasId: string) => {
+
+export const webGPUSetup = async (canvasToUse: string | HTMLCanvasElement) => {
   const navigator = window.navigator;
 
   // adapter is as WebGPU's representation of a specific
@@ -15,7 +16,9 @@ export const webGPUSetup = async (canvasId: string) => {
 
   //configure the canvas to be used with the device
   // you just created.
-  const canvas = document.querySelector<HTMLCanvasElement>("#" + canvasId);
+  const canvas = typeof canvasToUse === 'string' ?
+    document.querySelector<HTMLCanvasElement>("#" + canvasToUse) :
+    canvasToUse
 
   if (!canvas) {
     throw new Error("main canvas not found in the DOM");

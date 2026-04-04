@@ -5,19 +5,19 @@ import type { Vec2 } from "../editor/types";
 import { createUniformBufferHandler } from "./uniformBuffersHandler";
 import { createMiddlewareHandler } from "./handlers/middlewareHandler";
 import { createHistoryChangeHandler } from "./handlers/historyChangeHandler/historyChangeHandler";
+import { createExportHandler } from "./handlers/exportHandler";
+import { createLayerPreview } from "./layerPreview";
+import { LAYER_PREVIEW_SIZE } from "../constants";
+import { calculateZoomFromGridAndCanvasSize } from "../utils";
 
 export const pixelPainter = async (
   projectName: string,
   gridSize: Vec2,
   canvasSize: Vec2,
 ) => {
-  const canvas = document.querySelector<HTMLCanvasElement>("#" + "main-canvas");
-  if (!canvas) {
-    throw new Error("Could not find main canvas");
-  }
+
 
   const layerHandler = await createLayerHandler(projectName, gridSize);
-
 
   const uniformBufferHandler = createUniformBufferHandler(canvasSize, gridSize);
 
@@ -26,6 +26,12 @@ export const pixelPainter = async (
     uniformBufferHandler,
     gridSize,
   );
+
+  const layerPreview = await createLayerPreview(
+    gridSize,
+    calculateZoomFromGridAndCanvasSize(gridSize, LAYER_PREVIEW_SIZE),
+  );
+
 
   const historyChangeHandler = createHistoryChangeHandler(
     layerHandler,
@@ -47,10 +53,20 @@ export const pixelPainter = async (
     renderHandler,
     layerHandler,
     historyChangeHandler,
+    layerPreview
+  );
+
+
+  const exportHandler = createExportHandler(
+    projectName,
+    gridSize,
+    layerHandler,
   );
 
   middlewareHandler.loadTextureLayers();
   historyChangeHandler.addSnapshot();
+
+
 
   return {
     layer: {
@@ -83,7 +99,7 @@ export const pixelPainter = async (
       setThickness: middlewareHandler.setBrushThickness,
     },
     render: {
-      draw: renderHandler.draw,
+      draw: middlewareHandler.draw,
       setZoom: uniformBufferHandler.updateZoom,
       setPan: uniformBufferHandler.updatePan,
       setCanvasSize: uniformBufferHandler.updateCanvasSize,
@@ -102,5 +118,9 @@ export const pixelPainter = async (
       undo: historyChangeHandler.undo,
       redo: historyChangeHandler.redo,
     },
+    export: {
+      image: exportHandler.exportImage
+    }
   };
 };
+

@@ -1,9 +1,7 @@
-import { LAYER_PREVIEW_SIZE } from "../../constants";
+
 import type { Vec2 } from "../../editor/types";
-import { calculateZoomFromGridAndCanvasSize } from "../../utils";
 import { createVertexBuffer } from "../createBufferLayout";
 import { createPipeline, createTexturePipeline } from "../createPipeline";
-import { createLayerPreview } from "../layerPreview";
 import { material } from "../material";
 import type { BindPixelTexture } from "../material/pixel";
 import type { UniformBufferHandler } from "../uniformBuffersHandler";
@@ -12,32 +10,23 @@ import type { LayerHandler } from "./layerHandler";
 
 export type RenderHandler = Awaited<ReturnType<typeof createRenderHandler>>;
 
-/**
- * Create and initialize the render handler for the main canvas.
- *
- * The render handler is responsible for:
- * - Setting up GPU pipelines, buffers, and textures.
- * - Drawing the alpha layer, pixel layers, and UI to the canvas.
- * - Managing per-layer GPU textures (add/remove).
- *
- * @param {LayerHandler} layerHandler - Handles layer buffers, order, visibility, and active layer info.
- * @param {UniformBufferHandler} uniformBufferHandler - Provides access to common and UI uniform buffers.
- * @param {Vec2} gridSize - The width and height of the pixel grid to render.
- * @returns {Promise<RenderHandler>} Resolves to an object exposing draw, addLayerTexture, and removeLayerTexture methods.
- */
 export const createRenderHandler = async (
   layerHandler: LayerHandler,
   uniformBufferHandler: UniformBufferHandler,
   gridSize: Vec2,
+  canvas?: HTMLCanvasElement
 ) => {
+
+  let renderUI: boolean = true;
+
+  const setRenderUI = (value: boolean) => {
+    renderUI = value;
+  }
+
   const pixelBindTextureMap = new Map<string, BindPixelTexture>();
 
-  const { device, canvasFormat, context } = await webGPUSetup("main-canvas");
+  const { device, canvasFormat, context } = await webGPUSetup(canvas ?? "main-canvas");
 
-  const { drawPreview } = await createLayerPreview(
-    gridSize,
-    calculateZoomFromGridAndCanvasSize(gridSize, LAYER_PREVIEW_SIZE),
-  );
 
   const { vertices, vertexBuffer, vertexBufferLayout } =
     createVertexBuffer(device);
@@ -91,10 +80,12 @@ export const createRenderHandler = async (
     });
 
     // DRAW ALPHA LAYER
-    pass.setPipeline(alphaPipeline);
-    GPUBindAlpha.writeAlphaUniforms(uniformBufferHandler.commonUniforms);
-    pass.setBindGroup(0, GPUBindAlpha.bindGroup);
-    pass.draw(6);
+    if (renderUI) {
+      pass.setPipeline(alphaPipeline);
+      GPUBindAlpha.writeAlphaUniforms(uniformBufferHandler.commonUniforms);
+      pass.setBindGroup(0, GPUBindAlpha.bindGroup);
+      pass.draw(6);
+    }
 
     // DRAW PIXEL LAYERS
     pass.setPipeline(pixelPipeline);
@@ -111,9 +102,9 @@ export const createRenderHandler = async (
         throw new Error(`Layer texture with id ${layer.id} not found`);
       }
 
-      if (layer.id === layerHandler.getActive().id) {
-        drawPreview(buffer, layer.opacity);
-      }
+      // if (renderUI && layer.id === layerHandler.getActive().id) {
+      //   drawPreview(buffer, layer.opacity);
+      // }
 
       if (!layer.display) {
         continue;
@@ -131,14 +122,17 @@ export const createRenderHandler = async (
     }
 
     // DRAW UI
-    pass.setPipeline(uiPipeline);
-    pass.setVertexBuffer(0, vertexBuffer);
-    pass.setBindGroup(0, GPUBindUi.bindGroup);
-    GPUBindUi.writeBuffer(
-      uniformBufferHandler.commonUniforms,
-      uniformBufferHandler.uiUniforms,
-    );
-    pass.draw(vertices.length / 2, gridSize.x * gridSize.y);
+    if (renderUI) {
+      pass.setPipeline(uiPipeline);
+      pass.setVertexBuffer(0, vertexBuffer);
+      pass.setBindGroup(0, GPUBindUi.bindGroup);
+      GPUBindUi.writeBuffer(
+        uniformBufferHandler.commonUniforms,
+        uniformBufferHandler.uiUniforms,
+      );
+      pass.draw(vertices.length / 2, gridSize.x * gridSize.y);
+
+    }
 
     pass.end();
     const commandBuffer = encoder.finish();
@@ -149,5 +143,6 @@ export const createRenderHandler = async (
     draw,
     addLayerTexture,
     removeLayerTexture,
+    setRenderUI
   };
 };

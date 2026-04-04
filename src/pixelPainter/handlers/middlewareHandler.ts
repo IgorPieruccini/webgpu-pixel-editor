@@ -1,7 +1,8 @@
+import type { LayerPreviewHandler } from "../layerPreview";
 import type { Layers } from "../types";
 import type { UniformBufferHandler } from "../uniformBuffersHandler";
 import type { BrushHandler } from "./brushHandler";
-import type { HistoryChangeHandler } from "./historyChangeHandleold";
+import type { HistoryChangeHandler } from "./historyChangeHandler";
 import type { LayerHandler } from "./layerHandler";
 import type { RenderHandler } from "./renderHandler";
 
@@ -11,6 +12,7 @@ export const createMiddlewareHandler = (
   renderHandler: RenderHandler,
   layerHandler: LayerHandler,
   historyChangeHandler: HistoryChangeHandler,
+  layerPreview: LayerPreviewHandler
 ) => {
   const loadTextureLayers = (layers?: Layers) => {
     const curLayers = layers ?? layerHandler.getList();
@@ -51,7 +53,17 @@ export const createMiddlewareHandler = (
     if (registerHistoryChange) {
       historyChangeHandler.addAction({ captureCurrentBuffer: true });
     }
+  }
 
+  const draw = () => {
+    renderHandler.draw();
+    const currentLayer = layerHandler.getActive();
+    if (currentLayer) {
+      const currentBuffer = layerHandler.getBufferById(currentLayer.id);
+      if (currentBuffer) {
+        layerPreview.drawPreview(currentBuffer, currentLayer.opacity);
+      }
+    }
   }
 
   return {
@@ -61,5 +73,6 @@ export const createMiddlewareHandler = (
     removeLayer,
     duplicateLayer,
     setBrushThickness,
+    draw,
   };
 };

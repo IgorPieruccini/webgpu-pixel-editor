@@ -1,4 +1,4 @@
-import { useProjectConfig } from "../../projectConfig/projectConfigProvider";
+import { API, useProjectConfig } from "../../projectConfig/projectConfigProvider";
 import { LayerOpacity } from "./LayerOpacity/LayerOpacity";
 import { Layers } from "./Layers/Layers";
 import { AiOutlineExport } from 'solid-icons/ai'
@@ -7,12 +7,14 @@ import "./rightPanel.css";
 export const RightPanel = () => {
   const projectConfig = useProjectConfig();
 
+  const exportHandler = API.export();
+
   if (!projectConfig.projectName()) {
     return null;
   }
 
   const onExport = () => {
-    console.log("Export");
+    exportHandler().image();
   }
 
   return (
