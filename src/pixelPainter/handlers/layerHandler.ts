@@ -3,7 +3,6 @@ import type { Layer, Layers } from "../types";
 import { generateUUID } from "../../utils";
 import { localDataBase } from "../../storageDB";
 import type { Vec2 } from "../../editor/types";
-import { serialization } from "../../serialization";
 import { storageLocal } from "../../storageLocal";
 import { BYTES_PER_PIXEL } from "../../constants";
 
@@ -334,7 +333,7 @@ export const createLayerHandler = async (
 
   const load = (
     serializedLayers: Layers,
-    serializedBuffer: Record<string, number[]> | Record<string, Uint8Array<ArrayBuffer>>
+    serializedBuffer: Record<string, Uint8Array<ArrayBuffer>>
   ): string[] => {
     const layerCopy: Layers = JSON.parse(JSON.stringify(serializedLayers));
     setList(layerCopy);
@@ -342,8 +341,7 @@ export const createLayerHandler = async (
     storageLocal.saveLayers(projectName, layerCopy);
 
     for (const [id, buffer] of Object.entries(serializedBuffer)) {
-      const deserializedBuffer = serialization.layer.deserialize(buffer);
-      setLayerBuffer(id, deserializedBuffer);
+      setLayerBuffer(id, buffer);
     }
 
     const activeLayerIsPresent = layerCopy.find(

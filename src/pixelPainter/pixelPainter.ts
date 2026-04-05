@@ -83,7 +83,7 @@ export const pixelPainter = async (
       getBufferById: layerHandler.getBufferById,
       setLayerBuffer: layerHandler.setLayerBuffer,
       buffers: layerHandler.buffers,
-      load: layerHandler.load,
+      load: middlewareHandler.loadLayers,
       set: layerHandler.set,
     },
     brush: {

@@ -14,7 +14,7 @@ import { useMenu } from "../ui/tools/menuProvider";
 import { INITIAL_PIXEL_PAINTER } from "../editor/constant";
 import type { PixelPainterMethods } from "../pixelPainter/types";
 import { DEFAULT_GRID_SIZE } from "../constants";
-import type { SerializedProject } from "../serialization/project";
+import type { LoadedProject } from "../serialization/project";
 import { storageLocal } from "../storageLocal";
 
 type ProjectConfigContextType = {
@@ -22,7 +22,7 @@ type ProjectConfigContextType = {
   setProjectName: Setter<string>;
   setProjectGridSize: Setter<Vec2>;
   getProjectGridSize: Accessor<Vec2>;
-  createNewProject: (project: ProjectType & Partial<SerializedProject>) => void;
+  createNewProject: (project: LoadedProject) => void;
   pixel: Accessor<PixelPainterMethods>;
 };
 
@@ -65,7 +65,7 @@ export const ProjectConfigProvider = (props: ProjectConfigProviderProps) => {
     gridSize,
     layers,
     buffers,
-  }: ProjectType & Partial<SerializedProject>): void => {
+  }: ProjectType & Partial<LoadedProject>): void => {
     project()
       .createNewPainter(name, gridSize)
       .then((value) => {
@@ -78,7 +78,7 @@ export const ProjectConfigProvider = (props: ProjectConfigProviderProps) => {
         storageLocal.addProject({ name, gridSize });
 
         if (layers && buffers) {
-          value.layer.load();
+          value.layer.load(layers, buffers);
         }
       });
   };

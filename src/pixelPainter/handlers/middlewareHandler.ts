@@ -66,6 +66,17 @@ export const createMiddlewareHandler = (
     }
   }
 
+
+  const loadLayers = (
+    serializedLayers: Layers,
+    serializedBuffer: Record<string, Uint8Array<ArrayBuffer>>
+
+  ) => {
+    loadTextureLayers(serializedLayers);
+    layerHandler.load(serializedLayers, serializedBuffer);
+
+  }
+
   return {
     loadTextureLayers,
     addLayer,
@@ -74,5 +85,6 @@ export const createMiddlewareHandler = (
     duplicateLayer,
     setBrushThickness,
     draw,
+    loadLayers
   };
 };
