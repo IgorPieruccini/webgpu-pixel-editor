@@ -14,6 +14,7 @@
     justify-content: space-between;
     gap: 8px;
     height: 400px;
+    padding: 8px;
 
     #layer-slider {
       display: flex;
@@ -35,21 +36,14 @@
     gap: 8px
   }
 
-  button {
-    max-height: 42px;
-
-    p {
-      margin: 0;
-    }
-  }
-
   #layer-preview {
-    margin-top: 16px;
+    padding: 8px;
   }
 
   #project-title {
     display: flex;
     justify-content: space-between;
+    align-items: center;
   }
 
   #export {

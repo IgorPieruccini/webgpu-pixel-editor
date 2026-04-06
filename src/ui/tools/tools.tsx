@@ -24,9 +24,9 @@ export const Tools = () => {
         <FiMenu />
       </button>
       {isOpen() ? <MenuOptions /> : null}
-      <br />
+      <hr />
       <ColorPicker />
-      <br />
+      <hr />
       <button
         class="menu-btn"
         classList={{

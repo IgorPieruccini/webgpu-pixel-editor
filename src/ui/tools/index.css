@@ -1,50 +1,44 @@
 #tools {
-    margin: 4px 0 4px 0;
-    padding: 0 4px 0 4px;
+  margin: 4px 0 4px 0;
+  padding: 0 4px 0 4px;
+  display: flex;
+  flex-direction: column;
+  justify-items: center;
+  gap: 8px;
+
+  input {
+    width: 100%;
+  }
+
+  button:focus {
+    outline: none;
+  }
+
+  .menu-btn {
+    width: 32px;
+    height: 32px;
     display: flex;
-    flex-direction: column;
-    justify-items: center;
-    gap: 4px;
+    align-items: center;
+    justify-content: center;
 
-    input {
-        width: 100%;
+    svg {
+      width: 18px;
+      height: 18px;
     }
+  }
 
-    button {
-        stroke: none;
-        border: none;
-    }
-
-    button:focus {
-        outline: none;
-    }
-
-    .menu-btn {
-        width: 56px;
-        height: 56px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        svg {
-            width: 24px;
-            height: 24px;
-        }
-    }
-
-    .active {
-        /*border: 2px solid white;*/
-        background-color: #402d53;
-    }
+  .active {
+    background-color: #402d53;
+  }
 }
 
 #menu-options {
-    position: absolute;
-    left: 62px;
-    top: 0px;
-    background-color: #242424;
-    padding: 8px;
-    min-width: 200px;
-    display: flex;
-    flex-direction: column;
+  position: absolute;
+  left: 62px;
+  top: 0px;
+  background-color: #242424;
+  padding: 8px;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
 }

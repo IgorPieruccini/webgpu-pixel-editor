@@ -33,3 +33,6 @@ export const RGBA_OFFSET = {
   BLUE: 2,
   ALPHA: 3,
 } as const;
+
+
+export const FILE_FORMAT = ".pxart"

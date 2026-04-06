@@ -42,8 +42,6 @@ export const MenuOptions = () => {
     input.click();
   };
 
-
-
   return (
     <div id="menu-options">
       <button

@@ -28,11 +28,14 @@ export const RightPanel = () => {
           <button onClick={onExport} id="export"><AiOutlineExport /></button>
         </span>
       </div>
+      <hr />
       <Layers />
+      <hr />
       <div id="layer-preview">
         <p>Layer preview</p>
         <canvas id="preview-canvas" width={300} height={300} />
       </div>
+      <hr />
       <LayerOpacity />
     </div>
   );
