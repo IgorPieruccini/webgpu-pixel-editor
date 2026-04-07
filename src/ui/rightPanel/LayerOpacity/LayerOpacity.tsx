@@ -1,4 +1,5 @@
 import { API } from "../../../projectConfig/projectConfigProvider";
+import { Slider } from "../../shared/slider";
 import "./LayerOpacity.css";
 
 export const LayerOpacity = () => {
@@ -22,20 +23,12 @@ export const LayerOpacity = () => {
   }
 
   return (
-    <div id="layer-opacity-container">
-      <label for="layer-opacity-input">Layer opacity</label>
-      <div class="layer-opacity-input-content">
-        <input
-          id="layer-opacity-input"
-          type="range"
-          min={0}
-          max={100}
-          value={layersAPI().getActive().opacity * 100}
-          onInput={onChangeOpacity}
-          onChange={onFinishChange}
-        />
-        <p>{Math.floor(layersAPI().getActive().opacity * 100)}%</p>
-      </div>
-    </div>
+
+    <Slider
+      key="layer-opacity"
+      onChange={onChangeOpacity}
+      onFinish={onFinishChange}
+      value={layersAPI().getActive().opacity * 100}
+    />
   );
 };

@@ -1,0 +1,20 @@
+.slider {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: row;
+  max-height: 32px;
+
+  .slider-container {
+    display: flex;
+    justify-content: stretch;
+    gap: 4px;
+    flex: 1;
+
+    input {
+      min-width: 130px;
+      width: 100%;
+    }
+  }
+}
