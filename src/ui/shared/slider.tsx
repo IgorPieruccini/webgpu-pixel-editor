@@ -1,4 +1,4 @@
-import "./slider.css"
+import "./slider.css";
 export interface SliderProps {
   key: string;
   onChange: (e: InputEvent) => void;
@@ -7,7 +7,6 @@ export interface SliderProps {
 }
 
 export const Slider = (props: SliderProps) => {
-
   return (
     <div class="slider">
       <label for={`${props.key}-slider`}>Layer opacity</label>
@@ -23,5 +22,6 @@ export const Slider = (props: SliderProps) => {
         />
         <p>{Math.floor(props.value)}%</p>
       </div>
-    </div>)
-}
+    </div>
+  );
+};

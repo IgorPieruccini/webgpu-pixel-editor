@@ -41,7 +41,6 @@ p {
   font-size: 0.8em;
 }
 
-
 label {
   font-size: 0.8em;
 }
@@ -83,7 +82,6 @@ button:hover {
 
 button:focus {
   outline: none;
-
 }
 
 @media (prefers-color-scheme: light) {
@@ -99,4 +97,9 @@ button:focus {
   button {
     background-color: #f9f9f9;
   }
+}
+
+input[type="range"] {
+  accent-color: #8a8ab2;
+  height: 5px;
 }
