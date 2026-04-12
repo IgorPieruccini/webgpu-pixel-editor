@@ -4,41 +4,14 @@ import type { LayerHandler } from "./layerHandler";
 import { alphaComposite, numberToRGBA, rgbaToHex } from "../utils";
 import type { HistoryChangeHandler } from "./historyChangeHandler";
 import { BYTES_PER_PIXEL, RGBA_OFFSET } from "../../constants";
+import type { ColorPaletteHandler } from "./colorPaletteHandler";
 
 export type BrushHandler = ReturnType<typeof createBrushHandler>;
 
-/**
- * Creates a brush handler for painting and erasing pixels on the canvas.
- *
- * @description The brush handler manages all painting operations including color selection,
- * opacity, thickness, and provides methods for painting and erasing pixels with alpha compositing.
- * It tracks painted pixels during a stroke and integrates with layer and history handlers
- * for proper state management.
- *
- * @param layerHandler - Handler for managing layers and buffer operations
- * @param historyChangeHandler - Handler for managing undo/redo history of paint actions
- * @param gridSize - The dimensions of the pixel grid (width and height)
- *
- *
- * @example
- * ```typescript
- * const brushHandler = createBrushHandler(layerHandler, historyHandler, { x: 800, y: 600 });
- *
- * // Set brush properties
- * brushHandler.setSelectedColor("#ff0000");
- * brushHandler.setOpacity(80);
- * brushHandler.setThickness(3);
- *
- * // Paint at position
- * brushHandler.paint({ x: 100, y: 150 });
- *
- * // Erase at position
- * brushHandler.erase({ x: 200, y: 250 });
- * ```
- */
 export const createBrushHandler = (
   layerHandler: LayerHandler,
   historyChangeHandler: HistoryChangeHandler,
+  colorPalette: ColorPaletteHandler,
   gridSize: Vec2,
 ) => {
   const canvas = document.querySelector<HTMLCanvasElement>("#main-canvas");
@@ -50,6 +23,7 @@ export const createBrushHandler = (
   canvas.addEventListener("mouseup", () => {
     layerHandler.saveCurrentBuffer();
     historyChangeHandler.addAction({ paintedPixels: currentPaintedPixels });
+    colorPalette.calculateColorPalette();
     clearCurrentPaintedPixels();
   });
 

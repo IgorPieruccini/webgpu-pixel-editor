@@ -60,4 +60,8 @@ export const INITIAL_PIXEL_PAINTER: PixelPainterMethods = {
     undo: () => {},
     redo: () => {},
   },
+  colorPalette: {
+    getColors: () => [],
+    isLoading: false,
+  },
 };

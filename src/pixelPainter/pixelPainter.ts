@@ -9,15 +9,15 @@ import { createExportHandler } from "./handlers/exportHandler";
 import { createLayerPreview } from "./layerPreview";
 import { LAYER_PREVIEW_SIZE } from "../constants";
 import { calculateZoomFromGridAndCanvasSize } from "../utils";
+import { createColorPaletteHandler } from "./handlers/colorPaletteHandler";
 
 export const pixelPainter = async (
   projectName: string,
   gridSize: Vec2,
   canvasSize: Vec2,
 ) => {
-
-
   const layerHandler = await createLayerHandler(projectName, gridSize);
+  const colorPaletteHandler = createColorPaletteHandler(layerHandler);
 
   const uniformBufferHandler = createUniformBufferHandler(canvasSize, gridSize);
 
@@ -32,7 +32,6 @@ export const pixelPainter = async (
     calculateZoomFromGridAndCanvasSize(gridSize, LAYER_PREVIEW_SIZE),
   );
 
-
   const historyChangeHandler = createHistoryChangeHandler(
     layerHandler,
     renderHandler,
@@ -43,9 +42,9 @@ export const pixelPainter = async (
   const brushHandler = createBrushHandler(
     layerHandler,
     historyChangeHandler,
+    colorPaletteHandler,
     gridSize,
   );
-
 
   const middlewareHandler = createMiddlewareHandler(
     brushHandler,
@@ -53,9 +52,8 @@ export const pixelPainter = async (
     renderHandler,
     layerHandler,
     historyChangeHandler,
-    layerPreview
+    layerPreview,
   );
-
 
   const exportHandler = createExportHandler(
     projectName,
@@ -65,8 +63,7 @@ export const pixelPainter = async (
 
   middlewareHandler.loadTextureLayers();
   historyChangeHandler.addSnapshot();
-
-
+  colorPaletteHandler.calculateColorPalette();
 
   return {
     layer: {
@@ -119,8 +116,11 @@ export const pixelPainter = async (
       redo: historyChangeHandler.redo,
     },
     export: {
-      image: exportHandler.exportImage
-    }
+      image: exportHandler.exportImage,
+    },
+    colorPalette: {
+      getColors: colorPaletteHandler.getColors,
+      isLoading: colorPaletteHandler.isLoadingColors,
+    },
   };
 };
-

@@ -142,12 +142,19 @@ const getBrush = () => {
 };
 
 const getExport = () => {
-  const context = useContext((ProjectConfigContext));
-  return () => context.pixel().export
-}
+  const context = useContext(ProjectConfigContext);
+  return () => context.pixel().export;
+};
+
+const getColorPalette = () => {
+  const context = useContext(ProjectConfigContext);
+  console.log(context.pixel());
+  return () => context.pixel().colorPalette;
+};
 
 export const API = {
   layers: getLayers,
   brush: getBrush,
-  export: getExport
+  export: getExport,
+  colorPalette: getColorPalette,
 };

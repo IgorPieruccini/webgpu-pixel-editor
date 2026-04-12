@@ -43,6 +43,10 @@ export const rgbaToHex = ({ r, g, b, a }: RGBA): number => {
   );
 };
 
+export const numberToHex = (value: number): string => {
+  return `#${(value >>> 0).toString(16).padStart(6, "0").slice(-6)}`;
+};
+
 export const alphaComposite = (src: RGBA, dst: RGBA) => {
   const outA = src.a + dst.a * (1 - src.a);
 

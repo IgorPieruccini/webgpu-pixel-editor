@@ -4,6 +4,7 @@ import { API } from "../../projectConfig/projectConfigProvider";
 
 export const ColorPicker = () => {
   const brush = API.brush();
+  const colorPalette = API.colorPalette();
 
   const onChange = (color: ColorResult) => {
     brush().setColor(color.hex);
@@ -11,7 +12,10 @@ export const ColorPicker = () => {
 
   return (
     <div class="ColorPickerContainer">
-      <SketchPicker presetColors={[]} onChange={onChange} />
+      <SketchPicker
+        presetColors={colorPalette().getColors()}
+        onChange={onChange}
+      />
       <CompactPicker
         colors={[]}
         styles={{
