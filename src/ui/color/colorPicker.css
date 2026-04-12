@@ -1,0 +1,9 @@
+.ColorPickerContainer {
+  position: absolute;
+  left: 50px;
+  bottom: 50px;
+}
+
+.ColorPickerContainer .sketch-picker {
+  background: var(--background) !important;
+}

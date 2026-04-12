@@ -2,11 +2,12 @@
   min-width: 300px;
   gap: 8px;
   right: 0px;
-  padding: 16px;
   display: flex;
+  border-color: var(--primary-color-highlight);
   flex-direction: column;
-  background-color: #242424;
+  background-color: var(--background);
   flex: none;
+  padding: 2px;
 
   #layers {
     display: flex;
@@ -27,13 +28,13 @@
   }
 
   .active-layer {
-    background-color: #402d53;
+    background-color: var(--primary-color);
   }
 
   .left-container {
     display: flex;
     align-items: center;
-    gap: 8px
+    gap: 8px;
   }
 
   #layer-preview {
@@ -45,7 +46,6 @@
     justify-content: space-between;
     align-items: center;
   }
-
   #export {
     width: 32px;
     height: 32px;

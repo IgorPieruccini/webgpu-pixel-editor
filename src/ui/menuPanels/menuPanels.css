@@ -9,7 +9,7 @@
 }
 
 .menu-panel {
-    background-color: #242424;
+    background-color: var(--background);
     min-width: 300px;
     display: flex;
     gap: 16px;

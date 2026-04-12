@@ -12,7 +12,7 @@
 }
 
 .tool-input {
-    background-color: #242424;
+    background-color: var(--background);
     border-radius: 10px;
     padding-left: 20px;
     padding-right: 20px;
