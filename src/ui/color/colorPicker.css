@@ -7,3 +7,29 @@
 .ColorPickerContainer .sketch-picker {
   background: var(--background) !important;
 }
+
+.ColorPickerContainer .compact-picker {
+  background: var(--background) !important;
+  width: 220px !important;
+}
+
+.ColorPickerContainer .compact-picker input {
+  color: gray !important;
+}
+
+.ColorPickerContainer .compact-picker label {
+  color: white !important;
+}
+
+.ColorPickerContainer .compact-picker .flexbox-fix div {
+  display: flex;
+  align-items: center;
+
+  label {
+    line-height: 0px;
+  }
+}
+
+.ColorPickerContainer .compact-picker .flexbox-fix div label {
+  line-height: 9px !important;
+}
