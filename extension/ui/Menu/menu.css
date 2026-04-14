@@ -1,0 +1,21 @@
+#menu {
+  margin: 4px;
+  display: flex;
+  align-items: center;
+  z-index: 10;
+}
+
+.menu-section-title {
+  padding: 6px 8px;
+  color: var(--color-text-subtle, #6b7280);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.menu-divider {
+  height: 1px;
+  margin: 4px 0;
+  background: var(--color-border-subtle, rgba(0, 0, 0, 0.08));
+}

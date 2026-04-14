@@ -9,6 +9,8 @@ import {
 import type { CreateKittlAPIType } from "./KittlAPI";
 import { createKittlConfigController } from "./createKittlConfigController";
 import { API, useProject } from "../../../src/lib";
+import "@kittl/ui/Icons/download";
+import "./kittl.css";
 
 const initialKittlAPI: CreateKittlAPIType = {
   uploadImage: async () => {
@@ -68,25 +70,25 @@ export const KittlContextProvider = ({
   });
 
   return (
-    <KittleContext.Provider
-      value={{
-        api: controller.api,
-        isReady: controller.isReady,
-      }}
-    >
-      <p>{controller.isReady() ? "isReady" : "notReady"}</p>
-      <kittl-button
-        class="icon-button"
-        variant="ghost"
-        size="xs"
-        disabled={!controller.isReady()}
-        onClick={addToCanvas}
+    <div id="kittl">
+      <KittleContext.Provider
+        value={{
+          api: controller.api,
+          isReady: controller.isReady,
+        }}
       >
-        {controller.isReady() ? "is ready" : "not ready"}
-        <kittl-icon-duplicate class="icon" />
-      </kittl-button>
-      {resolvedChildren()}
-    </KittleContext.Provider>
+        <kittl-button
+          class="icon-button"
+          variant="primary"
+          size="xs"
+          disabled={!controller.isReady()}
+          onClick={addToCanvas}
+        >
+          <kittl-icon-download />
+        </kittl-button>
+        {resolvedChildren()}
+      </KittleContext.Provider>
+    </div>
   );
 };
 

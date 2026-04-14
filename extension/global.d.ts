@@ -1,5 +1,7 @@
 import type { JSX } from "solid-js";
 
+type KittlMenuEvent = CustomEvent<void>;
+
 declare module "solid-js" {
   namespace JSX {
     interface IntrinsicElements {
@@ -19,6 +21,32 @@ declare module "solid-js" {
       "kittl-icon-ratio-one-by-one": JSX.HTMLAttributes<HTMLElement>;
       "kittl-icon-eraser": JSX.HTMLAttributes<HTMLElement>;
       "kittl-icon-sliders": JSX.HTMLAttributes<HTMLElement>;
+      "kittl-icon-download": JSX.HTMLAttributes<HTMLElement>;
+      "kittl-icon-menu": JSX.HTMLAttributes<HTMLElement>;
+      "kittl-menu": JSX.HTMLAttributes<HTMLElement> & {
+        placement?:
+          | "top"
+          | "top-start"
+          | "top-end"
+          | "bottom"
+          | "bottom-start"
+          | "bottom-end"
+          | "left"
+          | "left-start"
+          | "left-end"
+          | "right"
+          | "right-start"
+          | "right-end";
+        open?: boolean;
+        offset?: number;
+        "onmenu-open"?: (event: KittlMenuEvent) => void;
+        "onmenu-close"?: (event: KittlMenuEvent) => void;
+      };
+      "kittl-menu-item": JSX.HTMLAttributes<HTMLElement> & {
+        disabled?: boolean;
+        destructive?: boolean;
+        "onmenu-item-select"?: (event: KittlMenuEvent) => void;
+      };
     }
   }
 }
