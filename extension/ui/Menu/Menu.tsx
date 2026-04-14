@@ -6,13 +6,19 @@ import "@kittl/ui/Icons/menu";
 import { createSignal } from "solid-js";
 import {
   DEFAULT_GRID_SIZE,
+  FILE_FORMAT,
   MAX_GRID_SIZE,
   MIN_GRID_SIZE,
 } from "../../../src/constants";
 import type { ProjectType } from "../../../src/editor/types";
-import { useProjectConfig } from "../../../src/projectConfig/projectConfigProvider";
+import {
+  API,
+  useProject,
+  useProjectConfig,
+} from "../../../src/projectConfig/projectConfigProvider";
 import { storageLocal } from "../../../src/storageLocal";
 import "./menu.css";
+import { serialization } from "../../../src/serialization";
 
 export const Menu = () => {
   const [projects, setProjects] = createSignal<ProjectType[]>([]);
@@ -25,6 +31,8 @@ export const Menu = () => {
     String(DEFAULT_GRID_SIZE.y),
   );
   const projectConfig = useProjectConfig();
+  const project = useProject();
+  const layerAPI = API.layers();
 
   const loadProjects = () => {
     setProjects(storageLocal.getProjects());
@@ -85,6 +93,34 @@ export const Menu = () => {
     closeCreateProjectPanel();
   };
 
+  const exportProject = () => {
+    const serializeProject = serialization.project.serialize(
+      project.projectName(),
+      project.getProjectGridSize(),
+      layerAPI().getList(),
+      layerAPI().buffers,
+    );
+    serialization.project.saveProject(serializeProject);
+  };
+
+  const importProject = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = FILE_FORMAT;
+
+    input.onchange = async (event) => {
+      const file = (event.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+
+      const loadedProject = await serialization.project.loadProject(file);
+
+      project.createNewProject(loadedProject);
+    };
+
+    // Trigger the file dialog
+    input.click();
+  };
+
   return (
     <div id="menu">
       <kittl-menu placement="bottom-start" onClick={loadProjects}>
@@ -107,6 +143,12 @@ export const Menu = () => {
         <div class="menu-section-title">Actions</div>
         <kittl-menu-item onClick={openCreateProjectPanel}>
           New project
+        </kittl-menu-item>
+        <kittl-menu-item onClick={exportProject}>
+          Export project
+        </kittl-menu-item>
+        <kittl-menu-item onClick={importProject}>
+          Import project
         </kittl-menu-item>
       </kittl-menu>
 
