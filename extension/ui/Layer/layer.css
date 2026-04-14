@@ -37,6 +37,10 @@
   color: black;
 }
 
+.active-layer .icon {
+  --icon-color: black;
+}
+
 .layer-opt-btn {
   display: flex;
   align-items: center;
@@ -45,15 +49,6 @@
 
 .layer-btn-icon {
   flex: 0 0 auto;
-}
-
-.layer-btn .layer-icon {
-  --icon-color: white;
-}
-
-.layer-btn:hover .layer-icon,
-.layer-btn.active-layer .layer-icon {
-  --icon-color: black;
 }
 
 #preview-canvas {

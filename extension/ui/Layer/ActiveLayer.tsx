@@ -1,5 +1,4 @@
 import { API } from "../../../src/lib";
-import "@kittl/ui";
 
 export const ActiveLayer = () => {
   API.layers();

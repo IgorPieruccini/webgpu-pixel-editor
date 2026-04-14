@@ -4,14 +4,16 @@ import { ProjectConfigProvider } from "../src/projectConfig/projectConfigProvide
 import { MenuProvider } from "../src/ui/tools/menuProvider";
 import { Layers } from "./ui/Layer/Layers";
 import { ActiveLayer } from "./ui/Layer/ActiveLayer";
+import { Tools } from "./ui/Tools/Tools";
 
 function AppExtention() {
   return (
     <MenuProvider>
       <ProjectConfigProvider>
-        <div id="editor">
+        <div id="editor" data-theme="dark">
           <canvas id="main-canvas" width={1024} height={1024} />
-          <div id="layer-container">
+          <div id="bottom-container">
+            <Tools />
             <Layers />
             <ActiveLayer />
           </div>

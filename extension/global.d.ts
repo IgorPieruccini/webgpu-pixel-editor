@@ -15,6 +15,9 @@ declare module "solid-js" {
       "kittl-icon-eye-opened": JSX.HTMLAttributes<HTMLElement>;
       "kittl-icon-eye-closed": JSX.HTMLAttributes<HTMLElement>;
       "kittl-icon-trash": JSX.HTMLAttributes<HTMLElement>;
+      "kittl-icon-pencil": JSX.HTMLAttributes<HTMLElement>;
+      "kittl-icon-ratio-one-by-one": JSX.HTMLAttributes<HTMLElement>;
+      "kittl-icon-eraser": JSX.HTMLAttributes<HTMLElement>;
     }
   }
 }

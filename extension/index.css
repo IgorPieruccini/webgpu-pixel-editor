@@ -98,10 +98,6 @@ input[type="range"] {
   height: 5px;
 }
 
-.layer-icon {
+.icon-button:hover .icon {
   --icon-color: white;
-}
-
-.layer-icon-button:hover .layer-icon {
-  --icon-color: black;
 }

@@ -2,7 +2,9 @@ import { createSortable, useDragDropContext } from "@thisbeyond/solid-dnd";
 import type { Layer } from "../../../src/pixelPainter/types";
 import { API } from "../../../src/projectConfig/projectConfigProvider";
 import { LayerTitle } from "./LayerTitle";
-import "@kittl/ui";
+import "@kittl/ui/Icons/eyeOpened";
+import "@kittl/ui/Icons/trash";
+import "@kittl/ui/Icons/duplicate";
 
 type LayerButtonProps = {
   layer: Layer;
@@ -54,32 +56,32 @@ export const LayerButton = ({ layer }: LayerButtonProps) => {
 
         <div class="layer-opt-btn">
           <kittl-button
-            class="layer-btn-icon"
+            class="icon-button"
             variant="ghost"
             size="xs"
             onClick={onDuplicate}
           >
-            <kittl-icon-duplicate class="layer-icon" />
+            <kittl-icon-duplicate class="icon" />
           </kittl-button>
           <kittl-button
-            class="layer-btn-icon"
+            class="icon-button"
             variant="ghost"
             size="xs"
             onClick={onToggleDisplay}
           >
             {layer.display ? (
-              <kittl-icon-eye-opened class="layer-icon" />
+              <kittl-icon-eye-opened class="icon" />
             ) : (
-              <kittl-icon-eye-closed class="layer-icon" />
+              <kittl-icon-eye-closed class="icon" />
             )}
           </kittl-button>
           <kittl-button
-            class="layer-btn-icon"
+            class="icon-button"
             variant="ghost"
             size="xs"
             onClick={onDelete}
           >
-            <kittl-icon-trash class="layer-icon" />
+            <kittl-icon-trash class="icon" />
           </kittl-button>
         </div>
       </kittl-button>

@@ -4,7 +4,7 @@
 
 import type { Vec2 } from "./editor/types";
 
-export const ZOOM_SENSITIVITY = 1 + (window.devicePixelRatio || 1) / 100;
+export const ZOOM_SENSITIVITY = 2 / (window.devicePixelRatio || 1);
 
 export const MIN_GRID_SIZE = 8;
 
@@ -34,5 +34,4 @@ export const RGBA_OFFSET = {
   ALPHA: 3,
 } as const;
 
-
-export const FILE_FORMAT = ".pxart"
+export const FILE_FORMAT = ".pxart";

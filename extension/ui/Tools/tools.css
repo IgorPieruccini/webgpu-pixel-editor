@@ -1,0 +1,47 @@
+#tools {
+  --tools-width: 200px;
+  position: absolute;
+  width: var(--tools-width);
+  left: calc(50% - (var(--tools-width) / 2));
+  top: -90px;
+  height: 56px;
+
+  padding: 0 var(--spacing-6);
+  gap: var(--spacing-8);
+  background-color: var(--color-bg-fill-brand);
+  border: 2px solid var(--colors-gray-20);
+  border-radius: var(--border-radius-12);
+  flex-direction: row;
+  align-items: center;
+
+  display: flex;
+  justify-content: center;
+}
+
+.tool-color-picker {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.tool-color-picker::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.tool-color-picker::-webkit-color-swatch {
+  border: 2px solid var(--colors-gray-20);
+  border-radius: 999px;
+}
+
+#tools .tool-btn.active {
+  background-color: #defe05;
+  color: black;
+}
+
+#tools .tool-btn.active .icon {
+  --icon-color: black;
+}
