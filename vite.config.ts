@@ -15,5 +15,6 @@ const wgslLoader = {
 };
 
 export default defineConfig({
+  base: "./",
   plugins: [solid(), wgslLoader],
 });

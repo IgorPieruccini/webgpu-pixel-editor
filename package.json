@@ -17,7 +17,11 @@
   ],
   "scripts": {
     "dev": "vite",
+    "dev:extension": "vite --config vite.extension.config.ts --open /",
+    "dev:extention": "vite --config vite.extension.config.ts --open /",
     "build": "tsc -b && vite build",
+    "build:extension": "tsc -b && vite build --config vite.extension.config.ts",
+    "build:extention": "tsc -b && vite build --config vite.extension.config.ts",
     "build:lib": "tsc -p tsconfig.lib.json && vite build --config vite.lib.config.ts",
     "preview": "vite preview"
   },
