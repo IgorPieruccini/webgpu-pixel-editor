@@ -3,6 +3,7 @@ import type { Layer } from "../../../src/pixelPainter/types";
 import { API } from "../../../src/projectConfig/projectConfigProvider";
 import { LayerTitle } from "./LayerTitle";
 import "@kittl/ui/Icons/eyeOpened";
+import "@kittl/ui/Icons/eyeClosed";
 import "@kittl/ui/Icons/trash";
 import "@kittl/ui/Icons/duplicate";
 
