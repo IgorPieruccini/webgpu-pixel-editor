@@ -1,4 +1,5 @@
 import type { Vec2 } from "../../editor/types";
+import { BYTES_PER_PIXEL } from "../../constants";
 
 export type BindPixelTexture = ReturnType<typeof bindTexture>;
 
@@ -49,7 +50,7 @@ export const bindTexture = (
       { texture: layerTexture },
       buffer,
       {
-        bytesPerRow: buffer.byteLength / gridSize.y,
+        bytesPerRow: gridSize.x * BYTES_PER_PIXEL,
       },
       {
         width: gridSize.x,

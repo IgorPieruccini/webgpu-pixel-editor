@@ -1,9 +1,4 @@
-import {
-  createContext,
-  onMount,
-  useContext,
-  type JSX,
-} from "solid-js";
+import { createContext, onMount, useContext, type JSX } from "solid-js";
 import { editorContext } from "../editor/editortContext";
 import { useMenu } from "../ui/tools/menuProvider";
 import { storageLocal } from "../storageLocal";
@@ -98,8 +93,12 @@ const getExport = () => {
 
 const getColorPalette = () => {
   const context = useContext(ProjectConfigContext);
-  console.log(context.pixel());
   return () => context.pixel().colorPalette;
+};
+
+const getImageImporter = () => {
+  const context = useContext(ProjectConfigContext);
+  return () => context.pixel().imageImporter;
 };
 
 export const API = {
@@ -107,4 +106,5 @@ export const API = {
   brush: getBrush,
   export: getExport,
   colorPalette: getColorPalette,
+  imageImporter: getImageImporter,
 };
