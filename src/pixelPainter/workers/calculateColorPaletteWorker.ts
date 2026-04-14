@@ -8,24 +8,6 @@ export type WorkerResponse = {
   colors: string[];
 };
 
-function extractUniqueColors(buffer: Uint8Array<ArrayBuffer>): Set<string> {
-  const hexColor = new Set<string>();
-  const stride = 4;
-
-  for (let i = 0; i < buffer.length; i += stride) {
-    const r = buffer[i];
-    const g = buffer[i + 1];
-    const b = buffer[i + 2];
-    const a = buffer[i + 3];
-
-    const color = (r << 24) | (g << 16) | (b << 8) | a;
-    const hex = numberToHex(color);
-    hexColor.add(hex);
-  }
-
-  return hexColor;
-}
-
 self.onmessage = (event: MessageEvent<WorkerRequest>) => {
   const { buffers } = event.data;
 

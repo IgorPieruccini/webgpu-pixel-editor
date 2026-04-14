@@ -1,10 +1,8 @@
 import { BYTES_PER_PIXEL } from "../../../constants";
 import type { Vec2 } from "../../../editor/types";
 import type { SerializedProject } from "../../../serialization/project";
-import { storageLocal } from "../../../storageLocal";
 import type { LayerHandler } from "../layerHandler";
-import type { Diff, LayerDiff, SerializedProjectSnapshot } from "./types";
-import * as jsondiffpatch from "jsondiffpatch";
+import type { LayerDiff } from "./types";
 
 export const getPortionOfBuffer = (
   buffer: Uint8Array<ArrayBuffer>,

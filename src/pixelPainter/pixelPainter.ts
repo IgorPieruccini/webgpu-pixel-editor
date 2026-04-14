@@ -15,6 +15,7 @@ export const pixelPainter = async (
   projectName: string,
   gridSize: Vec2,
   canvasSize: Vec2,
+  canvas: HTMLCanvasElement,
 ) => {
   const layerHandler = await createLayerHandler(projectName, gridSize);
   const colorPaletteHandler = createColorPaletteHandler(layerHandler);
@@ -25,6 +26,7 @@ export const pixelPainter = async (
     layerHandler,
     uniformBufferHandler,
     gridSize,
+    canvas,
   );
 
   const layerPreview = await createLayerPreview(
@@ -44,6 +46,7 @@ export const pixelPainter = async (
     historyChangeHandler,
     colorPaletteHandler,
     gridSize,
+    canvas,
   );
 
   const middlewareHandler = createMiddlewareHandler(

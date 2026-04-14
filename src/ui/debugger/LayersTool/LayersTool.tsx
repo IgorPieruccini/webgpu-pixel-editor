@@ -1,24 +1,19 @@
 import { AiOutlineDownload, AiOutlinePlus } from "solid-icons/ai";
 import {
   API,
-  useProjectConfig,
 } from "../../../projectConfig/projectConfigProvider";
 import { serialization } from "../../../serialization";
 import "./LayersTool.css";
-import { FiFilePlus } from 'solid-icons/fi'
+import { FiFilePlus } from "solid-icons/fi";
 import { downloadFile, importFile } from "../../../utils";
 
 export const LayersTool = () => {
   const layers = API.layers();
-  const project = useProjectConfig();
 
   const onDownload = (layerId: string) => {
     const buffer = layers().getBufferById(layerId);
     if (!buffer) return;
-    const serializedLayerBuffer = serialization.layer.serialize(
-      buffer,
-      project.getProjectGridSize(),
-    );
+    const serializedLayerBuffer = serialization.layer.serialize(buffer);
 
     const name =
       layers()
@@ -30,8 +25,7 @@ export const LayersTool = () => {
 
   const onImportFile = (layerId: string) => {
     importFile((content: string) => {
-      const layerData: number[] = JSON.parse(content);
-      const buffer = serialization.layer.deserialize(layerData);
+      const buffer = serialization.layer.deserialize(content);
       layers().setLayerBuffer(layerId, buffer);
     });
   };

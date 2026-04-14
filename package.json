@@ -1,11 +1,24 @@
 {
   "name": "isopixel",
-  "private": true,
+  "private": false,
   "version": "0.0.0",
   "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/types/lib.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/lib.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:lib": "tsc -p tsconfig.lib.json && vite build --config vite.lib.config.ts",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -22,6 +35,9 @@
     "typescript": "~5.9.3",
     "vite": "npm:rolldown-vite@7.1.14",
     "vite-plugin-solid": "^2.11.8"
+  },
+  "peerDependencies": {
+    "solid-js": "^1.9.9"
   },
   "overrides": {
     "vite": "npm:rolldown-vite@7.1.14"

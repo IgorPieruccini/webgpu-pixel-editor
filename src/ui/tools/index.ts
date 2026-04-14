@@ -1,2 +1,2 @@
 export { Tools } from "./tools";
-export { ToolSettings } from "./toolSettings/toolSettings";
+export { ToolSettings } from "./toolSettings/ToolSettings";

@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "emitDeclarationOnly": true,
+    "declaration": true,
+    "declarationMap": false,
+    "outDir": "./dist/types",
+    "rootDir": "./src",
+    "types": ["@webgpu/types"]
+  },
+  "include": ["src/lib.ts", "src/global.d.ts", "src/wgsl.d.ts", "src/projectConfig/**/*.ts", "src/projectConfig/**/*.tsx", "src/editor/**/*.ts", "src/editor/**/*.tsx", "src/pixelPainter/**/*.ts", "src/pixelPainter/**/*.tsx", "src/serialization/**/*.ts", "src/constants.ts", "src/storageLocal.ts", "src/utils.ts"]
+}

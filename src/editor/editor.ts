@@ -12,7 +12,12 @@ import { calculateZoomFromGridAndCanvasSize } from "../utils";
 
 export type EditorType = Awaited<ReturnType<typeof initializeEditor>>;
 
-export const initializeEditor = async () => {
+export type InitializeEditorOptions = {
+  canvas?: HTMLCanvasElement;
+  canvasId?: string;
+};
+
+export const initializeEditor = async (options: InitializeEditorOptions = {}) => {
   let pressingSpace = false;
   let isLeftMouseDown = false;
 
@@ -36,9 +41,11 @@ export const initializeEditor = async () => {
     }
   };
 
-  const canvas = document.getElementById("main-canvas");
+  const canvas =
+    options.canvas ??
+    document.getElementById(options.canvasId ?? "main-canvas");
 
-  if (!canvas) {
+  if (!(canvas instanceof HTMLCanvasElement)) {
     throw new Error("Canvas element not found");
   }
 
@@ -63,7 +70,7 @@ export const initializeEditor = async () => {
     pixel = await pixelPainter(name, gridSize, {
       x: viewport.width,
       y: viewport.height,
-    });
+    }, canvas);
 
     pixel.render.setZoom(zoom - zoom * 0.3);
 

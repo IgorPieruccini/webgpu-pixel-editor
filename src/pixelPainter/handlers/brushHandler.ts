@@ -13,12 +13,8 @@ export const createBrushHandler = (
   historyChangeHandler: HistoryChangeHandler,
   colorPalette: ColorPaletteHandler,
   gridSize: Vec2,
+  canvas: HTMLCanvasElement,
 ) => {
-  const canvas = document.querySelector<HTMLCanvasElement>("#main-canvas");
-  if (!canvas) {
-    throw new Error("Could not find main canvas");
-  }
-
   const currentPaintedPixels = new Set<number>();
   canvas.addEventListener("mouseup", () => {
     layerHandler.saveCurrentBuffer();

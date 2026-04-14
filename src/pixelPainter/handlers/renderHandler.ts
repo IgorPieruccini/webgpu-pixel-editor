@@ -14,10 +14,10 @@ export const createRenderHandler = async (
   layerHandler: LayerHandler,
   uniformBufferHandler: UniformBufferHandler,
   gridSize: Vec2,
-  canvas?: HTMLCanvasElement
+  canvas?: HTMLCanvasElement,
+  initialRenderUI = true,
 ) => {
-
-  let renderUI: boolean = true;
+  let renderUI: boolean = initialRenderUI;
 
   const setRenderUI = (value: boolean) => {
     renderUI = value;

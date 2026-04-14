@@ -13,7 +13,7 @@ type MenuContextType = {
 
 const initialValue: MenuContextType = {
   openedOption: () => -1,
-  openOption: (opt: number) => {
+  openOption: (_opt: number) => {
     console.warn("OpenOption not implemented");
   },
 };
