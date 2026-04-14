@@ -17,7 +17,9 @@ export type InitializeEditorOptions = {
   canvasId?: string;
 };
 
-export const initializeEditor = async (options: InitializeEditorOptions = {}) => {
+export const initializeEditor = async (
+  options: InitializeEditorOptions = {},
+) => {
   let pressingSpace = false;
   let isLeftMouseDown = false;
 
@@ -67,10 +69,15 @@ export const initializeEditor = async (options: InitializeEditorOptions = {}) =>
       y: viewport.height,
     });
 
-    pixel = await pixelPainter(name, gridSize, {
-      x: viewport.width,
-      y: viewport.height,
-    }, canvas);
+    pixel = await pixelPainter(
+      name,
+      gridSize,
+      {
+        x: viewport.width,
+        y: viewport.height,
+      },
+      canvas,
+    );
 
     pixel.render.setZoom(zoom - zoom * 0.3);
 

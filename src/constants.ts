@@ -4,7 +4,7 @@
 
 import type { Vec2 } from "./editor/types";
 
-export const ZOOM_SENSITIVITY = 2 / (window.devicePixelRatio || 1);
+export const ZOOM_SENSITIVITY = 0.4 * window.devicePixelRatio;
 
 export const MIN_GRID_SIZE = 8;
 

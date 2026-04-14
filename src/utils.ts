@@ -12,11 +12,10 @@ export const calculateZoomFromGridAndCanvasSize = (
   gridSize: Vec2,
   canvasSize: Vec2,
 ) => {
-  if (gridSize.x > gridSize.y) {
-    return canvasSize.x / canvasSize.y;
-  } else {
-    return gridSize.x / gridSize.y;
-  }
+  const canvasAspectRatio = canvasSize.x / canvasSize.y;
+  const gridAspectRatio = gridSize.x / gridSize.y;
+
+  return Math.min(canvasAspectRatio, gridAspectRatio);
 };
 
 export const downloadFile = <T>(data: T, name: string, format: string) => {
