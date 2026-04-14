@@ -47,6 +47,22 @@ declare module "solid-js" {
         destructive?: boolean;
         "onmenu-item-select"?: (event: KittlMenuEvent) => void;
       };
+      "kittl-card": JSX.HTMLAttributes<HTMLElement> & {
+        bordered?: boolean;
+        interactive?: boolean;
+        active?: boolean;
+        disabled?: boolean;
+      };
+      "kittl-input": JSX.HTMLAttributes<HTMLElement> & {
+        size?: "s" | "m" | "l";
+        disabled?: boolean;
+        placeholder?: string;
+        label?: string;
+        value?: string;
+        name?: string;
+        error?: string;
+        maxlength?: number;
+      };
     }
   }
 }

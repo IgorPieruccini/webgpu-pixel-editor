@@ -1,8 +1,14 @@
+import "@kittl/ui/Card";
+import "@kittl/ui/Input";
 import "@kittl/ui/Menu";
 import "@kittl/ui/MenuItem";
 import "@kittl/ui/Icons/menu";
 import { createSignal } from "solid-js";
-import { DEFAULT_GRID_SIZE } from "../../../src/constants";
+import {
+  DEFAULT_GRID_SIZE,
+  MAX_GRID_SIZE,
+  MIN_GRID_SIZE,
+} from "../../../src/constants";
 import type { ProjectType } from "../../../src/editor/types";
 import { useProjectConfig } from "../../../src/projectConfig/projectConfigProvider";
 import { storageLocal } from "../../../src/storageLocal";
@@ -10,6 +16,14 @@ import "./menu.css";
 
 export const Menu = () => {
   const [projects, setProjects] = createSignal<ProjectType[]>([]);
+  const [isCreatePanelOpen, setIsCreatePanelOpen] = createSignal(false);
+  const [projectName, setProjectName] = createSignal("new-project");
+  const [projectWidth, setProjectWidth] = createSignal(
+    String(DEFAULT_GRID_SIZE.x),
+  );
+  const [projectHeight, setProjectHeight] = createSignal(
+    String(DEFAULT_GRID_SIZE.y),
+  );
   const projectConfig = useProjectConfig();
 
   const loadProjects = () => {
@@ -39,11 +53,36 @@ export const Menu = () => {
     projectConfig.createNewProject(project);
   };
 
+  const openCreateProjectPanel = () => {
+    setProjectName(createProjectName());
+    setProjectWidth(String(DEFAULT_GRID_SIZE.x));
+    setProjectHeight(String(DEFAULT_GRID_SIZE.y));
+    setIsCreatePanelOpen(true);
+  };
+
+  const closeCreateProjectPanel = () => {
+    setIsCreatePanelOpen(false);
+  };
+
+  const parseGridSize = (value: string) => {
+    const parsed = Number.parseInt(value, 10);
+
+    if (Number.isNaN(parsed)) {
+      return MIN_GRID_SIZE;
+    }
+
+    return Math.min(Math.max(parsed, MIN_GRID_SIZE), MAX_GRID_SIZE);
+  };
+
   const onCreateProject = () => {
     projectConfig.createNewProject({
-      name: createProjectName(),
-      gridSize: DEFAULT_GRID_SIZE,
+      name: projectName().trim() || createProjectName(),
+      gridSize: {
+        x: parseGridSize(projectWidth()),
+        y: parseGridSize(projectHeight()),
+      },
     });
+    closeCreateProjectPanel();
   };
 
   return (
@@ -66,8 +105,66 @@ export const Menu = () => {
 
         <div class="menu-divider" />
         <div class="menu-section-title">Actions</div>
-        <kittl-menu-item onClick={onCreateProject}>New project</kittl-menu-item>
+        <kittl-menu-item onClick={openCreateProjectPanel}>
+          New project
+        </kittl-menu-item>
       </kittl-menu>
+
+      {isCreatePanelOpen() && (
+        <div class="create-project-panel">
+          <kittl-card bordered>
+            <div class="create-project-card-content">
+              <div class="create-project-header">
+                <span class="create-project-title">New project</span>
+              </div>
+
+              <kittl-input
+                label="Project name"
+                value={projectName()}
+                onInput={(event) => {
+                  const target = event.currentTarget as HTMLElement & {
+                    value: string;
+                  };
+                  setProjectName(target.value);
+                }}
+              />
+
+              <div class="create-project-size-row">
+                <kittl-input
+                  label="Width"
+                  value={projectWidth()}
+                  onInput={(event) => {
+                    const target = event.currentTarget as HTMLElement & {
+                      value: string;
+                    };
+                    setProjectWidth(target.value);
+                  }}
+                />
+
+                <kittl-input
+                  label="Height"
+                  value={projectHeight()}
+                  onInput={(event) => {
+                    const target = event.currentTarget as HTMLElement & {
+                      value: string;
+                    };
+                    setProjectHeight(target.value);
+                  }}
+                />
+              </div>
+
+              <div class="create-project-actions">
+                <kittl-button variant="ghost" onClick={closeCreateProjectPanel}>
+                  Close
+                </kittl-button>
+                <kittl-button variant="primary" onClick={onCreateProject}>
+                  Create
+                </kittl-button>
+              </div>
+            </div>
+          </kittl-card>
+        </div>
+      )}
     </div>
   );
 };

@@ -2,6 +2,7 @@
   margin: 4px;
   display: flex;
   align-items: center;
+  position: relative;
   z-index: 10;
 }
 
@@ -18,4 +19,50 @@
   height: 1px;
   margin: 4px 0;
   background: var(--color-border-subtle, rgba(0, 0, 0, 0.08));
+}
+
+.create-project-panel {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 20;
+}
+
+.create-project-panel kittl-card {
+  width: min(100%, 420px);
+}
+
+.create-project-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+}
+
+.create-project-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.create-project-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text, #111827);
+}
+
+.create-project-size-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.create-project-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
 }
