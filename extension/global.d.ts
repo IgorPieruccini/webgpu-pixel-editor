@@ -18,6 +18,7 @@ declare module "solid-js" {
       "kittl-icon-pencil": JSX.HTMLAttributes<HTMLElement>;
       "kittl-icon-ratio-one-by-one": JSX.HTMLAttributes<HTMLElement>;
       "kittl-icon-eraser": JSX.HTMLAttributes<HTMLElement>;
+      "kittl-icon-sliders": JSX.HTMLAttributes<HTMLElement>;
     }
   }
 }

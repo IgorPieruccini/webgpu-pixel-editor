@@ -1,5 +1,5 @@
 #tools {
-  --tools-width: 200px;
+  --tools-width: 300px;
   position: absolute;
   width: var(--tools-width);
   left: calc(50% - (var(--tools-width) / 2));
@@ -18,13 +18,38 @@
   justify-content: center;
 }
 
+.brush-thickness-popover {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 12px);
+  display: none;
+  padding: 12px 8px;
+  background-color: var(--color-bg-fill-brand);
+  border: 2px solid var(--colors-gray-20);
+  border-radius: var(--border-radius-12);
+}
+
+.brush-thickness-popover.open {
+  display: flex;
+}
+
+.brush-thickness-input {
+  width: 96px;
+  height: 24px;
+  margin: 0;
+  transform-origin: center;
+}
+
 .tool-color-picker {
+  display: block;
   width: 28px;
   height: 28px;
+  min-width: 28px;
   padding: 0;
   border: 0;
   border-radius: 999px;
   background: transparent;
+  overflow: hidden;
   cursor: pointer;
 }
 
@@ -37,6 +62,12 @@
   border-radius: 999px;
 }
 
+.tool-color-picker::-moz-color-swatch {
+  border: 2px solid var(--colors-gray-20);
+  border-radius: 999px;
+  width: 30px;
+}
+
 #tools .tool-btn.active {
   background-color: #defe05;
   color: black;
@@ -44,4 +75,12 @@
 
 #tools .tool-btn.active .icon {
   --icon-color: black;
+}
+
+.tools-separator {
+  width: 1px;
+  height: 24px;
+  margin: 0;
+  border: 0;
+  background: var(--colors-gray-20);
 }

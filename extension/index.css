@@ -94,7 +94,7 @@ button:focus {
 }
 
 input[type="range"] {
-  accent-color: var(--primary-color-light);
+  accent-color: #defe05;
   height: 5px;
 }
 
