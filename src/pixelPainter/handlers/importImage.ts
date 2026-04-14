@@ -1,6 +1,25 @@
 export type ImportImageHandler = ReturnType<typeof createImportImageHandler>;
 
 export const createImportImageHandler = () => {
+  const decodeImageElement = async (
+    blob: Blob,
+  ): Promise<{ image: HTMLImageElement; cleanup: () => void }> => {
+    const objectUrl = URL.createObjectURL(blob);
+    const image = new Image();
+    image.src = objectUrl;
+
+    try {
+      await image.decode();
+      return {
+        image,
+        cleanup: () => URL.revokeObjectURL(objectUrl),
+      };
+    } catch (error) {
+      URL.revokeObjectURL(objectUrl);
+      throw error;
+    }
+  };
+
   const parseBlobToUint8Array = async (
     blob: Blob,
   ): Promise<{
@@ -11,12 +30,30 @@ export const createImportImageHandler = () => {
     const bitmap = await createImageBitmap(blob);
 
     try {
+      let width = bitmap.width;
+      let height = bitmap.height;
+
+      if (width <= 0 || height <= 0) {
+        const { image, cleanup } = await decodeImageElement(blob);
+
+        try {
+          width = image.naturalWidth;
+          height = image.naturalHeight;
+        } finally {
+          cleanup();
+        }
+      }
+
+      if (width <= 0 || height <= 0) {
+        throw new Error("Imported image has invalid dimensions");
+      }
+
       const canvas =
         typeof OffscreenCanvas !== "undefined"
-          ? new OffscreenCanvas(bitmap.width, bitmap.height)
+          ? new OffscreenCanvas(width, height)
           : Object.assign(document.createElement("canvas"), {
-              width: bitmap.width,
-              height: bitmap.height,
+              width,
+              height,
             });
 
       const context = canvas.getContext("2d", {
@@ -29,13 +66,13 @@ export const createImportImageHandler = () => {
 
       context.drawImage(bitmap, 0, 0);
 
-      const { data } = context.getImageData(0, 0, bitmap.width, bitmap.height);
+      const { data } = context.getImageData(0, 0, width, height);
       const buffer = new Uint8Array(data);
 
       return {
         buffer,
-        width: bitmap.width,
-        height: bitmap.height,
+        width,
+        height,
       };
     } catch {
       throw new Error("Error on parsing blob");
