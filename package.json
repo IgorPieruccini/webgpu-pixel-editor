@@ -26,6 +26,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@kittl/ui": "^0.0.1",
+    "@kittl/ui-icons": "^0.0.1",
+    "@kittl/ui-tokens": "^0.0.1",
     "@thisbeyond/solid-dnd": "^0.7.5",
     "jsondiffpatch": "^0.7.3",
     "solid-color": "^0.0.9",

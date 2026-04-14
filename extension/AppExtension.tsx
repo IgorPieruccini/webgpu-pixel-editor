@@ -1,16 +1,23 @@
-import "../src/App.css";
+import "@kittl/ui/Styles";
+import "./app.css";
 import { ProjectConfigProvider } from "../src/projectConfig/projectConfigProvider";
+import { MenuProvider } from "../src/ui/tools/menuProvider";
+import { Layers } from "./ui/Layer/Layers";
+import { ActiveLayer } from "./ui/Layer/ActiveLayer";
 
 function AppExtention() {
   return (
-    <div>
+    <MenuProvider>
       <ProjectConfigProvider>
-        <div>
-          <canvas id="main-canvas" width={572} height={572} />
-          <canvas id="preview-canvas" width={300} height={300} />
+        <div id="editor">
+          <canvas id="main-canvas" width={1024} height={1024} />
+          <div id="layer-container">
+            <Layers />
+            <ActiveLayer />
+          </div>
         </div>
       </ProjectConfigProvider>
-    </div>
+    </MenuProvider>
   );
 }
 
