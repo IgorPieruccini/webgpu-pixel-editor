@@ -6,4 +6,5 @@
   height: 50px;
   justify-content: right;
   align-items: center;
+  gap: 4px;
 }

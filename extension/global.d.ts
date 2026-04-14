@@ -23,6 +23,7 @@ declare module "solid-js" {
       "kittl-icon-sliders": JSX.HTMLAttributes<HTMLElement>;
       "kittl-icon-download": JSX.HTMLAttributes<HTMLElement>;
       "kittl-icon-menu": JSX.HTMLAttributes<HTMLElement>;
+      "kittl-icon-uploads": JSX.HTMLAttributes<HTMLAttributes>;
       "kittl-menu": JSX.HTMLAttributes<HTMLElement> & {
         placement?:
           | "top"

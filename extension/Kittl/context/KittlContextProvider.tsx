@@ -8,9 +8,11 @@ import {
 } from "solid-js";
 import type { CreateKittlAPIType } from "./KittlAPI";
 import { createKittlConfigController } from "./createKittlConfigController";
-import { API, useProject } from "../../../src/lib";
+import { API, useProject, type Layer } from "../../../src/lib";
 import "@kittl/ui/Icons/download";
+import "@kittl/ui/Icons/uploads";
 import "./kittl.css";
+import { generateUUID } from "../../../src/utils";
 
 const initialKittlAPI: CreateKittlAPIType = {
   uploadImage: async () => {
@@ -19,6 +21,9 @@ const initialKittlAPI: CreateKittlAPIType = {
   },
   addImageToCanvas: async () => {
     console.warn("Can't add to canvas, kittlAPI is not ready");
+  },
+  importActiveSegment: async () => {
+    throw new Error("kittlAPI is not ready");
   },
 };
 
@@ -39,10 +44,12 @@ type KittlContextProviderProps = {
 export const KittlContextProvider = ({
   children: providerChildren,
 }: KittlContextProviderProps) => {
-  const controller = createKittlConfigController();
+  const project = useProject();
+  const controller = createKittlConfigController({
+    readImage: (blob) => project.pixel().imageImporter.readImage(blob),
+  });
   const resolvedChildren = children(() => providerChildren);
   const exportApi = API.export();
-  const project = useProject();
 
   const addToCanvas = async () => {
     const blob = await exportApi().getBlob();
@@ -62,6 +69,39 @@ export const KittlContextProvider = ({
 
     if (response.error) {
       console.error(response.error);
+    }
+  };
+
+  const importFromKittl = async () => {
+    const api = controller.api();
+
+    if (!api) {
+      throw new Error("Kittl api not available");
+    }
+
+    const { data, error } = await api.importActiveSegment();
+    if (data) {
+      const { buffer, width, height, name } = data;
+
+      const id = generateUUID();
+
+      const layer: Layer = {
+        id,
+        name: "imported Image",
+        display: true,
+        opacity: 1,
+      };
+
+      project.createNewProject({
+        name,
+        gridSize: { x: width, y: height },
+        layers: [layer],
+        buffers: {
+          [id]: buffer,
+        },
+      });
+    } else {
+      throw error;
     }
   };
 
@@ -85,6 +125,16 @@ export const KittlContextProvider = ({
           onClick={addToCanvas}
         >
           <kittl-icon-download />
+        </kittl-button>
+
+        <kittl-button
+          class="icon-button"
+          variant="primary"
+          size="xs"
+          disabled={!controller.isReady()}
+          onClick={importFromKittl}
+        >
+          <kittl-icon-uploads />
         </kittl-button>
         {resolvedChildren()}
       </KittleContext.Provider>
