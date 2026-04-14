@@ -18,19 +18,37 @@
   justify-content: center;
 }
 
-.brush-thickness-popover {
+.brush-popover {
+  display: none;
   position: absolute;
   left: 0;
   bottom: calc(100% + 12px);
-  display: none;
+}
+
+.brush-popover input {
+  width: 100px;
   padding: 12px 8px;
+}
+
+.brush-popover.open {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 0px 8px 0px 8px;
+
   background-color: var(--color-bg-fill-brand);
   border: 2px solid var(--colors-gray-20);
   border-radius: var(--border-radius-12);
+
+  label {
+    color: black;
+  }
 }
 
-.brush-thickness-popover.open {
+.brush-slide {
   display: flex;
+  align-items: center;
 }
 
 .brush-thickness-input {

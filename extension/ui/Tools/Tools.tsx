@@ -15,7 +15,7 @@ export const Tools = () => {
   const project = useEditor();
   const brush = API.brush();
   const layers = API.layers();
-  const [showBrushThickness, setShowBrushThickness] = createSignal(false);
+  const [showSliders, setSliders] = createSignal(false);
 
   const onBrushChangeThickness = (e: InputEvent) => {
     const target = e.target as HTMLInputElement | null;
@@ -26,22 +26,46 @@ export const Tools = () => {
     brush().setThickness(target.valueAsNumber);
   };
 
+  const onBrushChangeOpacity = (e: InputEvent) => {
+    const target = e.target as HTMLInputElement | null;
+    if (!target) {
+      return;
+    }
+
+    brush().setOpacity(target.valueAsNumber);
+  };
+
   return (
     <div id="tools">
       <div
         classList={{
-          "brush-thickness-popover": true,
-          open: showBrushThickness(),
+          "brush-popover": true,
+          open: showSliders(),
         }}
       >
-        <input
-          class="brush-thickness-input"
-          type="range"
-          min={1}
-          max={100}
-          value={brush().getThickness()}
-          onInput={onBrushChangeThickness}
-        />
+        <div class="brush-slide">
+          <label>thickness:</label>
+          <input
+            class="brush-thickness-input"
+            type="range"
+            min={1}
+            max={100}
+            value={brush().getThickness()}
+            onInput={onBrushChangeThickness}
+          />
+        </div>
+
+        <div class="brush-slide">
+          <label>opacity:</label>
+          <input
+            class="brush-opacity-input"
+            type="range"
+            min={1}
+            max={100}
+            value={brush().getOpacity()}
+            onInput={onBrushChangeOpacity}
+          />
+        </div>
       </div>
 
       <ColorPicker />
@@ -50,10 +74,10 @@ export const Tools = () => {
         variant="ghost"
         class="icon-button tool-btn"
         classList={{
-          active: showBrushThickness(),
+          active: showSliders(),
         }}
         onClick={() => {
-          setShowBrushThickness(!showBrushThickness());
+          setSliders(!showSliders());
         }}
       >
         <kittl-icon-sliders class="icon" />
