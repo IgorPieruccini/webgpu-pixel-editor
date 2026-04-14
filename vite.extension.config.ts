@@ -1,4 +1,3 @@
-import { resolve } from "node:path";
 import { defineConfig } from "vite";
 import solid from "vite-plugin-solid";
 
@@ -14,20 +13,15 @@ const wgslLoader = {
   },
 };
 
-const extensionEntry = () => ({
-  name: "extension-entry",
-  transformIndexHtml(html: string) {
-    return html.replace("/src/index.tsx", "/extension/index.tsx");
-  },
-});
-
 export default defineConfig({
   base: "./",
-  plugins: [solid(), wgslLoader, extensionEntry()],
-  build: {
-    outDir: "dist",
-    rollupOptions: {
-      input: resolve(__dirname, "index.html"),
-    },
+  plugins: [solid(), wgslLoader],
+  resolve: {
+    alias: [
+      {
+        find: /^\/src\/index\.tsx$/,
+        replacement: "/extension/index.tsx",
+      },
+    ],
   },
 });

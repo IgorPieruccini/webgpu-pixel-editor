@@ -26,6 +26,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@kittl/sdk": "^0.0.1",
     "@kittl/ui": "^0.0.3",
     "@kittl/ui-icons": "^0.0.1",
     "@kittl/ui-tokens": "^0.0.1",

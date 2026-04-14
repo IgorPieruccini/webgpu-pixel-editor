@@ -62,6 +62,7 @@ export const INITIAL_PIXEL_PAINTER: PixelPainterMethods = {
   },
   export: {
     image: async () => {},
+    getBlob: async () => new Blob(),
   },
   colorPalette: {
     getColors: () => [],

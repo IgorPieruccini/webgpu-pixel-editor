@@ -120,6 +120,7 @@ export const pixelPainter = async (
     },
     export: {
       image: exportHandler.exportImage,
+      getBlob: exportHandler.getBlob,
     },
     colorPalette: {
       getColors: colorPaletteHandler.getColors,
