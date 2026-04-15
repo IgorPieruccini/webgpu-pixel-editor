@@ -104,10 +104,6 @@ export const createRenderHandler = async (
         throw new Error(`Layer texture with id ${layer.id} not found`);
       }
 
-      // if (renderUI && layer.id === layerHandler.getActive().id) {
-      //   drawPreview(buffer, layer.opacity);
-      // }
-
       if (!layer.display) {
         continue;
       }

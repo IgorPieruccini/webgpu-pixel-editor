@@ -2,6 +2,7 @@ import { createContext, onMount, useContext, type JSX } from "solid-js";
 import { editorContext } from "../editor/editortContext";
 import { useMenu } from "../ui/tools/menuProvider";
 import { storageLocal } from "../storageLocal";
+import { storageDB } from "../storageDB";
 import { DEFAULT_GRID_SIZE } from "../constants";
 import { INITIAL_PIXEL_PAINTER } from "../editor/constant";
 import { createProjectConfigController } from "./createProjectConfigController";
@@ -18,6 +19,7 @@ const initialProjectConfig: ProjectConfigContextType = {
   setProjectGridSize: notImplemented,
   getProjectGridSize: () => DEFAULT_GRID_SIZE,
   createNewProject: notImplemented,
+  deleteProject: async () => undefined,
   getActiveProject: () => null,
   getProjects: () => [],
 };
@@ -39,6 +41,7 @@ export const ProjectConfigProvider = (props: ProjectConfigProviderProps) => {
     canvas: props.canvas,
     canvasId: props.canvasId,
     storage: props.storage ?? storageLocal,
+    storageDB,
     autoLoadActiveProject: props.autoLoadActiveProject ?? true,
     onProjectOpened: () => {
       props.onProjectOpened?.();
@@ -59,6 +62,7 @@ export const ProjectConfigProvider = (props: ProjectConfigProviderProps) => {
         setProjectGridSize: controller.setProjectGridSize,
         getProjectGridSize: controller.getProjectGridSize,
         createNewProject: controller.createNewProject,
+        deleteProject: controller.deleteProject,
         getActiveProject: controller.getActiveProject,
         getProjects: controller.getProjects,
       }}

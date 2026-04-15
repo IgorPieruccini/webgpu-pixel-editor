@@ -56,3 +56,7 @@
   height: 250px;
   border-radius: 10px;
 }
+
+#preview-canvas.preview-canvas-hidden {
+  display: none;
+}

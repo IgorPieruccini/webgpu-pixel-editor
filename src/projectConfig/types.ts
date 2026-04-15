@@ -9,6 +9,7 @@ export type ProjectConfigStorage = {
   setActiveProject: (project: ProjectType) => void;
   getProjects: () => ProjectType[];
   addProject: (project: ProjectType) => void;
+  deleteProject: (projectName: string) => void;
 };
 
 export type ProjectConfigContextType = {
@@ -17,6 +18,7 @@ export type ProjectConfigContextType = {
   setProjectGridSize: Setter<Vec2>;
   getProjectGridSize: Accessor<Vec2>;
   createNewProject: (project: ProjectType & Partial<LoadedProject>) => void;
+  deleteProject: (projectName: string) => Promise<void>;
   pixel: Accessor<PixelPainterMethods>;
   getActiveProject: () => ProjectType | null;
   getProjects: () => ProjectType[];
@@ -31,6 +33,9 @@ export type CreateProjectConfigControllerOptions = {
   canvas?: HTMLCanvasElement;
   canvasId?: string;
   storage?: ProjectConfigStorage;
+  storageDB?: {
+    delete: (projectName: string) => Promise<void>;
+  };
   onProjectOpened?: () => void;
   autoLoadActiveProject?: boolean;
   initialProjectName?: string;

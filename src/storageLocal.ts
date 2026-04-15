@@ -30,6 +30,10 @@ const setActiveProject = (project: ProjectType) => {
   window.localStorage.setItem("active_project", JSON.stringify(project));
 };
 
+const clearActiveProject = () => {
+  window.localStorage.removeItem("active_project");
+};
+
 const getActiveProject = () => {
   return window.localStorage.getItem("active_project");
 };
@@ -58,13 +62,31 @@ const addProject = (project: ProjectType) => {
   }
 };
 
+const deleteProject = (projectName: string) => {
+  const projects = getProjects().filter((project) => project.name !== projectName);
+  setProjects(projects);
+  window.localStorage.removeItem(`${projectName}-layers`);
+
+  const activeProject = getActiveProject();
+  if (!activeProject) {
+    return;
+  }
+
+  const parsedActiveProject = JSON.parse(activeProject) as ProjectType;
+  if (parsedActiveProject.name === projectName) {
+    clearActiveProject();
+  }
+};
+
 export const storageLocal = {
   getLayers,
   saveLayers,
   createLayers,
   setActiveProject,
+  clearActiveProject,
   getActiveProject,
   getProjects,
   setProjects,
   addProject,
+  deleteProject,
 };

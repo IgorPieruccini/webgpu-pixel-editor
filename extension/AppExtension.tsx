@@ -16,12 +16,13 @@ import { EmptyProject } from "./ui/EmptyProject/EmptyProject";
 
 const ExtensionContent = () => {
   const projects = useProject();
+  const hasProjects = () => projects.getProjects().length !== 0;
 
   return (
     <div id="editor" data-theme="dark">
       <div id="menu">
         <Menu />
-        <Show when={projects.getProjects().length !== 0}>
+        <Show when={hasProjects()}>
           <p>
             <strong>{`${projects.projectName()}`}</strong> -{" "}
             {`${projects.getProjectGridSize().x}`} x
@@ -30,15 +31,22 @@ const ExtensionContent = () => {
         </Show>
         <KittlContextProvider />
       </div>
-      <Show when={projects.getProjects().length === 0}>
+      <Show when={!hasProjects()}>
         <EmptyProject />
       </Show>
-      <canvas id="main-canvas" width={1024} height={1024} />
+      <canvas
+        id="main-canvas"
+        width={1024}
+        height={1024}
+        classList={{
+          "empty-project-canvas": !hasProjects(),
+        }}
+      />
       <div id="bottom-container">
-        <Show when={projects.getProjects().length !== 0}>
+        <Show when={hasProjects()}>
           <Tools />
+          <Layers />
         </Show>
-        <Layers />
         <ActiveLayer />
       </div>
       <kittl-toast id="extension-error-toast" duration={4000} />

@@ -34,7 +34,7 @@ export const createKittlAPI = () => {
         const firstObject = nodeIds[0];
         const obj = await kittl.design.object.getObject({ id: firstObject });
 
-        //@ts-expect-error - objectName exist but the type is narrowing down by type, let's suppress this for now
+        //@ts-expect-error - objectName exist but the type is narrowing down by type, let's suppress this for
         const objectName = obj.result.name;
         //@ts-expect-error - objectName exist but the type is narrowing down by type, let's suppress this for now
         const objectDefaultName = obj.result.defaultName;

@@ -1,4 +1,3 @@
-
 export const webGPUSetup = async (
   canvasToUse: string | HTMLCanvasElement,
   alphaMode: GPUCanvasAlphaMode = "premultiplied",
@@ -19,9 +18,10 @@ export const webGPUSetup = async (
 
   //configure the canvas to be used with the device
   // you just created.
-  const canvas = typeof canvasToUse === 'string' ?
-    document.querySelector<HTMLCanvasElement>("#" + canvasToUse) :
-    canvasToUse
+  const canvas =
+    typeof canvasToUse === "string"
+      ? document.querySelector<HTMLCanvasElement>("#" + canvasToUse)
+      : canvasToUse;
 
   if (!canvas) {
     throw new Error("main canvas not found in the DOM");

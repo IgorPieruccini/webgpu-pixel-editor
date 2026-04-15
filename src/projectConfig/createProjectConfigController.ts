@@ -73,10 +73,33 @@ export const createProjectConfigController = (
       });
   };
 
+  const deleteProject = async (projectName: string) => {
+    options.storage?.deleteProject(projectName);
+    const nextProjects = options.storage?.getProjects() ?? [];
+    const storedActiveProject = parseActiveProject(
+      options.storage?.getActiveProject() ?? null,
+    );
+    const nextProject = storedActiveProject ?? nextProjects[0] ?? null;
+
+    setProjects(nextProjects);
+    setActiveProject(nextProject);
+
+    if (nextProject) {
+      createOrOpenProject(nextProject);
+    } else {
+      setProjectName(options.initialProjectName ?? "new-project");
+      setProjectGridSize(options.initialGridSize ?? DEFAULT_GRID_SIZE);
+    }
+
+    await options.storageDB?.delete(projectName);
+  };
+
   const mount = async () => {
     const result = await initializeEditor(initializeEditorOptions);
     setProject(result);
-    setActiveProject(parseActiveProject(options.storage?.getActiveProject() ?? null));
+    setActiveProject(
+      parseActiveProject(options.storage?.getActiveProject() ?? null),
+    );
     setProjects(options.storage?.getProjects() ?? []);
 
     if (!options.autoLoadActiveProject || !options.storage) {
@@ -115,6 +138,7 @@ export const createProjectConfigController = (
     setProjectGridSize,
     getProjectGridSize,
     createNewProject: createOrOpenProject,
+    deleteProject,
     project,
     getActiveProject,
     getProjects,

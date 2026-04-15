@@ -3,6 +3,7 @@ import "@kittl/ui/Input";
 import "@kittl/ui/Menu";
 import "@kittl/ui/MenuItem";
 import "@kittl/ui/Icons/menu";
+import "@kittl/ui/Icons/trash";
 import { createSignal } from "solid-js";
 import {
   DEFAULT_GRID_SIZE,
@@ -60,6 +61,13 @@ export const Menu = () => {
 
   const onOpenProject = (project: ProjectType) => {
     projectConfig.createNewProject(project);
+  };
+
+  const onDeleteProject = async (event: MouseEvent, projectName: string) => {
+    event.stopPropagation();
+    event.preventDefault();
+    await projectConfig.deleteProject(projectName);
+    loadProjects();
   };
 
   const openCreateProjectPanel = () => {
@@ -135,7 +143,16 @@ export const Menu = () => {
         ) : (
           projects().map((project) => (
             <kittl-menu-item onClick={() => onOpenProject(project)}>
-              {project.name}
+              <div class="menu-project-item">
+                <span>{project.name}</span>
+                <kittl-button
+                  class="menu-project-delete"
+                  size="xs"
+                  onClick={(event) => void onDeleteProject(event, project.name)}
+                >
+                  <kittl-icon-trash />
+                </kittl-button>
+              </div>
             </kittl-menu-item>
           ))
         )}

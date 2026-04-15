@@ -12,11 +12,28 @@ function openDB(name: string): Promise<IDBDatabase> {
 
     request.onsuccess = (event) => {
       const db = (event.target as IDBOpenDBRequest).result;
+      db.onversionchange = () => {
+        db.close();
+      };
       resolve(db);
     };
 
     request.onerror = (event) => {
       reject((event.target as IDBOpenDBRequest).error);
+    };
+  });
+}
+
+function deleteDB(name: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.deleteDatabase(name);
+
+    request.onsuccess = () => resolve();
+    request.onerror = (event) => {
+      reject((event.target as IDBOpenDBRequest).error);
+    };
+    request.onblocked = () => {
+      reject(new Error(`Deletion of IndexedDB database "${name}" is blocked`));
     };
   });
 }
@@ -54,4 +71,8 @@ export const localDataBase = async (name: string) => {
     save,
     load,
   };
+};
+
+export const storageDB = {
+  delete: deleteDB,
 };

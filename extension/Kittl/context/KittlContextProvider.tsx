@@ -20,7 +20,6 @@ import {
   showSuccessfulToast,
   toastError,
 } from "../../ui/toast/errorToast";
-import { EmptyProject } from "../../ui/EmptyProject/EmptyProject";
 
 const initialKittlAPI: CreateKittlAPIType = {
   uploadImage: async () => {
