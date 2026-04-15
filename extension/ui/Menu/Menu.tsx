@@ -3,7 +3,7 @@ import "@kittl/ui/Input";
 import "@kittl/ui/Menu";
 import "@kittl/ui/MenuItem";
 import "@kittl/ui/Icons/menu";
-import { createSignal } from "solid-js";
+import { createMemo, createSignal } from "solid-js";
 import {
   DEFAULT_GRID_SIZE,
   FILE_FORMAT,
@@ -32,6 +32,11 @@ export const Menu = () => {
   );
   const projectConfig = useProjectConfig();
   const project = useProject();
+
+  const activeProject = createMemo(() => {
+    return project.getActiveProject();
+  }, false);
+
   const layerAPI = API.layers();
 
   const loadProjects = () => {
@@ -139,12 +144,16 @@ export const Menu = () => {
           ))
         )}
 
+        <p>{project.projectName()}</p>
         <div class="menu-divider" />
         <div class="menu-section-title">Actions</div>
         <kittl-menu-item onClick={openCreateProjectPanel}>
           New project
         </kittl-menu-item>
-        <kittl-menu-item onClick={exportProject}>
+        <kittl-menu-item
+          disabled={activeProject() === null}
+          onClick={exportProject}
+        >
           Export project
         </kittl-menu-item>
         <kittl-menu-item onClick={importProject}>

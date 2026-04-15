@@ -18,6 +18,7 @@ const initialProjectConfig: ProjectConfigContextType = {
   setProjectGridSize: notImplemented,
   getProjectGridSize: () => DEFAULT_GRID_SIZE,
   createNewProject: notImplemented,
+  getActiveProject: () => null,
 };
 
 const ProjectConfigContext = createContext(initialProjectConfig);
@@ -57,6 +58,7 @@ export const ProjectConfigProvider = (props: ProjectConfigProviderProps) => {
         setProjectGridSize: controller.setProjectGridSize,
         getProjectGridSize: controller.getProjectGridSize,
         createNewProject: controller.createNewProject,
+        getActiveProject: controller.getActiveProject,
       }}
     >
       <editorContext.Provider value={controller.project}>
@@ -96,15 +98,9 @@ const getColorPalette = () => {
   return () => context.pixel().colorPalette;
 };
 
-const getImageImporter = () => {
-  const context = useContext(ProjectConfigContext);
-  return () => context.pixel().imageImporter;
-};
-
 export const API = {
   layers: getLayers,
   brush: getBrush,
   export: getExport,
   colorPalette: getColorPalette,
-  imageImporter: getImageImporter,
 };

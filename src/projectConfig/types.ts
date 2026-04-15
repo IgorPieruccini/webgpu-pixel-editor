@@ -17,6 +17,7 @@ export type ProjectConfigContextType = {
   getProjectGridSize: Accessor<Vec2>;
   createNewProject: (project: ProjectType & Partial<LoadedProject>) => void;
   pixel: Accessor<PixelPainterMethods>;
+  getActiveProject: () => ProjectType | null;
 };
 
 export type ProjectConfigController = ProjectConfigContextType & {

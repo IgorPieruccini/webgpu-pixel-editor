@@ -82,6 +82,14 @@ export const createProjectConfigController = (
     createOrOpenProject(parsedActiveProject);
   };
 
+  const getActiveProject = (): ProjectType | null => {
+    const activeProjectJson = options.storage?.getActiveProject();
+    if (!activeProjectJson) {
+      return null;
+    }
+    return JSON.parse(activeProjectJson);
+  };
+
   return {
     pixel,
     projectName,
@@ -91,5 +99,6 @@ export const createProjectConfigController = (
     createNewProject: createOrOpenProject,
     project,
     mount,
+    getActiveProject,
   };
 };
