@@ -1,4 +1,3 @@
-
 import type { Vec2 } from "../../editor/types";
 import { createVertexBuffer } from "../createBufferLayout";
 import { createPipeline, createTexturePipeline } from "../createPipeline";
@@ -21,12 +20,13 @@ export const createRenderHandler = async (
 
   const setRenderUI = (value: boolean) => {
     renderUI = value;
-  }
+  };
 
   const pixelBindTextureMap = new Map<string, BindPixelTexture>();
 
-  const { device, canvasFormat, context } = await webGPUSetup(canvas ?? "main-canvas");
-
+  const { device, canvasFormat, context } = await webGPUSetup(
+    canvas ?? "main-canvas",
+  );
 
   const { vertices, vertexBuffer, vertexBufferLayout } =
     createVertexBuffer(device);
@@ -74,7 +74,9 @@ export const createRenderHandler = async (
           view: context.getCurrentTexture().createView(),
           loadOp: "clear",
           storeOp: "store",
-          clearValue: { r: 0.08, g: 0.08, b: 0.08, a: 0 },
+          clearValue: renderUI
+            ? { r: 0.08, g: 0.08, b: 0.08, a: 0 }
+            : { r: 0, g: 0, b: 0, a: 0 },
         },
       ],
     });
@@ -131,7 +133,6 @@ export const createRenderHandler = async (
         uniformBufferHandler.uiUniforms,
       );
       pass.draw(vertices.length / 2, gridSize.x * gridSize.y);
-
     }
 
     pass.end();
@@ -143,6 +144,6 @@ export const createRenderHandler = async (
     draw,
     addLayerTexture,
     removeLayerTexture,
-    setRenderUI
+    setRenderUI,
   };
 };

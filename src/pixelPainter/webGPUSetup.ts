@@ -1,5 +1,8 @@
 
-export const webGPUSetup = async (canvasToUse: string | HTMLCanvasElement) => {
+export const webGPUSetup = async (
+  canvasToUse: string | HTMLCanvasElement,
+  alphaMode: GPUCanvasAlphaMode = "premultiplied",
+) => {
   const navigator = window.navigator;
 
   // adapter is as WebGPU's representation of a specific
@@ -35,6 +38,7 @@ export const webGPUSetup = async (canvasToUse: string | HTMLCanvasElement) => {
   context.configure({
     device: device,
     format: canvasFormat,
+    alphaMode,
   });
 
   return {
