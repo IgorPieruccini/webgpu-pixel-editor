@@ -90,6 +90,14 @@ export const createProjectConfigController = (
     return JSON.parse(activeProjectJson);
   };
 
+  const getProjects = () => {
+    const projects = options.storage?.getProjects();
+    if (projects === undefined) {
+      return [];
+    }
+    return projects;
+  };
+
   return {
     pixel,
     projectName,
@@ -98,7 +106,8 @@ export const createProjectConfigController = (
     getProjectGridSize,
     createNewProject: createOrOpenProject,
     project,
-    mount,
     getActiveProject,
+    getProjects,
+    mount,
   };
 };

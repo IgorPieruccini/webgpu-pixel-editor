@@ -19,6 +19,7 @@ const initialProjectConfig: ProjectConfigContextType = {
   getProjectGridSize: () => DEFAULT_GRID_SIZE,
   createNewProject: notImplemented,
   getActiveProject: () => null,
+  getProjects: () => [],
 };
 
 const ProjectConfigContext = createContext(initialProjectConfig);
@@ -59,6 +60,7 @@ export const ProjectConfigProvider = (props: ProjectConfigProviderProps) => {
         getProjectGridSize: controller.getProjectGridSize,
         createNewProject: controller.createNewProject,
         getActiveProject: controller.getActiveProject,
+        getProjects: controller.getProjects,
       }}
     >
       <editorContext.Provider value={controller.project}>

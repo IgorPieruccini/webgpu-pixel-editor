@@ -7,6 +7,7 @@ import type { LoadedProject } from "../serialization/project";
 export type ProjectConfigStorage = {
   getActiveProject: () => string | null;
   setActiveProject: (project: ProjectType) => void;
+  getProjects: () => ProjectType[];
   addProject: (project: ProjectType) => void;
 };
 
@@ -18,6 +19,7 @@ export type ProjectConfigContextType = {
   createNewProject: (project: ProjectType & Partial<LoadedProject>) => void;
   pixel: Accessor<PixelPainterMethods>;
   getActiveProject: () => ProjectType | null;
+  getProjects: () => ProjectType[];
 };
 
 export type ProjectConfigController = ProjectConfigContextType & {
