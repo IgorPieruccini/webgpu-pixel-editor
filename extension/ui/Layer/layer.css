@@ -11,6 +11,9 @@
   flex: 1;
   display: flex;
   min-height: 250px;
+  justify-content: start;
+  align-items: center;
+  flex-direction: column;
 }
 
 #layer-slider {
@@ -51,12 +54,14 @@
   flex: 0 0 auto;
 }
 
-#preview-canvas {
-  width: 250px;
-  height: 250px;
-  border-radius: 10px;
+.preview-canvas-hidden {
+  display: none;
 }
 
-#preview-canvas.preview-canvas-hidden {
-  display: none;
+.layer-opacity-input {
+  margin: 5px;
+}
+
+.opacity-slide {
+  padding: 0px 0px 5px 0px;
 }

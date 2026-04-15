@@ -1,10 +1,10 @@
 {
   "$schema": "https://api.kittl.com/extensions/manifest/schema.json",
-  "displayName": "Pixel Editor",
+  "displayName": "Kixel Editor",
   "icon": "icon.svg",
-  "tagline": "Pixel Editor for Kittl.",
+  "tagline": "Kixel Editor for Kittl.",
   "installPage": {
-    "description": "Install Pixel Editor to use this extension in Kittl.",
+    "description": "Install Kixel Editor to use this extension in Kittl.",
     "coverImage": "icon.svg",
     "termsAndConditionsLink": "https://example.com/terms",
     "privacyPolicyLink": "https://example.com/privacy"
