@@ -18,11 +18,25 @@ import type {
 export const createProjectConfigController = (
   options: CreateProjectConfigControllerOptions = {},
 ): ProjectConfigController => {
+  const parseActiveProject = (activeProjectJson: string | null) => {
+    if (!activeProjectJson) {
+      return null;
+    }
+
+    return JSON.parse(activeProjectJson) as ProjectType;
+  };
+
   const [projectName, setProjectName] = createSignal(
     options.initialProjectName ?? "new-project",
   );
   const [getProjectGridSize, setProjectGridSize] = createSignal(
     options.initialGridSize ?? DEFAULT_GRID_SIZE,
+  );
+  const [activeProject, setActiveProject] = createSignal<ProjectType | null>(
+    parseActiveProject(options.storage?.getActiveProject() ?? null),
+  );
+  const [projects, setProjects] = createSignal<ProjectType[]>(
+    options.storage?.getProjects() ?? [],
   );
   const [project, setProject] = createSignal<EditorType>(editorInitialValue);
   const [pixel, setPixel] = createSignal<PixelPainterMethods>(
@@ -50,6 +64,8 @@ export const createProjectConfigController = (
         setProjectGridSize(gridSize);
         options.storage?.setActiveProject({ name, gridSize });
         options.storage?.addProject({ name, gridSize });
+        setActiveProject({ name, gridSize });
+        setProjects(options.storage?.getProjects() ?? []);
 
         if (layers && buffers) {
           value.layer.load(layers, buffers);
@@ -60,17 +76,19 @@ export const createProjectConfigController = (
   const mount = async () => {
     const result = await initializeEditor(initializeEditorOptions);
     setProject(result);
+    setActiveProject(parseActiveProject(options.storage?.getActiveProject() ?? null));
+    setProjects(options.storage?.getProjects() ?? []);
 
     if (!options.autoLoadActiveProject || !options.storage) {
       return;
     }
 
-    const activeProject = options.storage.getActiveProject();
-    if (!activeProject) {
+    const storedActiveProject = options.storage.getActiveProject();
+    if (!storedActiveProject) {
       return;
     }
 
-    const parsedActiveProject: ProjectType = JSON.parse(activeProject);
+    const parsedActiveProject: ProjectType = JSON.parse(storedActiveProject);
 
     if (!parsedActiveProject.name || !parsedActiveProject.gridSize) {
       throw new Error(
@@ -83,19 +101,11 @@ export const createProjectConfigController = (
   };
 
   const getActiveProject = (): ProjectType | null => {
-    const activeProjectJson = options.storage?.getActiveProject();
-    if (!activeProjectJson) {
-      return null;
-    }
-    return JSON.parse(activeProjectJson);
+    return activeProject();
   };
 
   const getProjects = () => {
-    const projects = options.storage?.getProjects();
-    if (projects === undefined) {
-      return [];
-    }
-    return projects;
+    return projects();
   };
 
   return {

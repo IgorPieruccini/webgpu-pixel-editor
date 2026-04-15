@@ -23,11 +23,12 @@
   align-items: center;
   justify-content: center;
   vertical-align: middle;
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   margin: 0 4px;
   border-radius: 8px;
   background: #fff;
   color: #111;
   box-shadow: 0 2px 8px rgb(0 0 0 / 0.15);
+  font-size: 16px;
 }

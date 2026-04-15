@@ -1,7 +1,9 @@
 import {
   children,
   createContext,
+  createMemo,
   onMount,
+  Show,
   useContext,
   type Accessor,
   type JSX,
@@ -18,6 +20,7 @@ import {
   showSuccessfulToast,
   toastError,
 } from "../../ui/toast/errorToast";
+import { EmptyProject } from "../../ui/EmptyProject/EmptyProject";
 
 const initialKittlAPI: CreateKittlAPIType = {
   uploadImage: async () => {
@@ -52,6 +55,10 @@ export const KittlContextProvider = ({
   const controller = createKittlConfigController();
   const resolvedChildren = children(() => providerChildren);
   const exportApi = API.export();
+  const projects = useProject();
+  const showEmptyProject = createMemo(() => {
+    return projects.getProjects().length === 0;
+  });
 
   const addToCanvas = async () => {
     const blob = await exportApi().getBlob();
@@ -123,20 +130,22 @@ export const KittlContextProvider = ({
           isReady: controller.isReady,
         }}
       >
-        <kittl-button
-          class="icon-button"
-          variant="primary"
-          size="xs"
-          disabled={!controller.isReady()}
-          onClick={addToCanvas}
-        >
-          <kittl-icon-download />
-        </kittl-button>
+        <Show when={!showEmptyProject()}>
+          <kittl-button
+            class="icon-button"
+            variant="primary"
+            size="s"
+            disabled={!controller.isReady()}
+            onClick={addToCanvas}
+          >
+            <kittl-icon-download />
+          </kittl-button>
+        </Show>
 
         <kittl-button
           class="icon-button"
           variant="primary"
-          size="xs"
+          size="s"
           disabled={!controller.isReady()}
           onClick={importFromKittl}
         >

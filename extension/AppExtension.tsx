@@ -1,7 +1,7 @@
 import "@kittl/ui/Styles";
 import "@kittl/ui/Toast";
 import "./app.css";
-import { createMemo, Show } from "solid-js";
+import { Show } from "solid-js";
 import {
   ProjectConfigProvider,
   useProject,
@@ -16,9 +16,6 @@ import { EmptyProject } from "./ui/EmptyProject/EmptyProject";
 
 const ExtensionContent = () => {
   const projects = useProject();
-  const showEmptyProject = createMemo(() => {
-    return projects.getProjects().length === 0;
-  });
 
   return (
     <div id="editor" data-theme="dark">
@@ -26,12 +23,14 @@ const ExtensionContent = () => {
         <Menu />
         <KittlContextProvider />
       </div>
-      <Show when={showEmptyProject()}>
+      <Show when={projects.getProjects().length === 0}>
         <EmptyProject />
       </Show>
       <canvas id="main-canvas" width={1024} height={1024} />
       <div id="bottom-container">
-        <Tools />
+        <Show when={projects.getProjects().length !== 0}>
+          <Tools />
+        </Show>
         <Layers />
         <ActiveLayer />
       </div>
