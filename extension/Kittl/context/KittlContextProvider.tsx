@@ -49,9 +49,7 @@ export const KittlContextProvider = ({
   children: providerChildren,
 }: KittlContextProviderProps) => {
   const project = useProject();
-  const controller = createKittlConfigController({
-    readImage: (blob) => project.pixel().imageImporter.readImage(blob),
-  });
+  const controller = createKittlConfigController();
   const resolvedChildren = children(() => providerChildren);
   const exportApi = API.export();
 

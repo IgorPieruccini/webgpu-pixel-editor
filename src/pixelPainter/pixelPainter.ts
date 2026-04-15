@@ -10,7 +10,6 @@ import { createLayerPreview } from "./layerPreview";
 import { LAYER_PREVIEW_SIZE } from "../constants";
 import { calculateZoomFromGridAndCanvasSize } from "../utils";
 import { createColorPaletteHandler } from "./handlers/colorPaletteHandler";
-import { createImportImageHandler } from "./handlers/importImage";
 
 export const pixelPainter = async (
   projectName: string,
@@ -64,8 +63,6 @@ export const pixelPainter = async (
     gridSize,
     layerHandler,
   );
-
-  const importImageHandler = createImportImageHandler();
 
   middlewareHandler.loadTextureLayers();
   historyChangeHandler.addSnapshot();
@@ -128,9 +125,6 @@ export const pixelPainter = async (
     colorPalette: {
       getColors: colorPaletteHandler.getColors,
       isLoading: colorPaletteHandler.isLoadingColors,
-    },
-    imageImporter: {
-      readImage: importImageHandler.parseBlobToUint8Array,
     },
   };
 };

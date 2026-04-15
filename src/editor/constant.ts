@@ -68,11 +68,4 @@ export const INITIAL_PIXEL_PAINTER: PixelPainterMethods = {
     getColors: () => [],
     isLoading: false,
   },
-  imageImporter: {
-    readImage: async () => ({
-      buffer: new Uint8Array(new ArrayBuffer(0)),
-      width: 0,
-      height: 0,
-    }),
-  },
 };

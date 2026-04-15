@@ -1,16 +1,11 @@
 import { kittl } from "@kittl/sdk";
-import type { PixelPainterMethods, Vec2 } from "../../../src/lib";
 import { toastError } from "../../ui/toast/errorToast";
-
-type ReadImage = PixelPainterMethods["imageImporter"]["readImage"];
+import { parseBlobToUint8Array } from "../../../src/pixelPainter/utils";
+import type { Vec2 } from "../../../src/lib";
 
 export type CreateKittlAPIType = ReturnType<typeof createKittlAPI>;
-export type ImportedActiveSegment = Awaited<ReturnType<ReadImage>>;
-export type ImportActiveSegmentResult =
-  | { data: ImportedActiveSegment & { name: string }; error: null }
-  | { data: null; error: unknown };
 
-export const createKittlAPI = (readImage: ReadImage) => {
+export const createKittlAPI = () => {
   const uploadImage = async (blob: Blob) => {
     const uploadResult = await kittl.upload.image.upload({ blob });
     return uploadResult;
@@ -70,7 +65,7 @@ export const createKittlAPI = (readImage: ReadImage) => {
 
         if (blobResult.isOk) {
           if (blobResult.result) {
-            const { width, height, buffer } = await readImage(
+            const { width, height, buffer } = await parseBlobToUint8Array(
               blobResult.result,
             );
 
@@ -98,13 +93,13 @@ export const createKittlAPI = (readImage: ReadImage) => {
       return {
         data: null,
         error,
-      } satisfies ImportActiveSegmentResult;
+      };
     }
 
     return {
       data: null,
       error: new Error("No active segment available to import"),
-    } satisfies ImportActiveSegmentResult;
+    };
   };
 
   return {
