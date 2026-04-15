@@ -5,6 +5,7 @@
   flex-direction: column;
   box-sizing: border-box;
   overflow: hidden;
+  position: relative;
 }
 
 #editor #main-canvas {

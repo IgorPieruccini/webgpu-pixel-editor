@@ -144,7 +144,6 @@ export const Menu = () => {
           ))
         )}
 
-        <p>{project.projectName()}</p>
         <div class="menu-divider" />
         <div class="menu-section-title">Actions</div>
         <kittl-menu-item onClick={openCreateProjectPanel}>
