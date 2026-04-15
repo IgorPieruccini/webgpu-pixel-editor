@@ -8,11 +8,11 @@ import {
 } from "../../../projectConfig/projectConfigProvider";
 import { generateUUID } from "../../../utils";
 import type { Layer } from "../../../lib";
+import { parseBlobToUint8Array } from "../../../pixelPainter/utils";
 
 export const ProjectTool = () => {
   const project = useProjectConfig();
   const layerAPI = API.layers();
-  const imageImporter = API.imageImporter();
 
   const onDownloadProject = () => {
     const serializeProject = serialization.project.serialize(
@@ -54,7 +54,7 @@ export const ProjectTool = () => {
       if (!file) return;
       const name = file.name;
 
-      const { buffer, width, height } = await imageImporter().readImage(file);
+      const { buffer, width, height } = await parseBlobToUint8Array(file);
 
       const id = generateUUID();
 

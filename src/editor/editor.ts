@@ -20,6 +20,20 @@ export type InitializeEditorOptions = {
 export const initializeEditor = async (
   options: InitializeEditorOptions = {},
 ) => {
+  const normalizeWheelDelta = (event: WheelEvent) => {
+    const LINE_HEIGHT = 16;
+    const PAGE_HEIGHT = window.innerHeight;
+
+    switch (event.deltaMode) {
+      case WheelEvent.DOM_DELTA_LINE:
+        return event.deltaY * LINE_HEIGHT;
+      case WheelEvent.DOM_DELTA_PAGE:
+        return event.deltaY * PAGE_HEIGHT;
+      default:
+        return event.deltaY;
+    }
+  };
+
   let pressingSpace = false;
   let isLeftMouseDown = false;
 
@@ -249,15 +263,11 @@ export const initializeEditor = async (
     const oldZoom = pixel.render.getZoom();
     const mouseX = e.clientX - viewport.left - viewport.width / 2;
     const mouseY = -(e.clientY - viewport.top - viewport.height / 2);
+    const delta = normalizeWheelDelta(e);
+    const zoomFactor = Math.exp(-delta * ZOOM_SENSITIVITY);
+    const newZoom = oldZoom * zoomFactor;
 
-    if (e.deltaY > 0) {
-      pixel.render.setZoom(oldZoom / ZOOM_SENSITIVITY);
-    } else {
-      pixel.render.setZoom(oldZoom * ZOOM_SENSITIVITY);
-    }
-
-    const newZoom = pixel.render.getZoom();
-    const zoomFactor = newZoom / oldZoom;
+    pixel.render.setZoom(newZoom);
 
     // Adjust pan so zoom centers on mouse
     const gridRatio = gridSize.x / gridSize.y;
