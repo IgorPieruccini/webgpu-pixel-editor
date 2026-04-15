@@ -27,16 +27,42 @@ export const createKittlAPI = (readImage: ReadImage) => {
     try {
       const response = await kittl.state.getSelectedObjectsIds();
       if (response.isOk) {
-        const id = response.result[0];
+        const nodeIds = response.result;
+
+        if (nodeIds.length === 0) {
+          throw "An element needs to be selected";
+        }
+
+        const firstObject = nodeIds[0];
+        const obj = await kittl.design.object.getObject({ id: firstObject });
+
+        //@ts-expect-error - objectName exist but the type is narrowing down by type, let's suppress this for now
+        const objectName = obj.result.name;
+        //@ts-expect-error - objectName exist but the type is narrowing down by type, let's suppress this for now
+        const objectDefaultName = obj.result.defaultName;
+
+        const name = objectName ?? objectDefaultName ?? "new project";
+
+        let width = 0;
+        let height = 0;
+
+        if (obj.result?.type === "illustrationImage") {
+          width = obj.result.width;
+          height = obj.result.height;
+        }
+
+        const hasDimensions = width > 0 && height > 0;
+
+        const dimensions = hasDimensions
+          ? { target: { width, height } }
+          : { multiplier: 1 };
 
         const blobResult = await kittl.design.canvas.getExport({
           format: "png",
           target: {
-            nodeIds: [id],
+            nodeIds,
           },
-          dimensions: {
-            multiplier: 1,
-          },
+          dimensions,
         });
 
         if (blobResult.isOk) {
@@ -45,8 +71,10 @@ export const createKittlAPI = (readImage: ReadImage) => {
               blobResult.result,
             );
 
+            console.log({ width, height });
+
             return {
-              data: { width, height, buffer, name: id },
+              data: { width, height, buffer, name: name },
               error: null,
             };
           }
