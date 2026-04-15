@@ -21,6 +21,13 @@ const ExtensionContent = () => {
     <div id="editor" data-theme="dark">
       <div id="menu">
         <Menu />
+        <Show when={projects.getProjects().length !== 0}>
+          <p>
+            <strong>{`${projects.projectName()}`}</strong> -{" "}
+            {`${projects.getProjectGridSize().x}`} x
+            {`${projects.getProjectGridSize().y}`}
+          </p>
+        </Show>
         <KittlContextProvider />
       </div>
       <Show when={projects.getProjects().length === 0}>
