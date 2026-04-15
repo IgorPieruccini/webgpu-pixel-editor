@@ -1,7 +1,10 @@
-import { API, useProjectConfig } from "../../projectConfig/projectConfigProvider";
+import {
+  API,
+  useProjectConfig,
+} from "../../projectConfig/projectConfigProvider";
 import { LayerOpacity } from "./LayerOpacity/LayerOpacity";
 import { Layers } from "./Layers/Layers";
-import { AiOutlineExport } from 'solid-icons/ai'
+import { AiOutlineExport } from "solid-icons/ai";
 import "./rightPanel.css";
 
 export const RightPanel = () => {
@@ -14,8 +17,8 @@ export const RightPanel = () => {
   }
 
   const onExport = () => {
-    exportHandler().image();
-  }
+    exportHandler().image(1);
+  };
 
   return (
     <div id="right-panel">
@@ -25,7 +28,9 @@ export const RightPanel = () => {
           <span>
             {`${projectConfig.getProjectGridSize().x} x ${projectConfig.getProjectGridSize().y}`}
           </span>
-          <button onClick={onExport} id="export"><AiOutlineExport /></button>
+          <button onClick={onExport} id="export">
+            <AiOutlineExport />
+          </button>
         </span>
       </div>
       <hr />

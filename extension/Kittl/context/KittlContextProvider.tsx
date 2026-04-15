@@ -77,7 +77,14 @@ export const KittlContextProvider = ({
 
     if (response.isOk) {
       const objectName = response.result[0].objectName;
-      await api.addImageToCanvas(objectName, project.getProjectGridSize());
+      const projectSize = project.getProjectGridSize();
+
+      const size = {
+        x: projectSize.x * multiplier,
+        y: projectSize.y * multiplier,
+      };
+
+      await api.addImageToCanvas(objectName, size);
       showSuccessfulToast("The image has been exported to canvas");
     }
 
