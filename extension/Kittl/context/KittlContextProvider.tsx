@@ -13,7 +13,11 @@ import "@kittl/ui/Icons/download";
 import "@kittl/ui/Icons/uploads";
 import "./kittl.css";
 import { generateUUID } from "../../../src/utils";
-import { showErrorToast, toastError } from "../../ui/toast/errorToast";
+import {
+  showErrorToast,
+  showSuccessfulToast,
+  toastError,
+} from "../../ui/toast/errorToast";
 
 const initialKittlAPI: CreateKittlAPIType = {
   uploadImage: async () => {
@@ -65,6 +69,7 @@ export const KittlContextProvider = ({
     if (response.isOk) {
       const objectName = response.result[0].objectName;
       await api.addImageToCanvas(objectName, project.getProjectGridSize());
+      showSuccessfulToast("The image has been exported to canvas");
     }
 
     if (response.error) {
@@ -101,6 +106,8 @@ export const KittlContextProvider = ({
           [id]: buffer,
         },
       });
+
+      showSuccessfulToast("New project created from selected elements");
     } else {
       throw toastError(error, "Failed to import active Kittl segment");
     }

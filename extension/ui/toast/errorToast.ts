@@ -46,10 +46,24 @@ export const showErrorToast = (
   toast.show();
 };
 
+export const showSuccessfulToast = (message: string) => {
+  const toast = getToastElement();
+
+  if (!toast) {
+    return;
+  }
+
+  toast.textContent = message;
+  toast.status = "success";
+  toast.show();
+};
+
 export const toastError = (
   error: unknown,
   fallback = DEFAULT_ERROR_MESSAGE,
 ) => {
   showErrorToast(error, fallback);
-  return error instanceof Error ? error : new Error(getErrorMessage(error, fallback));
+  return error instanceof Error
+    ? error
+    : new Error(getErrorMessage(error, fallback));
 };
