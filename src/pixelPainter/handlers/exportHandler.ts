@@ -1,4 +1,5 @@
 import type { Vec2 } from "../../editor/types";
+import { calculateZoomFromGridAndCanvasSize } from "../../utils";
 import { createUniformBufferHandler } from "../uniformBuffersHandler";
 import type { LayerHandler } from "./layerHandler";
 import { createRenderHandler } from "./renderHandler";
@@ -8,13 +9,21 @@ export const createExportHandler = (
   gridSize: Vec2,
   layerHandler: LayerHandler,
 ) => {
-  const renderToCanvas = async () => {
-    // Create the canvas and set to the gridSize
-    const canvas = document.createElement("canvas");
-    canvas.width = gridSize.x;
-    canvas.height = gridSize.y;
+  const renderToCanvas = async (multiplier: number) => {
+    const canvasSize = {
+      x: gridSize.x * multiplier,
+      y: gridSize.y * multiplier,
+    };
 
-    const uniformBufferHandler = createUniformBufferHandler(gridSize, gridSize);
+    // Create the canvas and set to the scaled export size.
+    const canvas = document.createElement("canvas");
+    canvas.width = canvasSize.x;
+    canvas.height = canvasSize.y;
+
+    const uniformBufferHandler = createUniformBufferHandler(
+      canvasSize,
+      gridSize,
+    );
 
     const renderHandler = await createRenderHandler(
       layerHandler,
@@ -28,15 +37,21 @@ export const createExportHandler = (
       renderHandler.addLayerTexture(layer.id);
     }
 
-    uniformBufferHandler.updateZoom(1);
+    uniformBufferHandler.updateZoom(
+      calculateZoomFromGridAndCanvasSize(gridSize, canvasSize),
+    );
+    uniformBufferHandler.updateCanvasSize(canvasSize);
 
     renderHandler.draw();
 
     return canvas;
   };
 
-  const getBlob = async (): Promise<Blob> => {
-    const canvas = await renderToCanvas();
+  const getBlob = async (multiplier: number): Promise<Blob> => {
+    const canvas = await renderToCanvas(multiplier);
+    await new Promise<void>((resolve) => {
+      requestAnimationFrame(() => resolve());
+    });
 
     return new Promise((resolve, reject) => {
       canvas.toBlob((blob) => {
@@ -50,8 +65,8 @@ export const createExportHandler = (
     });
   };
 
-  const exportImage = async () => {
-    const blob = await getBlob();
+  const exportImage = async (multiplier: number) => {
+    const blob = await getBlob(multiplier);
     const url = URL.createObjectURL(blob);
 
     const link = document.createElement("a");

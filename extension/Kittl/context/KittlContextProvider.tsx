@@ -2,6 +2,7 @@ import {
   children,
   createContext,
   createMemo,
+  createSignal,
   onMount,
   Show,
   useContext,
@@ -11,6 +12,7 @@ import {
 import type { CreateKittlAPIType } from "./KittlAPI";
 import { createKittlConfigController } from "./createKittlConfigController";
 import { API, useProject, type Layer } from "../../../src/lib";
+import "@kittl/ui/Menu";
 import "@kittl/ui/Icons/download";
 import "@kittl/ui/Icons/uploads";
 import "./kittl.css";
@@ -55,12 +57,15 @@ export const KittlContextProvider = ({
   const resolvedChildren = children(() => providerChildren);
   const exportApi = API.export();
   const projects = useProject();
+  const [exportMultiplier, setExportMultiplier] = createSignal("1");
   const showEmptyProject = createMemo(() => {
     return projects.getProjects().length === 0;
   });
 
   const addToCanvas = async () => {
-    const blob = await exportApi().getBlob();
+    const parsedMultiplier = Number.parseInt(exportMultiplier(), 10);
+    const multiplier = Math.min(Math.max(parsedMultiplier || 1, 1), 10);
+    const blob = await exportApi().getBlob(multiplier);
 
     const api = controller.api();
 
@@ -141,15 +146,37 @@ export const KittlContextProvider = ({
         }}
       >
         <Show when={!showEmptyProject()}>
-          <kittl-button
-            class="icon-button"
-            variant="primary"
-            size="s"
-            disabled={!controller.isReady()}
-            onClick={addToCanvas}
-          >
-            <kittl-icon-download />
-          </kittl-button>
+          <kittl-menu placement="bottom-end">
+            <kittl-button
+              class="icon-button"
+              slot="trigger"
+              variant="primary"
+              size="s"
+              disabled={!controller.isReady()}
+            >
+              <kittl-icon-download />
+            </kittl-button>
+
+            <div class="kittl-export-menu">
+              <label class="kittl-export-field">
+                <span>Multiplier</span>
+                <input
+                  class="kittl-export-input"
+                  type="number"
+                  min="1"
+                  max="10"
+                  value={exportMultiplier()}
+                  onInput={(event) => {
+                    setExportMultiplier(event.currentTarget.value);
+                  }}
+                />
+              </label>
+
+              <kittl-button variant="primary" size="s" onClick={addToCanvas}>
+                Add to canvas
+              </kittl-button>
+            </div>
+          </kittl-menu>
         </Show>
 
         <kittl-button
