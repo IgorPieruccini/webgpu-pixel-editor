@@ -64,6 +64,11 @@ declare module "solid-js" {
         error?: string;
         maxlength?: number;
       };
+      "kittl-toast": JSX.HTMLAttributes<HTMLElement> & {
+        open?: boolean;
+        status?: "success" | "error" | "warning";
+        duration?: number;
+      };
     }
   }
 }

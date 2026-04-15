@@ -13,17 +13,17 @@ import "@kittl/ui/Icons/download";
 import "@kittl/ui/Icons/uploads";
 import "./kittl.css";
 import { generateUUID } from "../../../src/utils";
+import { showErrorToast, toastError } from "../../ui/toast/errorToast";
 
 const initialKittlAPI: CreateKittlAPIType = {
   uploadImage: async () => {
-    console.warn("Can't upload, kittlAPI is not ready");
-    throw new Error("kittlAPI is not ready");
+    throw toastError(new Error("kittlAPI is not ready"));
   },
   addImageToCanvas: async () => {
-    console.warn("Can't add to canvas, kittlAPI is not ready");
+    showErrorToast(new Error("kittlAPI is not ready"));
   },
   importActiveSegment: async () => {
-    throw new Error("kittlAPI is not ready");
+    throw toastError(new Error("kittlAPI is not ready"));
   },
 };
 
@@ -57,7 +57,7 @@ export const KittlContextProvider = ({
     const api = controller.api();
 
     if (!api) {
-      throw new Error("Kittl api not available");
+      throw toastError(new Error("Kittl api not available"));
     }
 
     const response = await api.uploadImage(blob);
@@ -68,6 +68,7 @@ export const KittlContextProvider = ({
     }
 
     if (response.error) {
+      showErrorToast(response.error, "Failed to upload image to Kittl");
       console.error(response.error);
     }
   };
@@ -76,7 +77,7 @@ export const KittlContextProvider = ({
     const api = controller.api();
 
     if (!api) {
-      throw new Error("Kittl api not available");
+      throw toastError(new Error("Kittl api not available"));
     }
 
     const { data, error } = await api.importActiveSegment();
@@ -101,7 +102,7 @@ export const KittlContextProvider = ({
         },
       });
     } else {
-      throw error;
+      throw toastError(error, "Failed to import active Kittl segment");
     }
   };
 

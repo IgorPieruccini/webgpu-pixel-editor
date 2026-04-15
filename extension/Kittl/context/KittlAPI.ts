@@ -1,5 +1,6 @@
 import { kittl } from "@kittl/sdk";
 import type { PixelPainterMethods, Vec2 } from "../../../src/lib";
+import { toastError } from "../../ui/toast/errorToast";
 
 type ReadImage = PixelPainterMethods["imageImporter"]["readImage"];
 
@@ -30,7 +31,9 @@ export const createKittlAPI = (readImage: ReadImage) => {
         const nodeIds = response.result;
 
         if (nodeIds.length === 0) {
-          throw "An element needs to be selected";
+          throw toastError(
+            "Please select one or multiple element from the Canvas",
+          );
         }
 
         const firstObject = nodeIds[0];
@@ -81,12 +84,15 @@ export const createKittlAPI = (readImage: ReadImage) => {
         }
 
         if (blobResult.error) {
-          throw blobResult.error;
+          throw toastError(blobResult.error, "Kittl export failed");
         }
       }
 
       if (response.error) {
-        throw response.error;
+        throw toastError(
+          response.error,
+          "Failed to read selected Kittl objects",
+        );
       }
     } catch (error) {
       return {

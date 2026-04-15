@@ -1,4 +1,5 @@
 import "@kittl/ui/Styles";
+import "@kittl/ui/Toast";
 import "./app.css";
 import { ProjectConfigProvider } from "../src/projectConfig/projectConfigProvider";
 import { MenuProvider } from "../src/ui/tools/menuProvider";
@@ -23,6 +24,7 @@ function AppExtention() {
             <Layers />
             <ActiveLayer />
           </div>
+          <kittl-toast id="extension-error-toast" duration={4000} />
         </div>
       </ProjectConfigProvider>
     </MenuProvider>
