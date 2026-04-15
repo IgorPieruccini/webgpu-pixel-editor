@@ -94,6 +94,11 @@ export const KittlContextProvider = ({
     if (data) {
       const { buffer, width, height, name } = data;
 
+      const savedProjects = projects.getProjects();
+      const projectExist = savedProjects.find(
+        (project) => project.name === name,
+      );
+
       const id = generateUUID();
 
       const layer: Layer = {
@@ -103,13 +108,19 @@ export const KittlContextProvider = ({
         opacity: 1,
       };
 
+      const projectMeta = projectExist
+        ? undefined
+        : {
+            layers: [layer],
+            buffers: {
+              [id]: buffer,
+            },
+          };
+
       project.createNewProject({
         name,
         gridSize: { x: width, y: height },
-        layers: [layer],
-        buffers: {
-          [id]: buffer,
-        },
+        ...(projectMeta ? { ...projectMeta } : {}),
       });
 
       showSuccessfulToast("New project created from selected elements");
