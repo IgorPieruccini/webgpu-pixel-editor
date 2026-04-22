@@ -18,14 +18,11 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "build:lib": "tsc -p tsconfig.lib.json && vite build --config vite.lib.config.ts",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest",
+    "test:run": "vitest run"
   },
   "dependencies": {
-    "@kittl/sdk": "^0.0.1",
-    "@kittl/ui": "^0.0.3",
-    "@kittl/ui-icons": "^0.0.1",
-    "@kittl/ui-tokens": "^0.0.1",
     "@thisbeyond/solid-dnd": "^0.7.5",
     "jsondiffpatch": "^0.7.3",
     "solid-color": "^0.0.9",
@@ -36,9 +33,11 @@
     "@types/node": "^24.6.0",
     "@webgpu/types": "^0.1.66",
     "baseline-browser-mapping": "^2.9.15",
+    "jsdom": "^29.0.2",
     "typescript": "~5.9.3",
     "vite": "npm:rolldown-vite@7.1.14",
-    "vite-plugin-solid": "^2.11.8"
+    "vite-plugin-solid": "^2.11.8",
+    "vitest": "^4.1.4"
   },
   "peerDependencies": {
     "solid-js": "^1.9.9"
