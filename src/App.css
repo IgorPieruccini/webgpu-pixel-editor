@@ -12,6 +12,7 @@
 #editor #main-canvas {
   flex: 1;
   height: 100dvh;
+  background-color: var(--background-darker);
 }
 
 #editor #preview-canvas {
