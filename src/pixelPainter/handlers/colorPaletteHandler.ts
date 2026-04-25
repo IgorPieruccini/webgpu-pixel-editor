@@ -19,24 +19,24 @@ export const createColorPaletteHandler = (layerHandler: LayerHandler) => {
   );
 
   const calculateColorPalette = () => {
-    setIsLoading(true);
-    const buffers = Array.from(layerHandler.buffers.values());
-    const workerBuffers = buffers.map((buffer) => new Uint8Array(buffer));
-
-    const message: WorkerRequest = {
-      buffers: workerBuffers,
-    };
-
-    worker.onmessage = (event: MessageEvent<WorkerResponse>) => {
-      const { colors } = event.data;
-      setColors(colors);
-      setIsLoading(false);
-    };
-
-    worker.postMessage(
-      message,
-      workerBuffers.map((buffer) => buffer.buffer),
-    );
+    // setIsLoading(true);
+    // const buffers = Array.from(layerHandler.buffers.values());
+    // const workerBuffers = buffers.map((buffer) => new Uint8Array(buffer));
+    //
+    // const message: WorkerRequest = {
+    //   buffers: workerBuffers,
+    // };
+    //
+    // worker.onmessage = (event: MessageEvent<WorkerResponse>) => {
+    //   const { colors } = event.data;
+    //   setColors(colors);
+    //   setIsLoading(false);
+    // };
+    //
+    // worker.postMessage(
+    //   message,
+    //   workerBuffers.map((buffer) => buffer.buffer),
+    // );
   };
 
   return {
