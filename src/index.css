@@ -21,15 +21,32 @@
 
 #root {
   font-family:
-    Inter, "SF Pro Text", "Segoe UI", -apple-system, BlinkMacSystemFont,
+    Inter,
+    "SF Pro Text",
+    "Segoe UI",
+    -apple-system,
+    BlinkMacSystemFont,
     sans-serif;
   line-height: 1.5;
   font-weight: 400;
   color: var(--text-primary);
   background:
-    radial-gradient(circle at top left, rgba(78, 107, 255, 0.22), transparent 28%),
-    radial-gradient(circle at top right, rgba(102, 227, 255, 0.14), transparent 24%),
-    linear-gradient(180deg, #0d1730 0%, var(--background) 38%, var(--background-darker) 100%);
+    radial-gradient(
+      circle at top left,
+      rgba(78, 107, 255, 0.22),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at top right,
+      rgba(102, 227, 255, 0.14),
+      transparent 24%
+    ),
+    linear-gradient(
+      180deg,
+      #0d1730 0%,
+      var(--background) 38%,
+      var(--background-darker) 100%
+    );
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -56,9 +73,22 @@ body {
   min-height: 100vh;
   color: var(--text-primary);
   background:
-    radial-gradient(circle at top left, rgba(78, 107, 255, 0.22), transparent 28%),
-    radial-gradient(circle at top right, rgba(102, 227, 255, 0.14), transparent 24%),
-    linear-gradient(180deg, #0d1730 0%, var(--background) 38%, var(--background-darker) 100%);
+    radial-gradient(
+      circle at top left,
+      rgba(78, 107, 255, 0.22),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at top right,
+      rgba(102, 227, 255, 0.14),
+      transparent 24%
+    ),
+    linear-gradient(
+      180deg,
+      #0d1730 0%,
+      var(--background) 38%,
+      var(--background-darker) 100%
+    );
 }
 
 h1 {
@@ -84,7 +114,13 @@ span {
 hr {
   border: none;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(136, 166, 255, 0.45), transparent);
+  width: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(136, 166, 255, 0.45),
+    transparent
+  );
   margin: 10px 0;
 }
 
@@ -104,7 +140,11 @@ button {
   font-family: inherit;
   color: var(--text-primary);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02)),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.05),
+      rgba(255, 255, 255, 0.02)
+    ),
     var(--surface);
   cursor: pointer;
   transition:
