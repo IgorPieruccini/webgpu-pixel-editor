@@ -12,7 +12,7 @@ export const createMiddlewareHandler = (
   renderHandler: RenderHandler,
   layerHandler: LayerHandler,
   historyChangeHandler: HistoryChangeHandler,
-  layerPreview: LayerPreviewHandler
+  layerPreview: LayerPreviewHandler,
 ) => {
   const loadTextureLayers = (layers?: Layers) => {
     const curLayers = layers ?? layerHandler.getList();
@@ -48,15 +48,21 @@ export const createMiddlewareHandler = (
     uniformBufferHandler.updateBrushThickness(value);
   };
 
-  const setOpacity = (layerId: string, opacity: number, registerHistoryChange: boolean = false) => {
-    layerHandler.setOpacity(layerId, opacity)
+  const setOpacity = (
+    layerId: string,
+    opacity: number,
+    registerHistoryChange: boolean = false,
+  ) => {
+    layerHandler.setOpacity(layerId, opacity);
     if (registerHistoryChange) {
       historyChangeHandler.addAction({ captureCurrentBuffer: true });
     }
-  }
+  };
 
   const draw = () => {
-    renderHandler.draw();
+    // Draw preview first, because preview does not invalidate dirty layers,
+    // and render handler does, so if render handlers draws firs, the preview will
+    // always get clean layer and draw nothing
     const currentLayer = layerHandler.getActive();
     if (currentLayer) {
       const currentBuffer = layerHandler.getBufferById(currentLayer.id);
@@ -64,18 +70,16 @@ export const createMiddlewareHandler = (
         layerPreview.drawPreview(currentBuffer, currentLayer.opacity);
       }
     }
-  }
-
+    renderHandler.draw();
+  };
 
   const loadLayers = (
     serializedLayers: Layers,
-    serializedBuffer: Record<string, Uint8Array<ArrayBuffer>>
-
+    serializedBuffer: Record<string, Uint8Array<ArrayBuffer>>,
   ) => {
     loadTextureLayers(serializedLayers);
     layerHandler.load(serializedLayers, serializedBuffer);
-
-  }
+  };
 
   return {
     loadTextureLayers,
@@ -85,6 +89,6 @@ export const createMiddlewareHandler = (
     duplicateLayer,
     setBrushThickness,
     draw,
-    loadLayers
+    loadLayers,
   };
 };
