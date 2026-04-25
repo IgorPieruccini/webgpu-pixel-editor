@@ -27,13 +27,15 @@ export const MyProjects = () => {
       </div>
       <label for="project-name-input">Projects:</label>
       <div id="new-projects-list">
-        {projects().map((project) => {
-          return (
-            <button onClick={() => onOpenProject(project)}>
-              {project.name}
-            </button>
-          );
-        })}
+        <div id="content">
+          {projects().map((project) => {
+            return (
+              <button onClick={() => onOpenProject(project)}>
+                {project.name}
+              </button>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
