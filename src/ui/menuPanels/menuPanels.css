@@ -24,7 +24,29 @@
 
   #top-section {
     display: flex;
-    justify-content: flex-end;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .panel-title {
+    font-size: 0.9em;
+    color: var(--text-primary);
+  }
+
+  .panel-close-btn {
+    width: 32px;
+    height: 32px;
+    min-height: 32px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
   }
 
   #new-projects-list {

@@ -2,7 +2,7 @@ import { createSignal } from "solid-js";
 import { useProjectConfig } from "../../projectConfig/projectConfigProvider";
 import { useMenu } from "../tools/menuProvider";
 import "./menuPanels.css";
-import { AiFillCloseSquare } from "solid-icons/ai";
+import { HiSolidXMark } from "solid-icons/hi";
 import type { Vec2 } from "../../editor/types";
 import {
   DEFAULT_GRID_SIZE,
@@ -50,9 +50,16 @@ export const NewProjectPanel = () => {
   return (
     <div class="menu-panel">
       <div id="top-section">
-        <AiFillCloseSquare onClick={() => menu.openOption(-1)} />
+        <span class="panel-title">Project Name</span>
+        <button
+          class="panel-close-btn"
+          type="button"
+          aria-label="Close new project panel"
+          onClick={() => menu.openOption(-1)}
+        >
+          <HiSolidXMark />
+        </button>
       </div>
-      <label for="project-name-input">Project Name:</label>
       <input type="text" id="project-name-input" onInput={onUpdateName} />
       <div id="grid-size-container">
         <div class="grid-size-input">
