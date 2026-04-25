@@ -4,6 +4,7 @@ import { useMenu } from "../tools/menuProvider";
 import { useProjectConfig } from "../../projectConfig/projectConfigProvider";
 import type { ProjectType } from "../../editor/types";
 import { storageLocal } from "../../storageLocal";
+import { IoTrashBinOutline } from "solid-icons/io";
 
 export const MyProjects = () => {
   const [projects, setProjects] = createSignal<ProjectType[]>([]);
@@ -20,6 +21,10 @@ export const MyProjects = () => {
     projectConfig.createNewProject(project);
   };
 
+  const onDeleteProject = (project: ProjectType) => {
+    projectConfig.deleteProject(project.name);
+  };
+
   return (
     <div class="menu-panel">
       <div id="top-section">
@@ -30,9 +35,14 @@ export const MyProjects = () => {
         <div id="content">
           {projects().map((project) => {
             return (
-              <button onClick={() => onOpenProject(project)}>
-                {project.name}
-              </button>
+              <div class="button-project">
+                <button onClick={() => void onOpenProject(project)}>
+                  {project.name}
+                </button>{" "}
+                <button onClick={() => void onDeleteProject(project)}>
+                  <IoTrashBinOutline />
+                </button>
+              </div>
             );
           })}
         </div>

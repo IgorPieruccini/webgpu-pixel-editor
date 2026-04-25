@@ -32,8 +32,17 @@
 
     #content {
       display: flex;
-      gap: 4px;
+      gap: 8px;
       flex-direction: column;
+    }
+
+    .button-project {
+      display: flex;
+      justify-content: space-between;
+      gap: 4px;
+      button:nth-child(1) {
+        flex: 1;
+      }
     }
   }
 
