@@ -97,12 +97,23 @@ export const createBrushHandler = (
         const _x = cellPos.x + x * BYTES_PER_PIXEL;
         const _y = cellPos.y + y * BYTES_PER_PIXEL;
         const i = _x + _y * gridSize.x;
+        const cellX = _x / BYTES_PER_PIXEL;
+        const cellY = _y / BYTES_PER_PIXEL;
+
+        if (
+          cellX < 0 ||
+          cellX >= gridSize.x ||
+          cellY < 0 ||
+          cellY >= gridSize.y
+        ) {
+          continue;
+        }
 
         if (!forcePaint && currentPaintedPixels.has(i)) {
           continue;
         }
 
-        const distance = Math.hypot(cellPos.x - _x, cellPos.y - _y);
+        const distance = Math.hypot(x, y);
         if (distance < thickness) {
           composeColors(i);
           hasAppliedPaint = true;
@@ -122,12 +133,23 @@ export const createBrushHandler = (
         const _x = cellPos.x + x * BYTES_PER_PIXEL;
         const _y = cellPos.y + y * BYTES_PER_PIXEL;
         const index = _x + _y * gridSize.x;
+        const cellX = _x / BYTES_PER_PIXEL;
+        const cellY = _y / BYTES_PER_PIXEL;
+
+        if (
+          cellX < 0 ||
+          cellX >= gridSize.x ||
+          cellY < 0 ||
+          cellY >= gridSize.y
+        ) {
+          continue;
+        }
 
         if (currentPaintedPixels.has(index)) {
           continue;
         }
 
-        const distance = Math.hypot(cellPos.x - _x, cellPos.y - _y);
+        const distance = Math.hypot(x, y);
         if (distance < thickness) {
           const curBuffer = layerHandler.getCurrentBuffer();
           const _r = curBuffer[index + RGBA_OFFSET.RED];

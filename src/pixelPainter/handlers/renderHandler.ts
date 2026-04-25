@@ -28,8 +28,7 @@ export const createRenderHandler = async (
     canvas ?? "main-canvas",
   );
 
-  const { vertices, vertexBuffer, vertexBufferLayout } =
-    createVertexBuffer(device);
+  const { vertexBuffer, vertexBufferLayout } = createVertexBuffer(device);
 
   const uiPipeline = createPipeline(
     device,
@@ -133,7 +132,7 @@ export const createRenderHandler = async (
         uniformBufferHandler.commonUniforms,
         uniformBufferHandler.uiUniforms,
       );
-      pass.draw(vertices.length / 2, gridSize.x * gridSize.y);
+      pass.draw(6);
     }
 
     pass.end();
