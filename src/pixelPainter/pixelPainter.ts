@@ -30,6 +30,7 @@ export const pixelPainter = async (
   );
 
   const layerPreview = await createLayerPreview(
+    layerHandler,
     gridSize,
     calculateZoomFromGridAndCanvasSize(gridSize, LAYER_PREVIEW_SIZE),
   );

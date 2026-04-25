@@ -1,6 +1,7 @@
 import { LAYER_PREVIEW_SIZE } from "../constants";
 import type { Vec2 } from "../editor/types";
 import { createTexturePipeline } from "./createPipeline";
+import type { LayerHandler } from "./handlers/layerHandler";
 import { material } from "./material";
 import { webGPUSetup } from "./webGPUSetup";
 
@@ -8,7 +9,11 @@ export type LayerPreviewHandler = Awaited<
   ReturnType<typeof createLayerPreview>
 >;
 
-export const createLayerPreview = async (gridSize: Vec2, zoom: number) => {
+export const createLayerPreview = async (
+  layerHandler: LayerHandler,
+  gridSize: Vec2,
+  zoom: number,
+) => {
   const { device, context } = await webGPUSetup("preview-canvas");
 
   const pixelPipeline = createTexturePipeline(device, "pixel");
@@ -55,7 +60,10 @@ export const createLayerPreview = async (gridSize: Vec2, zoom: number) => {
     // DRAW PIXEL LAYER
     pass.setPipeline(pixelPipeline);
 
-    layerTexture.writeTexture(buffer);
+    if (layerHandler.isCurrentLayerDirty()) {
+      layerTexture.writeTexture(buffer);
+    }
+
     layerTexture.writeUniforms(
       commonUniformBuffer,
       new Float32Array([opacity]),

@@ -102,6 +102,11 @@ export const createLayerHandler = async (
     return dirtyStatus.has(id);
   };
 
+  const isCurrentLayerDirty = () => {
+    const currentLayer = getActive();
+    return isLayerDirty(currentLayer.id);
+  };
+
   const makeCurrentLayerDirty = () => {
     const currentLayer = getActive();
     makeLayerDirty(currentLayer.id);
@@ -421,6 +426,7 @@ export const createLayerHandler = async (
     getBufferById,
     load,
     isLayerDirty,
+    isCurrentLayerDirty,
     makeLayerDirty,
     makeCurrentLayerDirty,
     makeLayerClean,
