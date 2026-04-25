@@ -20,7 +20,7 @@
     justify-content: space-between;
     gap: 12px;
     height: 400px;
-    padding: 0;
+    margin: 4px 0px 4px 0px;
 
     #layer-slider {
       display: flex;
@@ -34,8 +34,11 @@
   }
 
   .active-layer {
-    background:
-      linear-gradient(135deg, rgba(78, 107, 255, 0.82), rgba(102, 227, 255, 0.28));
+    background: linear-gradient(
+      135deg,
+      rgba(78, 107, 255, 0.82),
+      rgba(102, 227, 255, 0.28)
+    );
     border-color: rgba(160, 213, 255, 0.65);
   }
 

@@ -1,23 +1,21 @@
-import {
-  API,
-  useProjectConfig,
-} from "../../projectConfig/projectConfigProvider";
+import { useProjectConfig } from "../../projectConfig/projectConfigProvider";
 import { LayerOpacity } from "./LayerOpacity/LayerOpacity";
 import { Layers } from "./Layers/Layers";
 import { AiOutlineExport } from "solid-icons/ai";
+import { useMenu } from "../tools/menuProvider";
+import { OPENED_OPTIONS } from "../tools/constants";
 import "./rightPanel.css";
 
 export const RightPanel = () => {
   const projectConfig = useProjectConfig();
-
-  const exportHandler = API.export();
+  const menu = useMenu();
 
   if (!projectConfig.projectName()) {
     return null;
   }
 
   const onExport = () => {
-    exportHandler().image(1);
+    menu.openOption(OPENED_OPTIONS.EXPORT_PNG);
   };
 
   return (

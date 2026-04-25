@@ -4,6 +4,7 @@ import "./menuPanels.css";
 import { useMenu } from "../tools/menuProvider";
 import { OPENED_OPTIONS } from "../tools/constants";
 import { MyProjects } from "./myProjects";
+import { ExportImagePanel } from "./exportImagePanel";
 
 export const MenuPanels = () => {
   const menu = useMenu();
@@ -16,6 +17,9 @@ export const MenuPanels = () => {
             <NewProjectPanel />
           )}
           {menu.openedOption() === OPENED_OPTIONS.MY_PROJECTS && <MyProjects />}
+          {menu.openedOption() === OPENED_OPTIONS.EXPORT_PNG && (
+            <ExportImagePanel />
+          )}
         </div>
       )}
     </>
