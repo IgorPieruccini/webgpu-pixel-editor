@@ -272,6 +272,9 @@ export const createLayerHandler = async (
     }
 
     setCurrentBuffer(buffer);
+
+    // By making the current layer dirty, it makes sure the preview updates correctly
+    makeCurrentLayerDirty();
   };
 
   const setOpacity = (layerId: string, opacity: number) => {
