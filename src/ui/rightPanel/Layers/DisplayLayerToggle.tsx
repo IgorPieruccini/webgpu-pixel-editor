@@ -10,7 +10,7 @@ export const DisplayLayerToggle = ({ layer }: DisplayLayerToggleProps) => {
   const layersAPI = API.layers();
 
   const onToggleDisplay = (e: MouseEvent) => {
-    e.preventDefault();
+    e.stopPropagation();
     layersAPI().toggleDisplay(layer.id);
   };
 
