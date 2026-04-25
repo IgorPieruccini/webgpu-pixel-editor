@@ -109,6 +109,8 @@ export const createBrushHandler = (
         }
       }
     }
+
+    layerHandler.makeCurrentLayerDirty();
     return hasAppliedPaint;
   };
 
@@ -155,6 +157,7 @@ export const createBrushHandler = (
         }
       }
     }
+    layerHandler.makeCurrentLayerDirty();
   };
 
   const setSelectedColor = (color: number | string) => {

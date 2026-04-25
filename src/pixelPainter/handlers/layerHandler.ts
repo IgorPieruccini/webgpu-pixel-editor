@@ -53,6 +53,9 @@ export const createLayerHandler = async (
   const stringLayers = storageLocal.createLayers(projectName);
 
   const [getList, setList] = createSignal<Layers>(stringLayers);
+  const dirtyStatus: Set<string> = new Set(
+    stringLayers.map((layer) => layer.id),
+  );
 
   const firstLayer = getList().at(0);
   if (!firstLayer) {
@@ -95,6 +98,23 @@ export const createLayerHandler = async (
   const [getCurrentBuffer, setCurrentBuffer] =
     createSignal<Uint8Array<ArrayBuffer>>(firstBuffer);
 
+  const isLayerDirty = (id: string) => {
+    return dirtyStatus.has(id);
+  };
+
+  const makeCurrentLayerDirty = () => {
+    const currentLayer = getActive();
+    makeLayerDirty(currentLayer.id);
+  };
+
+  const makeLayerDirty = (id: string) => {
+    dirtyStatus.add(id);
+  };
+
+  const makeLayerClean = (id: string) => {
+    dirtyStatus.delete(id);
+  };
+
   const add = (): string => {
     const layers = getList();
 
@@ -116,6 +136,8 @@ export const createLayerHandler = async (
 
     buffers.set(layer.id, newBuffer);
     setCurrentBuffer(newBuffer);
+
+    dirtyStatus.add(layer.id);
 
     return layer.id;
   };
@@ -163,6 +185,9 @@ export const createLayerHandler = async (
     buffers.delete(id);
 
     storageLocal.saveLayers(projectName, _layers);
+
+    dirtyStatus.delete(id);
+
     return id;
   };
 
@@ -267,6 +292,8 @@ export const createLayerHandler = async (
         opacity,
       });
     }
+
+    dirtyStatus.add(layerId);
   };
 
   const saveCurrentBuffer = () => {
@@ -314,6 +341,9 @@ export const createLayerHandler = async (
 
     setActive(newLayer);
     setCurrentBuffer(newBuffer);
+
+    dirtyStatus.add(newLayer.id);
+
     return newLayer.id;
   };
 
@@ -327,16 +357,19 @@ export const createLayerHandler = async (
     buffers.set(layerId, buffer);
     db.save(buffer, layerId);
     setCurrentBuffer(buffer);
-    if (layerId === getActive().id) {
-    }
+    dirtyStatus.add(layerId);
   };
 
   const load = (
     serializedLayers: Layers,
-    serializedBuffer: Record<string, Uint8Array<ArrayBuffer>>
+    serializedBuffer: Record<string, Uint8Array<ArrayBuffer>>,
   ): string[] => {
     const layerCopy: Layers = JSON.parse(JSON.stringify(serializedLayers));
     setList(layerCopy);
+
+    for (const layer of layerCopy) {
+      dirtyStatus.add(layer.id);
+    }
 
     storageLocal.saveLayers(projectName, layerCopy);
 
@@ -363,8 +396,8 @@ export const createLayerHandler = async (
   };
 
   const getLayerById = (id: string) => {
-    return getList().find(l => l.id === id);
-  }
+    return getList().find((l) => l.id === id);
+  };
 
   return {
     add,
@@ -387,5 +420,9 @@ export const createLayerHandler = async (
     buffers,
     getBufferById,
     load,
+    isLayerDirty,
+    makeLayerDirty,
+    makeCurrentLayerDirty,
+    makeLayerClean,
   };
 };

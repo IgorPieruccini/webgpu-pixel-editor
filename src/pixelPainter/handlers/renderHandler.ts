@@ -108,8 +108,13 @@ export const createRenderHandler = async (
         continue;
       }
 
-      // Write texture and uniforms for this layer
-      layerTexture.writeTexture(buffer);
+      // write texture if the layer buffer has been modified
+      if (layerHandler.isLayerDirty(layer.id)) {
+        layerTexture.writeTexture(buffer);
+        layerHandler.makeLayerClean(layer.id);
+      }
+
+      // Write uniforms for this layer
       layerTexture.writeUniforms(
         uniformBufferHandler.commonUniforms,
         new Float32Array([layer.opacity]),
