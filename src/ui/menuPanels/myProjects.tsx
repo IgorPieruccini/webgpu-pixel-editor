@@ -4,7 +4,7 @@ import { useMenu } from "../tools/menuProvider";
 import { useProjectConfig } from "../../projectConfig/projectConfigProvider";
 import type { ProjectType } from "../../editor/types";
 import { storageLocal } from "../../storageLocal";
-import { IoTrashBinOutline } from "solid-icons/io";
+import { AiOutlineDelete } from "solid-icons/ai";
 
 export const MyProjects = () => {
   const [projects, setProjects] = createSignal<ProjectType[]>([]);
@@ -40,7 +40,7 @@ export const MyProjects = () => {
                   {project.name}
                 </button>{" "}
                 <button onClick={() => void onDeleteProject(project)}>
-                  <IoTrashBinOutline />
+                  <AiOutlineDelete />
                 </button>
               </div>
             );

@@ -1,23 +1,27 @@
 #dev-tool {
     position: absolute;
     width: 100%;
-    background-color: #333;
+    background: rgba(6, 13, 24, 0.88);
     bottom: 0;
+    left: 0;
 
     display: flex;
     flex-direction: column;
+    backdrop-filter: blur(16px);
+    border-top: 1px solid var(--surface-border);
 
     #header {
-        padding: 4px;
-        height: 32px;
-        background-color: black;
+        padding: 10px 16px;
+        min-height: 40px;
+        background: rgba(3, 8, 15, 0.7);
         display: flex;
         justify-content: space-between;
+        align-items: center;
     }
 
     #content {
         display: flex;
-        padding: 8px;
+        padding: 16px;
         gap: 16px;
     }
 }
@@ -27,11 +31,13 @@
 }
 
 .dev-tool-hide {
-    height: 10;
+    height: auto;
     background-color: transparent;
 }
 
 .tool {
-    background-color: #444;
-    padding: 8px;
+    background: rgba(12, 22, 39, 0.92);
+    border: 1px solid var(--surface-border);
+    border-radius: 16px;
+    padding: 12px;
 }

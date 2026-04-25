@@ -1,16 +1,16 @@
 .slider {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   align-items: center;
   justify-content: space-between;
   flex-direction: row;
-  max-height: 32px;
+  min-height: 32px;
 
   .slider-container {
     display: flex;
     justify-content: stretch;
     align-items: center;
-    gap: 4px;
+    gap: 10px;
     flex: 1;
 
     input {
@@ -18,4 +18,10 @@
       width: 100%;
     }
   }
+}
+
+.slider label {
+  min-width: 84px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }

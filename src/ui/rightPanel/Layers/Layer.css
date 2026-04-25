@@ -2,13 +2,22 @@
     display: flex;
     justify-content: space-between;
     width: 100%;
+    min-height: 48px;
+    padding: 0 12px;
+    border-radius: 16px;
+    align-items: center;
+    gap: 12px;
 }
 
 .layer-btn-icon {
-    width: 20px;
-    height: 20px;
+    width: 30px;
+    height: 30px;
     background: none;
     padding: 0;
+    min-height: 30px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    color: var(--text-secondary);
 }
 
 .opacity-50 {
@@ -18,12 +27,13 @@
 .layer-opt-btn {
     display: flex;
     background: none;
-    gap: 8px;
+    gap: 6px;
 }
 
 .layer-title {
     font-size: 12px;
     max-width: 150px;
+    color: inherit;
 }
 
 span.layer-title {

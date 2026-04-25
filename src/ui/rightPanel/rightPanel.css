@@ -1,34 +1,42 @@
 #right-panel {
   min-width: 300px;
-  gap: 8px;
+  width: 320px;
+  gap: 10px;
   right: 0px;
   display: flex;
-  border-color: var(--primary-color-highlight);
   flex-direction: column;
-  background-color: var(--background);
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
   flex: none;
-  padding: 2px;
+  padding: 18px;
+  box-sizing: border-box;
+  backdrop-filter: blur(18px);
 
   #layers {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    gap: 8px;
+    gap: 12px;
     height: 400px;
-    padding: 8px;
+    padding: 0;
 
     #layer-slider {
       display: flex;
       flex-direction: column;
       justify-content: start;
-      gap: 8px;
+      gap: 10px;
       max-height: 400px;
       overflow-y: auto;
+      padding-right: 4px;
     }
   }
 
   .active-layer {
-    background-color: var(--primary-color);
+    background:
+      linear-gradient(135deg, rgba(78, 107, 255, 0.82), rgba(102, 227, 255, 0.28));
+    border-color: rgba(160, 213, 255, 0.65);
   }
 
   .left-container {
@@ -38,20 +46,35 @@
   }
 
   #layer-preview {
-    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px;
+    border-radius: 18px;
+    background: rgba(8, 16, 30, 0.52);
+    border: 1px solid rgba(255, 255, 255, 0.05);
   }
 
   #project-title {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 12px;
+
+    > span:first-child {
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
   }
+
   #export {
-    width: 32px;
-    height: 32px;
+    width: 40px;
+    height: 40px;
     padding: 0px;
     display: flex;
     justify-content: center;
     align-items: center;
+    border-radius: 14px;
   }
 }
