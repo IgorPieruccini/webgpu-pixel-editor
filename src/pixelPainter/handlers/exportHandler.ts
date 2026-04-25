@@ -35,6 +35,7 @@ export const createExportHandler = (
 
     for (const layer of layerHandler.getList()) {
       renderHandler.addLayerTexture(layer.id);
+      layerHandler.makeLayerDirty(layer.id);
     }
 
     uniformBufferHandler.updateZoom(
