@@ -1,4 +1,4 @@
-import { SketchPicker, CompactPicker, type ColorResult } from "solid-color";
+import { SketchPicker, type ColorResult } from "solid-color";
 import "./colorPicker.css";
 import { API } from "../../projectConfig/projectConfigProvider";
 
@@ -11,18 +11,10 @@ export const ColorPicker = () => {
   };
 
   return (
-    <div class="ColorPickerContainer">
+    <div class="ColorPickerContainer tool-input">
       <SketchPicker
         presetColors={colorPalette().getColors()}
         onChange={onChange}
-      />
-      <CompactPicker
-        colors={[]}
-        styles={{
-          Compact: {
-            background: "var(--background)",
-          },
-        }}
       />
     </div>
   );
