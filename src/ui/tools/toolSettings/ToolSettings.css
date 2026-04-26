@@ -1,4 +1,6 @@
 #tool-settings {
+  position: relative;
+  z-index: 10;
   gap: 12px;
   min-height: 52px;
   display: flex;
@@ -10,8 +12,4 @@
   box-shadow: var(--shadow-md);
   backdrop-filter: blur(18px);
   padding: 0px 12px 0px 12px;
-}
-
-#tool-menu {
-  width: 250px;
 }

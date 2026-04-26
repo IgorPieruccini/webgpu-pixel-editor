@@ -41,9 +41,6 @@
 }
 
 #menu-options {
-  position: absolute;
-  left: 88px;
-  top: 18px;
   background: var(--surface-strong);
   border: 1px solid var(--surface-border);
   border-radius: 16px;

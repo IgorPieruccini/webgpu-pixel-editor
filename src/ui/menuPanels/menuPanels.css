@@ -8,7 +8,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 20;
 }
 
 .menu-panel {
@@ -104,7 +103,11 @@
     margin: 0 6px 0 0;
     border-left: 1px solid rgba(136, 166, 255, 0.18);
     background:
-      linear-gradient(180deg, rgba(78, 107, 255, 0.2), rgba(102, 227, 255, 0.08)),
+      linear-gradient(
+        180deg,
+        rgba(78, 107, 255, 0.2),
+        rgba(102, 227, 255, 0.08)
+      ),
       rgba(255, 255, 255, 0.03);
     border-radius: 8px;
     opacity: 1;
@@ -114,7 +117,11 @@
   .panel-number-input:hover::-webkit-outer-spin-button,
   .panel-number-input:hover::-webkit-inner-spin-button {
     background:
-      linear-gradient(180deg, rgba(78, 107, 255, 0.28), rgba(102, 227, 255, 0.14)),
+      linear-gradient(
+        180deg,
+        rgba(78, 107, 255, 0.28),
+        rgba(102, 227, 255, 0.14)
+      ),
       rgba(255, 255, 255, 0.05);
   }
 
