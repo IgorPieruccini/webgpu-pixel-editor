@@ -12,16 +12,5 @@
     align-items: center;
     gap: 10px;
     flex: 1;
-
-    input {
-      min-width: 130px;
-      width: 100%;
-    }
   }
-}
-
-.slider label {
-  min-width: 84px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
 }

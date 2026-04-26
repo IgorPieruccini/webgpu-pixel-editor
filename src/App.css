@@ -8,8 +8,8 @@
 
   .row {
     display: flex;
-    gap: 18px;
-    padding: 18px;
+    gap: 14px;
+    padding: 14px;
     height: 100%;
     box-sizing: border-box;
     align-items: stretch;

@@ -1,5 +1,6 @@
 #tools {
   margin: 0;
+  max-width: 250px;
   padding: 14px 10px;
   display: flex;
   flex-direction: column;
@@ -11,6 +12,12 @@
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
   backdrop-filter: blur(18px);
+
+  #tools-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+  }
 
   input {
     width: 100%;
@@ -35,8 +42,11 @@
   }
 
   .active {
-    background:
-      linear-gradient(180deg, rgba(111, 135, 255, 0.95), rgba(69, 100, 255, 0.95));
+    background: linear-gradient(
+      180deg,
+      rgba(111, 135, 255, 0.95),
+      rgba(69, 100, 255, 0.95)
+    );
     border-color: rgba(151, 208, 255, 0.7);
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.18),

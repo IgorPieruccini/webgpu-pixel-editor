@@ -9,7 +9,7 @@ export interface SliderProps {
 export const Slider = (props: SliderProps) => {
   return (
     <div class="slider">
-      <label for={`${props.key}-slider`}>Layer opacity</label>
+      <label for={`${props.key}-slider`}>LAYER OPACITY</label>
       <div class="slider-container">
         <input
           id={`${props.key}-slider`}

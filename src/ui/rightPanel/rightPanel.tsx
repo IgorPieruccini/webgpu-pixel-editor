@@ -36,7 +36,7 @@ export const RightPanel = () => {
       <hr />
       <div id="layer-preview">
         <p>Layer preview</p>
-        <canvas id="preview-canvas" width={300} height={300} />
+        <canvas id="preview-canvas" width={250} height={250} />
       </div>
       <hr />
       <LayerOpacity />

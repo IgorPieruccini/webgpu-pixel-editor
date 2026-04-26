@@ -12,7 +12,7 @@ import { useEditor } from "../../editor/editortContext";
 import { ACTIVATE_TOOL } from "../../editor/constant";
 import { MenuOptions } from "./menu/menuOptions";
 import { createSignal } from "solid-js";
-import { ColorPicker } from "../ColorPicker";
+import { ColorPicker } from "../color/colorPicker";
 
 export const Tools = () => {
   const project = useEditor();
@@ -25,53 +25,56 @@ export const Tools = () => {
       </button>
       {isOpen() ? <MenuOptions /> : null}
       <hr />
-      <ColorPicker />
+      <div id="tools-container">
+        <button
+          class="menu-btn"
+          classList={{
+            active: project?.().activeTool() === ACTIVATE_TOOL.PAINT,
+          }}
+          onClick={() => {
+            project?.().setActiveTool(ACTIVATE_TOOL.PAINT);
+          }}
+        >
+          {project?.().activeTool() === ACTIVATE_TOOL.PAINT ? (
+            <BsBrushFill />
+          ) : (
+            <BsBrush />
+          )}
+        </button>
+        <button
+          class="menu-btn"
+          classList={{
+            active: project?.().activeTool() === ACTIVATE_TOOL.PAINT_SELECTION,
+          }}
+          onClick={() => {
+            project?.().setActiveTool(ACTIVATE_TOOL.PAINT_SELECTION);
+          }}
+        >
+          {project?.().activeTool() === ACTIVATE_TOOL.PAINT_SELECTION ? (
+            <BiSolidBrush />
+          ) : (
+            <BiRegularBrush />
+          )}
+        </button>
+        <button
+          class="menu-btn"
+          classList={{
+            active: project?.().activeTool() === ACTIVATE_TOOL.DELETE,
+          }}
+          onClick={() => {
+            project?.().setActiveTool(ACTIVATE_TOOL.DELETE);
+          }}
+        >
+          {project?.().activeTool() === ACTIVATE_TOOL.DELETE ? (
+            <BiSolidEraser />
+          ) : (
+            <BiRegularEraser />
+          )}
+        </button>
+      </div>
+
       <hr />
-      <button
-        class="menu-btn"
-        classList={{
-          active: project?.().activeTool() === ACTIVATE_TOOL.PAINT,
-        }}
-        onClick={() => {
-          project?.().setActiveTool(ACTIVATE_TOOL.PAINT);
-        }}
-      >
-        {project?.().activeTool() === ACTIVATE_TOOL.PAINT ? (
-          <BsBrushFill />
-        ) : (
-          <BsBrush />
-        )}
-      </button>
-      <button
-        class="menu-btn"
-        classList={{
-          active: project?.().activeTool() === ACTIVATE_TOOL.PAINT_SELECTION,
-        }}
-        onClick={() => {
-          project?.().setActiveTool(ACTIVATE_TOOL.PAINT_SELECTION);
-        }}
-      >
-        {project?.().activeTool() === ACTIVATE_TOOL.PAINT_SELECTION ? (
-          <BiSolidBrush />
-        ) : (
-          <BiRegularBrush />
-        )}
-      </button>
-      <button
-        class="menu-btn"
-        classList={{
-          active: project?.().activeTool() === ACTIVATE_TOOL.DELETE,
-        }}
-        onClick={() => {
-          project?.().setActiveTool(ACTIVATE_TOOL.DELETE);
-        }}
-      >
-        {project?.().activeTool() === ACTIVATE_TOOL.DELETE ? (
-          <BiSolidEraser />
-        ) : (
-          <BiRegularEraser />
-        )}
-      </button>
+      <ColorPicker />
     </div>
   );
 };

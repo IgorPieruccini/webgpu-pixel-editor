@@ -1,6 +1,5 @@
 import "./App.css";
 import { ProjectConfigProvider } from "./projectConfig/projectConfigProvider";
-import { ColorPicker } from "./ui/color/colorPicker";
 import { DevTool } from "./ui/debugger/DevTool";
 import { MenuPanels } from "./ui/menuPanels";
 import { RightPanel } from "./ui/rightPanel/rightPanel";
@@ -23,7 +22,6 @@ function App() {
             <RightPanel />
             <MenuPanels />
           </div>
-          <ColorPicker />
           {isDebugMode && <DevTool />}
         </ProjectConfigProvider>
       </MenuProvider>

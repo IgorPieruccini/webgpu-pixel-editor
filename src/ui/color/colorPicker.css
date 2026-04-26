@@ -1,8 +1,4 @@
 .ColorPickerContainer {
-  position: absolute;
-  left: 115px;
-  bottom: 30px;
-  padding: 12px 18px;
 }
 
 .ColorPickerContainer .sketch-picker {
