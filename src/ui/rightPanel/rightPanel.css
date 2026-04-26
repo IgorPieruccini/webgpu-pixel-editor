@@ -23,7 +23,7 @@
       flex-direction: column;
       justify-content: start;
       gap: 10px;
-      max-height: 400px;
+      max-height: 300px;
       overflow-y: auto;
       padding-right: 4px;
     }
