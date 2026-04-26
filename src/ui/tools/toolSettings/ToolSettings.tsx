@@ -21,7 +21,7 @@ export const ToolSettings = () => {
         <SquareButton
           id="menu"
           class="square-tool-button"
-          size="lg"
+          size="sm"
           onClick={() => setIsOpen(!isOpen())}
         >
           <FiMenu />

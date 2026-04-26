@@ -27,7 +27,7 @@ export const RightPanel = () => {
           <span>
             {`${projectConfig.getProjectGridSize().x} x ${projectConfig.getProjectGridSize().y}`}
           </span>
-          <SquareButton onClick={onExport} size="md">
+          <SquareButton onClick={onExport} size="sm">
             <AiOutlineExport />
           </SquareButton>
         </span>
