@@ -5,6 +5,7 @@ import type { ProjectType } from "../../editor/types";
 import { storageLocal } from "../../storageLocal";
 import { AiOutlineDelete } from "solid-icons/ai";
 import { HiSolidXMark } from "solid-icons/hi";
+import { SquareButton } from "../shared/squareButton";
 
 export const MyProjects = () => {
   const [projects, setProjects] = createSignal<ProjectType[]>([]);
@@ -29,14 +30,14 @@ export const MyProjects = () => {
     <div class="menu-panel">
       <div id="top-section">
         <span class="panel-title">Projects</span>
-        <button
-          class="panel-close-btn"
+        <SquareButton
           type="button"
+          size="sm"
           aria-label="Close projects panel"
           onClick={() => menu.openOption(-1)}
         >
           <HiSolidXMark />
-        </button>
+        </SquareButton>
       </div>
       <div id="new-projects-list">
         <div id="content">
@@ -46,9 +47,9 @@ export const MyProjects = () => {
                 <button onClick={() => void onOpenProject(project)}>
                   {project.name}
                 </button>{" "}
-                <button onClick={() => void onDeleteProject(project)}>
+                <SquareButton size="sm" onClick={() => void onDeleteProject(project)}>
                   <AiOutlineDelete />
-                </button>
+                </SquareButton>
               </div>
             );
           })}

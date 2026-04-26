@@ -1,0 +1,52 @@
+.square-button {
+  flex: none;
+  padding: 0;
+  min-height: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.square-button svg {
+  width: 18px;
+  height: 18px;
+}
+
+.square-button-xs {
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+}
+
+.square-button-xs svg {
+  width: 16px;
+  height: 16px;
+}
+
+.square-button-sm {
+  width: 32px;
+  height: 32px;
+  border-radius: 12px;
+}
+
+.square-button-sm svg {
+  width: 16px;
+  height: 16px;
+}
+
+.square-button-md {
+  width: 40px;
+  height: 40px;
+  border-radius: 14px;
+}
+
+.square-button-lg {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+}
+
+.square-button-lg svg {
+  width: 19px;
+  height: 19px;
+}

@@ -5,6 +5,7 @@ import { AiOutlineExport } from "solid-icons/ai";
 import { useMenu } from "../tools/menuProvider";
 import { OPENED_OPTIONS } from "../tools/constants";
 import "./rightPanel.css";
+import { SquareButton } from "../shared/squareButton";
 
 export const RightPanel = () => {
   const projectConfig = useProjectConfig();
@@ -26,9 +27,9 @@ export const RightPanel = () => {
           <span>
             {`${projectConfig.getProjectGridSize().x} x ${projectConfig.getProjectGridSize().y}`}
           </span>
-          <button onClick={onExport} id="export">
+          <SquareButton onClick={onExport} size="md">
             <AiOutlineExport />
-          </button>
+          </SquareButton>
         </span>
       </div>
       <hr />

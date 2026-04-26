@@ -1,5 +1,6 @@
 import { AiOutlineDelete } from "solid-icons/ai";
 import { API } from "../../../projectConfig/projectConfigProvider";
+import { SquareButton } from "../../shared/squareButton";
 
 type DeleteLayerButtonProps = {
   layerId: string;
@@ -14,8 +15,8 @@ export const DeleteLayerButton = ({ layerId }: DeleteLayerButtonProps) => {
   };
 
   return (
-    <button class="layer-btn-icon" onClick={onDelete}>
+    <SquareButton class="layer-btn-icon" size="xs" onClick={onDelete}>
       <AiOutlineDelete />
-    </button>
+    </SquareButton>
   );
 };

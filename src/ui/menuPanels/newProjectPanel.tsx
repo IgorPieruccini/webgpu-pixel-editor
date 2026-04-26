@@ -9,6 +9,7 @@ import {
   MAX_GRID_SIZE,
   MIN_GRID_SIZE,
 } from "../../constants";
+import { SquareButton } from "../shared/squareButton";
 
 export const NewProjectPanel = () => {
   const [getProjectName, setProjectName] = createSignal("new project");
@@ -51,14 +52,14 @@ export const NewProjectPanel = () => {
     <div class="menu-panel">
       <div id="top-section">
         <span class="panel-title">Project Name</span>
-        <button
-          class="panel-close-btn"
+        <SquareButton
           type="button"
+          size="sm"
           aria-label="Close new project panel"
           onClick={() => menu.openOption(-1)}
         >
           <HiSolidXMark />
-        </button>
+        </SquareButton>
       </div>
       <input type="text" id="project-name-input" onInput={onUpdateName} />
       <div id="grid-size-container">

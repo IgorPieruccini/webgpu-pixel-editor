@@ -1,25 +1,17 @@
 #tool-settings {
-  position: absolute;
-  top: 30px;
-  left: 120px;
   gap: 12px;
-  min-height: 58px;
+  min-height: 52px;
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  label {
-    font-size: 12px;
-    margin: 0px;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-  }
-}
-
-.tool-input {
   background: var(--surface);
   border-radius: 16px;
-  padding: 12px 18px;
   border: 1px solid var(--surface-border);
   box-shadow: var(--shadow-md);
   backdrop-filter: blur(18px);
+  padding: 0px 12px 0px 12px;
+}
+
+#tool-menu {
+  width: 250px;
 }

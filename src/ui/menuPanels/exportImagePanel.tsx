@@ -2,6 +2,7 @@ import { createSignal } from "solid-js";
 import { HiSolidXMark } from "solid-icons/hi";
 import { API } from "../../projectConfig/projectConfigProvider";
 import { useMenu } from "../tools/menuProvider";
+import { SquareButton } from "../shared/squareButton";
 
 const MIN_MULTIPLIER = 1;
 const MAX_MULTIPLIER = 10;
@@ -44,14 +45,14 @@ export const ExportImagePanel = () => {
     <div class="menu-panel">
       <div id="top-section">
         <span class="panel-title">Export PNG</span>
-        <button
-          class="panel-close-btn"
+        <SquareButton
           type="button"
+          size="sm"
           aria-label="Close export png panel"
           onClick={() => menu.openOption(-1)}
         >
           <HiSolidXMark />
-        </button>
+        </SquareButton>
       </div>
       <div class="panel-field">
         <label for="export-multiplier-input">Multiplier</label>

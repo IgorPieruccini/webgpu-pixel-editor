@@ -15,8 +15,8 @@ function App() {
     <div id="editor">
       <MenuProvider>
         <ProjectConfigProvider>
+          <ToolSettings />
           <div class="row">
-            <ToolSettings />
             <Tools />
             <canvas id="main-canvas" width={1280} height={1280} />
             <RightPanel />

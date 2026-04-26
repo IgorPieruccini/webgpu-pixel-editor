@@ -127,6 +127,22 @@ hr {
   margin: 10px 0;
 }
 
+.separator {
+  flex: none;
+}
+
+.separator-vertical {
+  width: 1px;
+  align-self: stretch;
+  margin: 8px 0;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    rgba(136, 166, 255, 0.45),
+    transparent
+  );
+}
+
 br::after {
   content: "";
   display: block;

@@ -5,29 +5,22 @@ import {
   BiSolidEraser,
 } from "solid-icons/bi";
 import { BsBrushFill, BsBrush } from "solid-icons/bs";
-import { FiMenu } from "solid-icons/fi";
 
 import "./index.css";
 import { useEditor } from "../../editor/editortContext";
 import { ACTIVATE_TOOL } from "../../editor/constant";
-import { MenuOptions } from "./menu/menuOptions";
-import { createSignal } from "solid-js";
 import { ColorPicker } from "../color/colorPicker";
+import { SquareButton } from "../shared/squareButton";
 
 export const Tools = () => {
   const project = useEditor();
-  const [isOpen, setIsOpen] = createSignal(false);
 
   return (
     <div id="tools">
-      <button id="menu" class="menu-btn" onClick={() => setIsOpen(!isOpen())}>
-        <FiMenu />
-      </button>
-      {isOpen() ? <MenuOptions /> : null}
-      <hr />
       <div id="tools-container">
-        <button
-          class="menu-btn"
+        <SquareButton
+          class="square-tool-button"
+          size="lg"
           classList={{
             active: project?.().activeTool() === ACTIVATE_TOOL.PAINT,
           }}
@@ -40,9 +33,10 @@ export const Tools = () => {
           ) : (
             <BsBrush />
           )}
-        </button>
-        <button
-          class="menu-btn"
+        </SquareButton>
+        <SquareButton
+          class="square-tool-button"
+          size="lg"
           classList={{
             active: project?.().activeTool() === ACTIVATE_TOOL.PAINT_SELECTION,
           }}
@@ -55,9 +49,10 @@ export const Tools = () => {
           ) : (
             <BiRegularBrush />
           )}
-        </button>
-        <button
-          class="menu-btn"
+        </SquareButton>
+        <SquareButton
+          class="square-tool-button"
+          size="lg"
           classList={{
             active: project?.().activeTool() === ACTIVATE_TOOL.DELETE,
           }}
@@ -70,7 +65,7 @@ export const Tools = () => {
           ) : (
             <BiRegularEraser />
           )}
-        </button>
+        </SquareButton>
       </div>
 
       <hr />

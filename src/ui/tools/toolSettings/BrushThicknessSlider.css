@@ -1,19 +1,12 @@
 #brush-thickness-container {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    p {
-        font-size: 12px;
-    }
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  p {
+    font-size: 12px;
+  }
 
-    input {
-        flex: 1;
-    }
-}
-
-.tool-input {
-    background-color: var(--background);
-    border-radius: 10px;
-    padding-left: 20px;
-    padding-right: 20px;
+  input {
+    flex: 1;
+  }
 }

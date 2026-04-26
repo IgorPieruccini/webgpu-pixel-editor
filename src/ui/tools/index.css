@@ -27,20 +27,6 @@
     outline: none;
   }
 
-  .menu-btn {
-    width: 44px;
-    height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 14px;
-
-    svg {
-      width: 19px;
-      height: 19px;
-    }
-  }
-
   .active {
     background: linear-gradient(
       180deg,
