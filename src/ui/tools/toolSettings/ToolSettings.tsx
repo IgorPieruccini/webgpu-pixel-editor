@@ -10,29 +10,32 @@ import { AnchoredPopover } from "../../shared/anchoredPopover";
 
 export const ToolSettings = () => {
   const project = useEditor();
-  const showThickness =
+
+  const showThickness = () =>
     project?.().activeTool() !== ACTIVATE_TOOL.PAINT_SELECTION;
 
   return (
     <div id="tool-settings">
-      <AnchoredPopover
-        side="bottom"
-        trigger={({ toggle }) => (
-          <SquareButton
-            id="menu"
-            class="square-tool-button"
-            size="sm"
-            onClick={toggle}
-          >
-            <FiMenu />
-          </SquareButton>
-        )}
-      >
-        <MenuOptions />
-      </AnchoredPopover>
+      <div id="menu-section">
+        <AnchoredPopover
+          side="bottom"
+          trigger={({ toggle }) => (
+            <SquareButton
+              id="menu"
+              class="square-tool-button"
+              size="sm"
+              onClick={toggle}
+            >
+              <FiMenu />
+            </SquareButton>
+          )}
+        >
+          <MenuOptions />
+        </AnchoredPopover>
+      </div>
       <div class="separator separator-vertical" aria-hidden="true" />
-      {showThickness && <BrushThicknessSlider />}
-      {showThickness && (
+      {showThickness() && <BrushThicknessSlider />}
+      {showThickness() && (
         <div class="separator separator-vertical" aria-hidden="true" />
       )}
       <BrushOpacitySlider />

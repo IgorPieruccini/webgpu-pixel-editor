@@ -13,3 +13,7 @@
   backdrop-filter: blur(18px);
   padding: 0px 12px 0px 12px;
 }
+
+#menu-section {
+  width: 240px;
+}
