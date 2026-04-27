@@ -7,12 +7,20 @@ import { MenuOptions } from "../menu/menuOptions";
 import { FiMenu } from "solid-icons/fi";
 import { SquareButton } from "../../shared/squareButton";
 import { AnchoredPopover } from "../../shared/anchoredPopover";
+import { AiOutlineExport } from "solid-icons/ai";
+import { useMenu } from "../menuProvider";
+import { OPENED_OPTIONS } from "../constants";
 
 export const ToolSettings = () => {
   const project = useEditor();
+  const menu = useMenu();
 
   const showThickness = () =>
     project?.().activeTool() !== ACTIVATE_TOOL.PAINT_SELECTION;
+
+  const onExport = () => {
+    menu.openOption(OPENED_OPTIONS.EXPORT_PNG);
+  };
 
   return (
     <div id="tool-settings">
@@ -39,6 +47,13 @@ export const ToolSettings = () => {
         <div class="separator separator-vertical" aria-hidden="true" />
       )}
       <BrushOpacitySlider />
+
+      <div class="separator separator-vertical" aria-hidden="true" />
+      <div id="general-section">
+        <SquareButton onClick={onExport} size="sm">
+          <AiOutlineExport />
+        </SquareButton>
+      </div>
     </div>
   );
 };
