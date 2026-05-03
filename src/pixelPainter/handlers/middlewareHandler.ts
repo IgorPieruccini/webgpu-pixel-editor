@@ -48,6 +48,16 @@ export const createMiddlewareHandler = (
     uniformBufferHandler.updateBrushThickness(value);
   };
 
+  const setBrushColor = (color: number | string) => {
+    brushHandler.setColor(color);
+    uniformBufferHandler.updateSelectedColor(brushHandler.getSelectedColor());
+  };
+
+  const setBrushOpacity = (opacity: number) => {
+    brushHandler.setOpacity(opacity);
+    uniformBufferHandler.updateBrushOpacity(brushHandler.getOpacity());
+  };
+
   const setOpacity = (
     layerId: string,
     opacity: number,
@@ -87,6 +97,8 @@ export const createMiddlewareHandler = (
     setOpacity,
     removeLayer,
     duplicateLayer,
+    setBrushColor,
+    setBrushOpacity,
     setBrushThickness,
     draw,
     loadLayers,

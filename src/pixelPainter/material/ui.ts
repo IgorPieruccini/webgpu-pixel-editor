@@ -11,7 +11,7 @@ export const bind = (
 
   const uiUniformBuffer = device.createBuffer({
     label: `${label} - ui uniform buffer`,
-    size: 8 * 4,
+    size: 12 * 4,
     usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
   });
 

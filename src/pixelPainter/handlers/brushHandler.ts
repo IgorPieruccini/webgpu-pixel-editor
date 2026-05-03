@@ -182,16 +182,6 @@ export const createBrushHandler = (
     layerHandler.makeCurrentLayerDirty();
   };
 
-  const setSelectedColor = (color: number | string) => {
-    if (typeof color === "string") {
-      const hex = parseInt(color.replace("#", ""), 16);
-      _setSelectedColor(hex);
-      return;
-    }
-
-    _setSelectedColor(color);
-  };
-
   const getSelectedColor = (format: "number" | "string" = "number") => {
     if (format === "string") {
       return `#${_getSelectedColor().toString(16).padStart(6, "0")}`;
@@ -208,7 +198,6 @@ export const createBrushHandler = (
     getOpacity,
     setOpacity,
     getSelectedColor,
-    setSelectedColor,
     getThickness,
     setThickness,
     clearCurrentPaintedPixels,

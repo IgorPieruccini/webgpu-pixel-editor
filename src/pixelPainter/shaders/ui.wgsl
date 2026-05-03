@@ -17,6 +17,7 @@ struct UIParams {
     selectionRectH: f32,
     brushThickness: f32,
     selectionToolActivated: f32,
+    selectedColor: vec4f,
 }
 
 @group(0) @binding(0) var<uniform> commonValues: CommonValues;
@@ -67,16 +68,17 @@ fn fragmentMain(@location(0) canvasPixelCoord: vec2f) -> @location(0) vec4f {
     let cell = floor(canvasPixelCoord);
     let snappedCenter = cell + vec2f(0.5);
     let selectionActive = uiParams.selectionToolActivated > 0.5;
+    let uiColor = uiParams.selectedColor;
 
     if !selectionActive && uiParams.mouseCellX >= 0.0 && uiParams.mouseCellY >= 0.0 {
         let brushCenterPx = vec2f(uiParams.mouseCellX, uiParams.mouseCellY) + vec2f(0.5);
         let radiusPx = max(uiParams.brushThickness, 0.5);
         let dist = distance(snappedCenter, brushCenterPx);
         let fill = select(0.0, 1.0, dist < radiusPx);
-        let alpha = fill * 0.18;
+        let alpha = fill * uiColor.a;
 
         if alpha > 0.0 {
-            return vec4f(1.0, 1.0, 1.0, alpha);
+            return vec4f(uiColor.rgb, alpha);
         }
     }
 
@@ -97,7 +99,7 @@ fn fragmentMain(@location(0) canvasPixelCoord: vec2f) -> @location(0) vec4f {
         let inside = rectMask(cell, rectMin, rectMax);
 
         if inside == 1.0 {
-            return vec4f(0.97, 0.97, 0.97, 0.1);
+            return vec4f(uiColor.rgb, uiColor.a);
         }
     }
 

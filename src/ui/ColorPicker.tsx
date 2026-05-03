@@ -9,7 +9,7 @@ export const ColorPicker = () => {
       name="color"
       value={brush().getSelectedColor("string")}
       onInput={(e) => {
-        brush().setSelectedColor(e.target.value);
+        brush().setColor(e.target.value);
       }}
     />
   );

@@ -1,4 +1,5 @@
 import type { Vec2 } from "../editor/types";
+import { numberToRGBA } from "./utils";
 
 export type UniformBufferHandler = ReturnType<
   typeof createUniformBufferHandler
@@ -31,6 +32,10 @@ export const createUniformBufferHandler = (
     0, // selectedCells.h
     1, // brushThickness
     0, // selection tool activated
+    1, // selectedColor.r
+    0, // selectedColor.g
+    1, // selectedColor.b
+    1, // selectedColor.a
   ]);
 
   const updatePan = (pan: Vec2) => {
@@ -73,6 +78,19 @@ export const createUniformBufferHandler = (
     value == true ? (uiUniforms[7] = 1) : (uiUniforms[7] = 0);
   };
 
+  const updateSelectedColor = (color: number | string) => {
+    const normalizedColor =
+      typeof color === "string" ? parseInt(color.replace("#", ""), 16) : color;
+    const rgba = numberToRGBA(normalizedColor);
+    uiUniforms[8] = rgba.r / 255;
+    uiUniforms[9] = rgba.g / 255;
+    uiUniforms[10] = rgba.b / 255;
+  };
+
+  const updateBrushOpacity = (opacity: number) => {
+    uiUniforms[11] = opacity / 100;
+  };
+
   return {
     commonUniforms,
     layerUniforms,
@@ -98,6 +116,8 @@ export const createUniformBufferHandler = (
     updateSelectedCellsPosition,
     updateBrushThickness,
     setSelectionTool,
+    updateSelectedColor,
+    updateBrushOpacity,
     isSelectionToolEnabled: () => (uiUniforms[7] === 1 ? true : false),
   };
 };
