@@ -15,7 +15,7 @@
     flex-direction: column;
     justify-content: space-between;
     gap: 12px;
-    height: 400px;
+    height: 350px;
     margin: 4px 0px 4px 0px;
 
     #layer-slider {
@@ -23,7 +23,6 @@
       flex-direction: column;
       justify-content: start;
       gap: 10px;
-      max-height: 400px;
       overflow-y: auto;
       padding-right: 4px;
     }
