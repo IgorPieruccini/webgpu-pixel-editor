@@ -32,9 +32,9 @@ export const createUniformBufferHandler = (
     0, // selectedCells.h
     1, // brushThickness
     0, // selection tool activated
-    1, // selectedColor.r
+    0, // selectedColor.r
     0, // selectedColor.g
-    1, // selectedColor.b
+    0, // selectedColor.b
     1, // selectedColor.a
     -1, // startLineX
     -1, // startLineY

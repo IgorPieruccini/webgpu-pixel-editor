@@ -13,6 +13,7 @@ export const ColorPicker = () => {
   return (
     <div class={`${styles.container} tool-input`}>
       <SketchPicker
+        defaultColor={"#000000"}
         presetColors={colorPalette().getColors()}
         onChange={onChange}
       />

@@ -26,7 +26,7 @@ export const createBrushHandler = (
   });
 
   // Default color: magenta RGB (0xff00ff), will be converted to ABGR when set
-  const [_getSelectedColor, _setSelectedColor] = createSignal(0xff00ff);
+  const [_getSelectedColor, _setSelectedColor] = createSignal(0x000000);
   const [getOpacity, setOpacity] = createSignal(100);
   const [getThickness, setThickness] = createSignal(1);
 
