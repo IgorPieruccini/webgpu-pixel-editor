@@ -1,4 +1,4 @@
-import { BYTES_PER_PIXEL, RGBA_OFFSET } from "../../../constants";
+import { BYTES_PER_PIXEL } from "../../../constants";
 import type { Vec2 } from "../../../editor/types";
 import type { UniformBufferHandler } from "../../uniformBuffersHandler";
 import type { BrushHandler } from "../brushHandler";

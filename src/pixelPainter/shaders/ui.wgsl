@@ -41,14 +41,15 @@ fn rectMask(cell: vec2f, rectMin: vec2f, rectMax: vec2f) -> f32 {
     return 0.0;
 }
 
-fn lineMask(cell: vec2f, lineStart: vec2f, lineEnd: vec2f) -> f32 {
+fn lineMask(cell: vec2f, lineStart: vec2f, lineEnd: vec2f, thickness: f32) -> f32 {
     let dx = lineEnd.x - lineStart.x;
     let dy = lineEnd.y - lineStart.y;
     let steps = i32(max(abs(dx), abs(dy)));
 
     if steps == 0 {
         let point = vec2f(round(lineStart.x), round(lineStart.y));
-        return select(0.0, 1.0, all(point == cell));
+        let dist = distance(point, cell);
+        return select(0.0, 1.0, dist < thickness);
     }
 
     let xInc = dx / f32(steps);
@@ -59,7 +60,7 @@ fn lineMask(cell: vec2f, lineStart: vec2f, lineEnd: vec2f) -> f32 {
 
     for (var i = 0; i <= steps; i++) {
         let point = vec2f(round(x), round(y));
-        if all(point == cell) {
+        if distance(point, cell) < thickness {
             return 1.0;
         }
 
@@ -108,7 +109,8 @@ fn fragmentMain(@location(0) canvasPixelCoord: vec2f) -> @location(0) vec4f {
         uiParams.mouseCellY >= 0.0 {
         let lineStart = vec2f(uiParams.lineStartX, uiParams.lineStartY);
         let lineEnd = vec2f(uiParams.mouseCellX, uiParams.mouseCellY);
-        let fill = lineMask(cell, lineStart, lineEnd);
+        let thickness = max(uiParams.brushThickness, 0.5);
+        let fill = lineMask(cell, lineStart, lineEnd, thickness);
         let alpha = fill * uiColor.a;
 
         if alpha > 0.0 {
