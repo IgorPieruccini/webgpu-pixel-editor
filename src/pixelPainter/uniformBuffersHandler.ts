@@ -103,6 +103,10 @@ export const createUniformBufferHandler = (
     uiUniforms[13] = -1;
   };
 
+  const getStartLinePosition = (): Vec2 => {
+    return { x: uiUniforms[12], y: uiUniforms[13] };
+  };
+
   return {
     commonUniforms,
     layerUniforms,
@@ -133,5 +137,6 @@ export const createUniformBufferHandler = (
     isSelectionToolEnabled: () => (uiUniforms[7] === 1 ? true : false),
     setLineStartPosition,
     resetStartLinePosition,
+    getStartLinePosition,
   };
 };

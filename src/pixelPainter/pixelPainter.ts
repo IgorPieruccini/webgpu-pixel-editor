@@ -51,7 +51,13 @@ export const pixelPainter = async (
     canvas,
   );
 
-  const lineHandler = createLineHandler(gridSize, uniformBufferHandler);
+  const lineHandler = createLineHandler(
+    gridSize,
+    uniformBufferHandler,
+    layerHandler,
+    brushHandler,
+    historyChangeHandler,
+  );
 
   const middlewareHandler = createMiddlewareHandler(
     brushHandler,
@@ -104,6 +110,7 @@ export const pixelPainter = async (
     line: {
       setLineStartPosition: lineHandler.setStartLinePosition,
       resetLineStartPosition: lineHandler.resetStartLinePosition,
+      draw: lineHandler.draw,
     },
     render: {
       draw: middlewareHandler.draw,

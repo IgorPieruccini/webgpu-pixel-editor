@@ -132,7 +132,6 @@ export const initializeEditor = async (
           y: cell.y * BYTES_PER_PIXEL,
         });
       }
-
     }
 
     if (activeTool() === ACTIVATE_TOOL.PAINT_SELECTION && isLeftMouseDown) {
@@ -177,10 +176,16 @@ export const initializeEditor = async (
     }
   });
 
-  canvas.addEventListener("mouseup", () => {
+  canvas.addEventListener("mouseup", (e) => {
     isLeftMouseDown = false;
 
     if (activeTool() === ACTIVATE_TOOL.LINE) {
+      const cell = pickCell(
+        { x: e.clientX, y: e.clientY },
+        { x: canvas.offsetLeft, y: canvas.offsetTop },
+      );
+
+      pixel.line.draw(cell);
       pixel.line.resetLineStartPosition();
     }
 

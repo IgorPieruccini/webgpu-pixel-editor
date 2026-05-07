@@ -184,13 +184,16 @@ export const createBrushHandler = (
     layerHandler.makeCurrentLayerDirty();
   };
 
-  const getSelectedColor = (format: "number" | "string" = "number") => {
+  function getSelectedColor(): number;
+  function getSelectedColor(format: "number"): number;
+  function getSelectedColor(format: "string"): string;
+  function getSelectedColor(format: "number" | "string" = "number") {
     if (format === "string") {
       return `#${_getSelectedColor().toString(16).padStart(6, "0")}`;
     }
 
     return _getSelectedColor();
-  };
+  }
 
   return {
     setColor,
