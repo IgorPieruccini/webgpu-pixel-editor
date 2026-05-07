@@ -24,6 +24,7 @@ export const LayerOpacity = () => {
   return (
     <Slider
       key="layer-opacity"
+      label="Layer Opacity"
       onChange={onChangeOpacity}
       onFinish={onFinishChange}
       value={layersAPI().getActive().opacity * 100}

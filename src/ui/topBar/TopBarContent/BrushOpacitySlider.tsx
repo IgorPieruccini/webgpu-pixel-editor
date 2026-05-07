@@ -1,5 +1,5 @@
 import { API } from "../../../projectConfig/projectConfigProvider";
-import styles from "./BrushOpacitySlider.module.css";
+import { Slider } from "../../shared/slider";
 
 export const BrushOpacitySlider = () => {
   const brush = API.brush();
@@ -12,17 +12,14 @@ export const BrushOpacitySlider = () => {
   };
 
   return (
-    <div class={`${styles.container} tool-input`}>
-      <label for="layer-opacity-input">Opacity</label>
-      <input
-        class={styles.input}
-        type="range"
-        min={0}
-        max={100}
-        value={brush().getOpacity()}
-        onInput={onBrushChangeOpacity}
-      />
-      <p class={styles.value}>{Math.floor(brush().getOpacity())}%</p>
-    </div>
+    <Slider
+      key="brush-opacity"
+      label="Opacity"
+      min={0}
+      max={100}
+      value={brush().getOpacity()}
+      valueText={`${Math.floor(brush().getOpacity())}%`}
+      onChange={onBrushChangeOpacity}
+    />
   );
 };

@@ -1,5 +1,5 @@
 import { API } from "../../../projectConfig/projectConfigProvider";
-import styles from "./BrushThicknessSlider.module.css";
+import { Slider } from "../../shared/slider";
 
 export const BrushThicknessSlider = () => {
   const brush = API.brush();
@@ -12,17 +12,14 @@ export const BrushThicknessSlider = () => {
   };
 
   return (
-    <div class={`${styles.container} tool-input`}>
-      <label for="layer-thickness-input">Thickness</label>
-      <input
-        class={styles.input}
-        type="range"
-        min={1}
-        max={100}
-        value={brush().getThickness()}
-        onInput={onBrushChangeThickness}
-      />
-      <p class={styles.value}>{brush().getThickness()}</p>
-    </div>
+    <Slider
+      key="brush-thickness"
+      label="Thickness"
+      min={1}
+      max={100}
+      value={brush().getThickness()}
+      valueText={brush().getThickness().toString()}
+      onChange={onBrushChangeThickness}
+    />
   );
 };
