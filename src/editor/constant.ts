@@ -7,6 +7,15 @@ export const ACTIVATE_TOOL = {
   LINE: 3,
 };
 
+function getSelectedColor(): number;
+function getSelectedColor(format: "number"): number;
+function getSelectedColor(format: "string"): string;
+function getSelectedColor(
+  format: "number" | "string" = "number",
+): number | string {
+  return format === "string" ? "#000000" : 0;
+}
+
 export const INITIAL_PIXEL_PAINTER: PixelPainterMethods = {
   layer: {
     add: () => "",
@@ -37,13 +46,14 @@ export const INITIAL_PIXEL_PAINTER: PixelPainterMethods = {
     erase: () => {},
     getOpacity: () => 1,
     setOpacity: () => {},
-    getSelectedColor: () => 0,
+    getSelectedColor,
     getThickness: () => 1,
     setThickness: () => {},
   },
   line: {
     setLineStartPosition: () => {},
     resetLineStartPosition: () => {},
+    draw: () => {},
   },
   render: {
     draw: () => {},

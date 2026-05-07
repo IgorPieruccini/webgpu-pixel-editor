@@ -56,7 +56,6 @@ export const pixelPainter = async (
     uniformBufferHandler,
     layerHandler,
     brushHandler,
-    historyChangeHandler,
   );
 
   const middlewareHandler = createMiddlewareHandler(
