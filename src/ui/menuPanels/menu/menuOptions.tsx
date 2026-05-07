@@ -4,7 +4,7 @@ import {
   loadProject,
   saveProject,
 } from "../../../projectConfig/projectUtils";
-import { OPENED_OPTIONS } from "../constants";
+import { OPENED_OPTIONS } from "../../topBar/constants";
 import { useMenu } from "../menuProvider";
 import "./menu.css";
 

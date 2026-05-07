@@ -1,15 +1,15 @@
 import { createSignal } from "solid-js";
-import { useProjectConfig } from "../../projectConfig/projectConfigProvider";
-import { useMenu } from "../tools/menuProvider";
+import { useProjectConfig } from "../../../projectConfig/projectConfigProvider";
+import { useMenu } from "../menuProvider";
 import "./menuPanels.css";
 import { HiSolidXMark } from "solid-icons/hi";
-import type { Vec2 } from "../../editor/types";
+import type { Vec2 } from "../../../editor/types";
 import {
   DEFAULT_GRID_SIZE,
   MAX_GRID_SIZE,
   MIN_GRID_SIZE,
-} from "../../constants";
-import { SquareButton } from "../shared/squareButton";
+} from "../../../constants";
+import { SquareButton } from "../../shared/squareButton";
 
 export const NewProjectPanel = () => {
   const [getProjectName, setProjectName] = createSignal("new project");

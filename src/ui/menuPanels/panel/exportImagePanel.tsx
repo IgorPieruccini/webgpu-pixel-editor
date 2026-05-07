@@ -1,8 +1,8 @@
 import { createSignal } from "solid-js";
 import { HiSolidXMark } from "solid-icons/hi";
-import { API } from "../../projectConfig/projectConfigProvider";
-import { useMenu } from "../tools/menuProvider";
-import { SquareButton } from "../shared/squareButton";
+import { API } from "../../../projectConfig/projectConfigProvider";
+import { useMenu } from "../menuProvider";
+import { SquareButton } from "../../shared/squareButton";
 
 const MIN_MULTIPLIER = 1;
 const MAX_MULTIPLIER = 10;

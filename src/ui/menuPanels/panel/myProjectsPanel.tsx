@@ -1,11 +1,11 @@
 import { createSignal, onMount } from "solid-js";
-import { useMenu } from "../tools/menuProvider";
-import { useProjectConfig } from "../../projectConfig/projectConfigProvider";
-import type { ProjectType } from "../../editor/types";
-import { storageLocal } from "../../storageLocal";
+import { useMenu } from "../menuProvider";
+import { useProjectConfig } from "../../../projectConfig/projectConfigProvider";
+import type { ProjectType } from "../../../editor/types";
+import { storageLocal } from "../../../storageLocal";
 import { AiOutlineDelete } from "solid-icons/ai";
 import { HiSolidXMark } from "solid-icons/hi";
-import { SquareButton } from "../shared/squareButton";
+import { SquareButton } from "../../shared/squareButton";
 
 export const MyProjects = () => {
   const [projects, setProjects] = createSignal<ProjectType[]>([]);
@@ -47,7 +47,10 @@ export const MyProjects = () => {
                 <button onClick={() => void onOpenProject(project)}>
                   {project.name}
                 </button>{" "}
-                <SquareButton size="sm" onClick={() => void onDeleteProject(project)}>
+                <SquareButton
+                  size="sm"
+                  onClick={() => void onDeleteProject(project)}
+                >
                   <AiOutlineDelete />
                 </SquareButton>
               </div>

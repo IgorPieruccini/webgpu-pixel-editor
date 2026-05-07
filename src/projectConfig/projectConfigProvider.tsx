@@ -1,6 +1,6 @@
 import { createContext, onMount, useContext, type JSX } from "solid-js";
 import { editorContext } from "../editor/editortContext";
-import { useMenu } from "../ui/tools/menuProvider";
+import { useMenu } from "../ui/menuPanels/menuProvider";
 import { storageLocal } from "../storageLocal";
 import { storageDB } from "../storageDB";
 import { DEFAULT_GRID_SIZE } from "../constants";

@@ -1,9 +1,9 @@
 import { NewProjectPanel } from "./newProjectPanel";
 
 import "./menuPanels.css";
-import { useMenu } from "../tools/menuProvider";
-import { OPENED_OPTIONS } from "../tools/constants";
-import { MyProjects } from "./myProjects";
+import { useMenu } from "../menuProvider";
+import { OPENED_OPTIONS } from "../../topBar/constants";
+import { MyProjects } from "./myProjectsPanel";
 import { ExportImagePanel } from "./exportImagePanel";
 
 export const MenuPanels = () => {

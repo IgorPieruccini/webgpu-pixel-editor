@@ -3,12 +3,12 @@ import { useEditor } from "../../../editor/editortContext";
 import { BrushOpacitySlider } from "./BrushOpacitySlider";
 import { BrushThicknessSlider } from "./BrushThicknessSlider";
 import "./ToolSettings.css";
-import { MenuOptions } from "../menu/menuOptions";
+import { MenuOptions } from "../../menuPanels/menu/menuOptions";
 import { FiMenu } from "solid-icons/fi";
 import { SquareButton } from "../../shared/squareButton";
 import { AnchoredPopover } from "../../shared/anchoredPopover";
 import { AiOutlineExport } from "solid-icons/ai";
-import { useMenu } from "../menuProvider";
+import { useMenu } from "../../menuPanels/menuProvider";
 import { OPENED_OPTIONS } from "../constants";
 
 export const ToolSettings = () => {

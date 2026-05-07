@@ -1,10 +1,10 @@
 import "./App.css";
 import { ProjectConfigProvider } from "./projectConfig/projectConfigProvider";
 import { DevTool } from "./ui/debugger/DevTool";
-import { MenuPanels } from "./ui/menuPanels";
+import { MenuPanels } from "./ui/menuPanels/panel";
 import { RightPanel } from "./ui/rightPanel/rightPanel";
-import { Tools, ToolSettings } from "./ui/tools";
-import { MenuProvider } from "./ui/tools/menuProvider";
+import { Tools, ToolSettings } from "./ui/topBar";
+import { MenuProvider } from "./ui/menuPanels/menuProvider";
 
 function App() {
   // Check if debug=1 parameter is in the URL
