@@ -18,6 +18,8 @@ struct UIParams {
     brushThickness: f32,
     selectionToolActivated: f32,
     selectedColor: vec4f,
+    lineStartX: f32,
+    lineStartY: f32,
 }
 
 @group(0) @binding(0) var<uniform> commonValues: CommonValues;
@@ -34,6 +36,35 @@ fn rectMask(cell: vec2f, rectMin: vec2f, rectMax: vec2f) -> f32 {
         cell.y >= rectMin.y &&
         cell.y <= rectMax.y {
         return 1.0;
+    }
+
+    return 0.0;
+}
+
+fn lineMask(cell: vec2f, lineStart: vec2f, lineEnd: vec2f) -> f32 {
+    let dx = lineEnd.x - lineStart.x;
+    let dy = lineEnd.y - lineStart.y;
+    let steps = i32(max(abs(dx), abs(dy)));
+
+    if steps == 0 {
+        let point = vec2f(round(lineStart.x), round(lineStart.y));
+        return select(0.0, 1.0, all(point == cell));
+    }
+
+    let xInc = dx / f32(steps);
+    let yInc = dy / f32(steps);
+
+    var x = lineStart.x;
+    var y = lineStart.y;
+
+    for (var i = 0; i <= steps; i++) {
+        let point = vec2f(round(x), round(y));
+        if all(point == cell) {
+            return 1.0;
+        }
+
+        x += xInc;
+        y += yInc;
     }
 
     return 0.0;
@@ -69,6 +100,21 @@ fn fragmentMain(@location(0) canvasPixelCoord: vec2f) -> @location(0) vec4f {
     let snappedCenter = cell + vec2f(0.5);
     let selectionActive = uiParams.selectionToolActivated > 0.5;
     let uiColor = uiParams.selectedColor;
+
+    if !selectionActive &&
+        uiParams.lineStartX >= 0.0 &&
+        uiParams.lineStartY >= 0.0 &&
+        uiParams.mouseCellX >= 0.0 &&
+        uiParams.mouseCellY >= 0.0 {
+        let lineStart = vec2f(uiParams.lineStartX, uiParams.lineStartY);
+        let lineEnd = vec2f(uiParams.mouseCellX, uiParams.mouseCellY);
+        let fill = lineMask(cell, lineStart, lineEnd);
+        let alpha = fill * uiColor.a;
+
+        if alpha > 0.0 {
+            return vec4f(uiColor.rgb, alpha);
+        }
+    }
 
     if !selectionActive && uiParams.mouseCellX >= 0.0 && uiParams.mouseCellY >= 0.0 {
         let brushCenterPx = vec2f(uiParams.mouseCellX, uiParams.mouseCellY) + vec2f(0.5);

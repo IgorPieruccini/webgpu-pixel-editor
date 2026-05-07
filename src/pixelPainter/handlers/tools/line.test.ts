@@ -5,8 +5,12 @@ import { createLineHandler } from "./line";
 describe("Line", () => {
   it("getPixelsToPaint", () => {
     const gridSize: Vec2 = { x: 100, y: 100 };
+    const uniformBufferHandler = {
+      setLineStartPosition: () => {},
+      resetStartLinePosition: () => {},
+    } as never;
 
-    const lineHandler = createLineHandler(gridSize);
+    const lineHandler = createLineHandler(gridSize, uniformBufferHandler);
 
     const line = lineHandler.getPixelToPaint({
       a: {

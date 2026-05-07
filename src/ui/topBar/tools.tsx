@@ -3,6 +3,8 @@ import {
   BiRegularEraser,
   BiSolidBrush,
   BiSolidEraser,
+  BiRegularPencil,
+  BiSolidPencil,
 } from "solid-icons/bi";
 import { BsBrushFill, BsBrush } from "solid-icons/bs";
 
@@ -64,6 +66,23 @@ export const Tools = () => {
             <BiSolidEraser />
           ) : (
             <BiRegularEraser />
+          )}
+        </SquareButton>
+
+        <SquareButton
+          class="square-tool-button"
+          size="lg"
+          classList={{
+            active: project?.().activeTool() === ACTIVATE_TOOL.LINE,
+          }}
+          onClick={() => {
+            project?.().setActiveTool(ACTIVATE_TOOL.LINE);
+          }}
+        >
+          {project?.().activeTool() === ACTIVATE_TOOL.LINE ? (
+            <BiSolidPencil />
+          ) : (
+            <BiRegularPencil />
           )}
         </SquareButton>
       </div>

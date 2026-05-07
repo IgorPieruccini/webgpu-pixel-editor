@@ -1,4 +1,5 @@
 import type { Vec2 } from "../../../editor/types";
+import type { UniformBufferHandler } from "../../uniformBuffersHandler";
 
 export type Line = {
   a: Vec2;
@@ -12,7 +13,10 @@ export type Line = {
  * @param gridSize - The size of the grid (width and height).
  * @returns An object with the getPixelToPaint method.
  */
-export const createLineHandler = (gridSize: Vec2) => {
+export const createLineHandler = (
+  gridSize: Vec2,
+  uniformBufferHandler: UniformBufferHandler,
+) => {
   /**
    * Calculates the set of pixel indices that should be painted to represent the given line.
    *
@@ -55,7 +59,17 @@ export const createLineHandler = (gridSize: Vec2) => {
     return pixelsToPaint;
   };
 
+  const setStartLinePosition = (cell: Vec2) => {
+    uniformBufferHandler.setLineStartPosition(cell);
+  };
+
+  const resetStartLinePosition = () => {
+    uniformBufferHandler.resetStartLinePosition();
+  };
+
   return {
     getPixelToPaint,
+    setStartLinePosition,
+    resetStartLinePosition,
   };
 };

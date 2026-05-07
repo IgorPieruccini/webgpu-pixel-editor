@@ -10,6 +10,7 @@ import { createLayerPreview } from "./layerPreview";
 import { LAYER_PREVIEW_SIZE } from "../constants";
 import { calculateZoomFromGridAndCanvasSize } from "../utils";
 import { createColorPaletteHandler } from "./handlers/colorPaletteHandler";
+import { createLineHandler } from "./handlers/tools/line";
 
 export const pixelPainter = async (
   projectName: string,
@@ -49,6 +50,8 @@ export const pixelPainter = async (
     gridSize,
     canvas,
   );
+
+  const lineHandler = createLineHandler(gridSize, uniformBufferHandler);
 
   const middlewareHandler = createMiddlewareHandler(
     brushHandler,
@@ -97,6 +100,10 @@ export const pixelPainter = async (
       getSelectedColor: brushHandler.getSelectedColor,
       getThickness: brushHandler.getThickness,
       setThickness: middlewareHandler.setBrushThickness,
+    },
+    line: {
+      setLineStartPosition: lineHandler.setStartLinePosition,
+      resetLineStartPosition: lineHandler.resetStartLinePosition,
     },
     render: {
       draw: middlewareHandler.draw,

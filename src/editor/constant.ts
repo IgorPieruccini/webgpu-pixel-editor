@@ -4,6 +4,7 @@ export const ACTIVATE_TOOL = {
   PAINT: 0,
   PAINT_SELECTION: 1,
   DELETE: 2,
+  LINE: 3,
 };
 
 export const INITIAL_PIXEL_PAINTER: PixelPainterMethods = {
@@ -39,6 +40,10 @@ export const INITIAL_PIXEL_PAINTER: PixelPainterMethods = {
     getSelectedColor: () => 0,
     getThickness: () => 1,
     setThickness: () => {},
+  },
+  line: {
+    setLineStartPosition: () => {},
+    resetLineStartPosition: () => {},
   },
   render: {
     draw: () => {},

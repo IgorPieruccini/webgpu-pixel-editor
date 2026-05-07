@@ -36,6 +36,8 @@ export const createUniformBufferHandler = (
     0, // selectedColor.g
     1, // selectedColor.b
     1, // selectedColor.a
+    -1, // startLineX
+    -1, // startLineY
   ]);
 
   const updatePan = (pan: Vec2) => {
@@ -91,6 +93,16 @@ export const createUniformBufferHandler = (
     uiUniforms[11] = opacity / 100;
   };
 
+  const setLineStartPosition = (cell: Vec2) => {
+    uiUniforms[12] = cell.x;
+    uiUniforms[13] = cell.y;
+  };
+
+  const resetStartLinePosition = () => {
+    uiUniforms[12] = -1;
+    uiUniforms[13] = -1;
+  };
+
   return {
     commonUniforms,
     layerUniforms,
@@ -119,5 +131,7 @@ export const createUniformBufferHandler = (
     updateSelectedColor,
     updateBrushOpacity,
     isSelectionToolEnabled: () => (uiUniforms[7] === 1 ? true : false),
+    setLineStartPosition,
+    resetStartLinePosition,
   };
 };
