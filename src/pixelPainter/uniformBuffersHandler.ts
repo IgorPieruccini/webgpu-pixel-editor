@@ -26,8 +26,8 @@ export const createUniformBufferHandler = (
   const uiUniforms = new Float32Array([
     0, // cellPos.x
     0, // cellPos.y
-    0, // selectedCells.x
-    0, // selectedCells.y
+    -1, // selectedCells.x
+    -1, // selectedCells.y
     0, // selectedCells.w
     0, // selectedCells.h
     1, // brushThickness
