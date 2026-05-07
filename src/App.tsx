@@ -1,4 +1,4 @@
-import "./App.css";
+import styles from "./App.module.css";
 import { ProjectConfigProvider } from "./projectConfig/projectConfigProvider";
 import { DevTool } from "./ui/debugger/DevTool";
 import { MenuPanels } from "./ui/menuPanels/panel";
@@ -12,13 +12,18 @@ function App() {
   const isDebugMode = urlParams.get("debug") === "1";
 
   return (
-    <div id="editor">
+    <div class={styles.editor}>
       <MenuProvider>
         <ProjectConfigProvider>
           <ToolSettings />
-          <div class="row">
+          <div class={styles.row}>
             <Tools />
-            <canvas id="main-canvas" width={1280} height={1280} />
+            <canvas
+              id="main-canvas"
+              class={styles.mainCanvas}
+              width={1280}
+              height={1280}
+            />
             <RightPanel />
             <MenuPanels />
           </div>

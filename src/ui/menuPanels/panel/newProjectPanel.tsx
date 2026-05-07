@@ -1,7 +1,7 @@
 import { createSignal } from "solid-js";
 import { useProjectConfig } from "../../../projectConfig/projectConfigProvider";
 import { useMenu } from "../menuProvider";
-import "./menuPanels.css";
+import styles from "./NewProjectPanel.module.css";
 import { HiSolidXMark } from "solid-icons/hi";
 import type { Vec2 } from "../../../editor/types";
 import {
@@ -49,9 +49,9 @@ export const NewProjectPanel = () => {
   };
 
   return (
-    <div class="menu-panel">
-      <div id="top-section">
-        <span class="panel-title">Project Name</span>
+    <div class={styles.panel}>
+      <div class={styles.topSection}>
+        <span class={styles.panelTitle}>Project Name</span>
         <SquareButton
           type="button"
           size="sm"
@@ -61,9 +61,9 @@ export const NewProjectPanel = () => {
           <HiSolidXMark />
         </SquareButton>
       </div>
-      <input type="text" id="project-name-input" onInput={onUpdateName} />
-      <div id="grid-size-container">
-        <div class="grid-size-input">
+      <input type="text" class={styles.projectNameInput} onInput={onUpdateName} />
+      <div class={styles.gridSizeContainer}>
+        <div class={styles.gridSizeInput}>
           <label for="grid-x-input">Width:</label>
           <input
             id="grid-x-input"
@@ -75,7 +75,7 @@ export const NewProjectPanel = () => {
             onFocusOut={() => onFocusOut("x")}
           />
         </div>
-        <div class="grid-size-input">
+        <div class={styles.gridSizeInput}>
           <label for="grid-y">Height:</label>
           <input
             id="grid-y-input"

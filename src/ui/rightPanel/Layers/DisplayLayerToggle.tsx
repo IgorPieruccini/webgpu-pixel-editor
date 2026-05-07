@@ -2,6 +2,7 @@ import { BiRegularShow, BiRegularHide } from "solid-icons/bi";
 import type { Layer } from "../../../pixelPainter/types";
 import { API } from "../../../projectConfig/projectConfigProvider";
 import { SquareButton } from "../../shared/squareButton";
+import styles from "./LayerActionButton.module.css";
 
 type DisplayLayerToggleProps = {
   layer: Layer;
@@ -16,7 +17,7 @@ export const DisplayLayerToggle = ({ layer }: DisplayLayerToggleProps) => {
   };
 
   return (
-    <SquareButton class="layer-btn-icon" size="xs" onClick={onToggleDisplay}>
+    <SquareButton class={styles.button} size="xs" onClick={onToggleDisplay}>
       {layer.display ? (
         <BiRegularShow size={16} />
       ) : (

@@ -1,5 +1,5 @@
 import { SketchPicker, type ColorResult } from "solid-color";
-import "./colorPicker.css";
+import styles from "./ColorPicker.module.css";
 import { API } from "../../projectConfig/projectConfigProvider";
 
 export const ColorPicker = () => {
@@ -11,7 +11,7 @@ export const ColorPicker = () => {
   };
 
   return (
-    <div class="ColorPickerContainer tool-input">
+    <div class={`${styles.container} tool-input`}>
       <SketchPicker
         presetColors={colorPalette().getColors()}
         onChange={onChange}

@@ -1,0 +1,12 @@
+.menuOptions {
+  background: var(--surface-strong);
+  border: 1px solid var(--surface-border);
+  border-radius: 16px;
+  padding: 10px;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(18px);
+}

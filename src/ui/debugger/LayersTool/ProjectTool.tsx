@@ -1,6 +1,6 @@
 import { AiOutlineDownload } from "solid-icons/ai";
 import { FiFilePlus } from "solid-icons/fi";
-import "./ProjectTool.css";
+import styles from "./ProjectTool.module.css";
 import { serialization } from "../../../serialization";
 import {
   API,
@@ -80,9 +80,9 @@ export const ProjectTool = () => {
   };
 
   return (
-    <div id="project-tool" class="tool">
+    <div class={`${styles.projectTool} ${styles.tool}`}>
       <h3>Project Tool</h3>
-      <div id="project-tool-buttons">
+      <div class={styles.projectToolButtons}>
         <button onClick={onDownloadProject}>
           <AiOutlineDownload />
         </button>

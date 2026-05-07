@@ -1,5 +1,6 @@
 import { createSignal } from "solid-js";
 import { API } from "../../../projectConfig/projectConfigProvider";
+import styles from "./LayerTitle.module.css";
 
 type LayerTitleProps = {
   layerName: string;
@@ -57,14 +58,14 @@ export const LayerTitle = ({ layerName }: LayerTitleProps) => {
       {isEditing() ? (
         <input
           ref={autoFocus}
-          class="layer-title"
+          class={styles.title}
           type="text"
           value={getName()}
           onInput={onTypeName}
           onBlur={finishEditing}
         />
       ) : (
-        <span class="layer-title" onDblClick={onStartEditing}>
+        <span class={styles.title} onDblClick={onStartEditing}>
           {getShortenName()}
         </span>
       )}

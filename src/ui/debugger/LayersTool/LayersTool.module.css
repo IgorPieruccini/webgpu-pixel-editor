@@ -1,0 +1,33 @@
+.tool {
+  background: rgba(12, 22, 39, 0.92);
+  border: 1px solid var(--surface-border);
+  border-radius: 16px;
+  padding: 12px;
+}
+
+.layersTool {
+  display: flex;
+  flex-direction: column;
+  min-width: 356px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.layerNode {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}

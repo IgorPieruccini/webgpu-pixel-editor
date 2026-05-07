@@ -1,6 +1,5 @@
 import { API } from "../../../projectConfig/projectConfigProvider";
 import { Slider } from "../../shared/slider";
-import "./LayerOpacity.css";
 
 export const LayerOpacity = () => {
   const layersAPI = API.layers();
@@ -20,10 +19,9 @@ export const LayerOpacity = () => {
       //@ts-expect-error - fix input type
       layersAPI().setOpacity(activeLayerId, e.target.valueAsNumber / 100 ?? 1, true);
     }
-  }
+  };
 
   return (
-
     <Slider
       key="layer-opacity"
       onChange={onChangeOpacity}

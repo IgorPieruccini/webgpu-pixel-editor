@@ -1,0 +1,15 @@
+.tool {
+  background: rgba(12, 22, 39, 0.92);
+  border: 1px solid var(--surface-border);
+  border-radius: 16px;
+  padding: 12px;
+}
+
+.projectTool {
+  min-width: 150px;
+}
+
+.projectToolButtons {
+  display: flex;
+  gap: 8px;
+}

@@ -1,9 +1,7 @@
 import { AiOutlineDownload, AiOutlinePlus } from "solid-icons/ai";
-import {
-  API,
-} from "../../../projectConfig/projectConfigProvider";
+import { API } from "../../../projectConfig/projectConfigProvider";
 import { serialization } from "../../../serialization";
-import "./LayersTool.css";
+import styles from "./LayersTool.module.css";
 import { FiFilePlus } from "solid-icons/fi";
 import { downloadFile, importFile } from "../../../utils";
 
@@ -31,21 +29,21 @@ export const LayersTool = () => {
   };
 
   return (
-    <div id="layers-tool" class="tool">
-      <div id="layer-tool-title">
+    <div class={`${styles.layersTool} ${styles.tool}`}>
+      <div class={styles.header}>
         <h3>Layers tool</h3>
         <button>
           <AiOutlinePlus />
         </button>
       </div>
-      <div class="list">
+      <div class={styles.list}>
         {layers()
           .getList()
           .map((layer) => {
             return (
-              <div class="layer-node">
+              <div class={styles.layerNode}>
                 <span>{layer.name}</span>
-                <div class="layer-node">
+                <div class={styles.layerNode}>
                   <button onClick={() => onDownload(layer.id)}>
                     <AiOutlineDownload />
                   </button>

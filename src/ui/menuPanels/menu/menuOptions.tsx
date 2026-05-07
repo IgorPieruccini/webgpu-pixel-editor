@@ -6,7 +6,7 @@ import {
 } from "../../../projectConfig/projectUtils";
 import { OPENED_OPTIONS } from "../../topBar/constants";
 import { useMenu } from "../menuProvider";
-import "./menu.css";
+import styles from "./MenuOptions.module.css";
 
 export const MenuOptions = () => {
   const menu = useMenu();
@@ -26,7 +26,7 @@ export const MenuOptions = () => {
   };
 
   return (
-    <div id="menu-options">
+    <div class={styles.menuOptions}>
       <button
         onClick={() => {
           menu.openOption(OPENED_OPTIONS.NEW_PROJECT);

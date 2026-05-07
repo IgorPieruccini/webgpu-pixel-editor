@@ -1,6 +1,6 @@
 import { API } from "../../../projectConfig/projectConfigProvider";
 import { AiOutlinePlus } from "solid-icons/ai";
-import "./Layer.css";
+import styles from "./Layers.module.css";
 import { For } from "solid-js";
 import { LayerButton } from "./LayerButton";
 import {
@@ -34,10 +34,10 @@ export const Layers = () => {
   };
 
   return (
-    <div id="layers">
+    <div class={styles.layers}>
       <DragDropProvider onDragEnd={onDragEnd} collisionDetector={closestCenter}>
         <DragDropSensors />
-        <div id="layer-slider">
+        <div class={styles.layerSlider}>
           <SortableProvider ids={getLayerIds()}>
             <For each={layersAPI().getList()}>
               {(layer) => <LayerButton layer={layer}></LayerButton>}

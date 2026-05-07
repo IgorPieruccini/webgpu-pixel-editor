@@ -12,3 +12,8 @@ declare module "*.wgsl" {
   const shader: string;
   export default shader;
 }
+
+declare module "*.module.css" {
+  const classes: Record<string, string>;
+  export default classes;
+}

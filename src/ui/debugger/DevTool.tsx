@@ -1,5 +1,5 @@
 import { createSignal } from "solid-js";
-import "./DevTool.css";
+import styles from "./DevTool.module.css";
 import { LayersTool } from "./LayersTool/LayersTool";
 import { ProjectTool } from "./LayersTool/ProjectTool";
 
@@ -8,19 +8,19 @@ export const DevTool = () => {
 
   return (
     <div
-      id="dev-tool"
+      class={styles.devTool}
       classList={{
-        "dev-tool-show": getShow(),
-        "dev-tool-hide": !getShow(),
+        [styles.show]: getShow(),
+        [styles.hide]: !getShow(),
       }}
     >
       {getShow() && (
         <>
-          <div id="header">
+          <div class={styles.header}>
             <span>Dev tools</span>
             <button onClick={() => setShow(false)}>close</button>
           </div>
-          <div id="content">
+          <div class={styles.content}>
             <LayersTool />
             <ProjectTool />
           </div>

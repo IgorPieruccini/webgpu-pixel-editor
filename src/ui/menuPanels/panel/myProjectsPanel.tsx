@@ -6,6 +6,7 @@ import { storageLocal } from "../../../storageLocal";
 import { AiOutlineDelete } from "solid-icons/ai";
 import { HiSolidXMark } from "solid-icons/hi";
 import { SquareButton } from "../../shared/squareButton";
+import styles from "./MyProjectsPanel.module.css";
 
 export const MyProjects = () => {
   const [projects, setProjects] = createSignal<ProjectType[]>([]);
@@ -27,9 +28,9 @@ export const MyProjects = () => {
   };
 
   return (
-    <div class="menu-panel">
-      <div id="top-section">
-        <span class="panel-title">Projects</span>
+    <div class={styles.panel}>
+      <div class={styles.topSection}>
+        <span class={styles.panelTitle}>Projects</span>
         <SquareButton
           type="button"
           size="sm"
@@ -39,11 +40,11 @@ export const MyProjects = () => {
           <HiSolidXMark />
         </SquareButton>
       </div>
-      <div id="new-projects-list">
-        <div id="content">
+      <div class={styles.projectsList}>
+        <div class={styles.content}>
           {projects().map((project) => {
             return (
-              <div class="button-project">
+              <div class={styles.projectRow}>
                 <button onClick={() => void onOpenProject(project)}>
                   {project.name}
                 </button>{" "}

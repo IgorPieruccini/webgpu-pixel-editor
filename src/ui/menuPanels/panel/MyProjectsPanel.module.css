@@ -1,0 +1,49 @@
+.panel {
+  background: var(--surface-strong);
+  min-width: 300px;
+  display: flex;
+  gap: 16px;
+  flex-direction: column;
+  padding: 18px;
+  border-radius: 24px;
+  border: 1px solid var(--surface-border);
+  box-shadow: var(--shadow-lg);
+}
+
+.topSection {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.panelTitle {
+  font-size: 0.9em;
+  color: var(--text-primary);
+}
+
+.projectsList {
+  width: 300px;
+  max-height: 80vh;
+  display: flex;
+  gap: 8px;
+  flex-direction: column;
+  padding: 10px 0 0;
+  overflow: auto;
+}
+
+.content {
+  display: flex;
+  gap: 8px;
+  flex-direction: column;
+}
+
+.projectRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.projectRow button:nth-child(1) {
+  flex: 1;
+}

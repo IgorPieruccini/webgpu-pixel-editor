@@ -5,6 +5,7 @@ import { LayerTitle } from "./LayerTitle";
 import { DisplayLayerToggle } from "./DisplayLayerToggle";
 import { DuplicateLayerButton } from "./DuplicateLayerButton";
 import { API } from "../../../projectConfig/projectConfigProvider";
+import styles from "./LayerButton.module.css";
 
 type LayerButtonProps = {
   layer: Layer;
@@ -25,20 +26,20 @@ export const LayerButton = ({ layer }: LayerButtonProps) => {
     <div
       use:sortable
       classList={{
-        "opacity-50": sortable.isActiveDraggable,
+        [styles.dragging]: sortable.isActiveDraggable,
         "transition-transform": !!state.active.draggable,
       }}
     >
       <button
-        class={"layer-btn"}
+        class={styles.layerButton}
         classList={{
-          "active-layer": layersAPI().getActive().id === layer.id,
+          [styles.active]: layersAPI().getActive().id === layer.id,
         }}
         onClick={() => onSelectLayer(layer.id)}
       >
         <LayerTitle layerName={layer.name} />
 
-        <div class="layer-opt-btn">
+        <div class={styles.layerOptions}>
           <DuplicateLayerButton layerId={layer.id} />
           <DisplayLayerToggle layer={layer} />
           <DeleteLayerButton layerId={layer.id} />

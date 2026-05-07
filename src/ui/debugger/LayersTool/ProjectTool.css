@@ -1,8 +1,0 @@
-#project-tool {
-    min-width: 150px;
-
-    #project-tool-buttons {
-        display: flex;
-        gap: 8px;
-    }
-}

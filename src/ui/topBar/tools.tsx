@@ -8,7 +8,7 @@ import {
 } from "solid-icons/bi";
 import { BsBrushFill, BsBrush } from "solid-icons/bs";
 
-import "./index.css";
+import styles from "./Tools.module.css";
 import { useEditor } from "../../editor/editortContext";
 import { ACTIVATE_TOOL } from "../../editor/constant";
 import { ColorPicker } from "../color/colorPicker";
@@ -18,13 +18,13 @@ export const Tools = () => {
   const project = useEditor();
 
   return (
-    <div id="tools">
-      <div id="tools-container">
+    <div class={styles.tools}>
+      <div class={styles.toolsContainer}>
         <SquareButton
-          class="square-tool-button"
+          class={styles.toolButton}
           size="lg"
           classList={{
-            active: project?.().activeTool() === ACTIVATE_TOOL.PAINT,
+            [styles.active]: project?.().activeTool() === ACTIVATE_TOOL.PAINT,
           }}
           onClick={() => {
             project?.().setActiveTool(ACTIVATE_TOOL.PAINT);
@@ -37,10 +37,11 @@ export const Tools = () => {
           )}
         </SquareButton>
         <SquareButton
-          class="square-tool-button"
+          class={styles.toolButton}
           size="lg"
           classList={{
-            active: project?.().activeTool() === ACTIVATE_TOOL.PAINT_SELECTION,
+            [styles.active]:
+              project?.().activeTool() === ACTIVATE_TOOL.PAINT_SELECTION,
           }}
           onClick={() => {
             project?.().setActiveTool(ACTIVATE_TOOL.PAINT_SELECTION);
@@ -53,10 +54,10 @@ export const Tools = () => {
           )}
         </SquareButton>
         <SquareButton
-          class="square-tool-button"
+          class={styles.toolButton}
           size="lg"
           classList={{
-            active: project?.().activeTool() === ACTIVATE_TOOL.DELETE,
+            [styles.active]: project?.().activeTool() === ACTIVATE_TOOL.DELETE,
           }}
           onClick={() => {
             project?.().setActiveTool(ACTIVATE_TOOL.DELETE);
@@ -70,10 +71,10 @@ export const Tools = () => {
         </SquareButton>
 
         <SquareButton
-          class="square-tool-button"
+          class={styles.toolButton}
           size="lg"
           classList={{
-            active: project?.().activeTool() === ACTIVATE_TOOL.LINE,
+            [styles.active]: project?.().activeTool() === ACTIVATE_TOOL.LINE,
           }}
           onClick={() => {
             project?.().setActiveTool(ACTIVATE_TOOL.LINE);

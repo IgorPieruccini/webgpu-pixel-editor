@@ -1,6 +1,6 @@
 import { NewProjectPanel } from "./newProjectPanel";
 
-import "./menuPanels.css";
+import styles from "./MenuPanels.module.css";
 import { useMenu } from "../menuProvider";
 import { OPENED_OPTIONS } from "../../topBar/constants";
 import { MyProjects } from "./myProjectsPanel";
@@ -12,7 +12,7 @@ export const MenuPanels = () => {
   return (
     <>
       {menu.openedOption() === -1 ? null : (
-        <div id="menu-panels">
+        <div class={styles.menuPanels}>
           {menu.openedOption() === OPENED_OPTIONS.NEW_PROJECT && (
             <NewProjectPanel />
           )}

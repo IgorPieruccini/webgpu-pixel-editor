@@ -1,0 +1,17 @@
+.layers {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+  height: 350px;
+  margin: 4px 0;
+}
+
+.layerSlider {
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  gap: 10px;
+  overflow-y: auto;
+  padding-right: 4px;
+}

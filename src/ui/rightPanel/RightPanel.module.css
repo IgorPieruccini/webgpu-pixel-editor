@@ -1,0 +1,64 @@
+.rightPanel {
+  gap: 10px;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 14px;
+  box-sizing: border-box;
+  backdrop-filter: blur(18px);
+}
+
+.projectTitle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.projectTitle > span:first-child {
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex-shrink: 0;
+}
+
+.layerPreview {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(8, 16, 30, 0.52);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  justify-content: center;
+  align-items: center;
+}
+
+.previewCanvas {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  max-width: 250px;
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba(8, 15, 28, 0.92), rgba(5, 10, 19, 0.92)),
+    var(--background-darker);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  display: flex;
+}

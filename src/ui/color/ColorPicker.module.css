@@ -1,12 +1,9 @@
-.ColorPickerContainer {
-}
-
-.ColorPickerContainer .sketch-picker {
+.container :global(.sketch-picker) {
   background: transparent !important;
   box-shadow: none !important;
 }
 
-.ColorPickerContainer .sketch-picker input {
+.container :global(.sketch-picker input) {
   color: var(--text-primary) !important;
   background: rgba(8, 16, 30, 0.82) !important;
   border: 1px solid var(--surface-border) !important;
@@ -14,6 +11,6 @@
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
 }
 
-.ColorPickerContainer .sketch-picker label {
+.container :global(.sketch-picker label) {
   color: var(--text-secondary) !important;
 }

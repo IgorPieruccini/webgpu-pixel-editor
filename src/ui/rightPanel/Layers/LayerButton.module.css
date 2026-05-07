@@ -1,0 +1,29 @@
+.layerButton {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 48px;
+  padding: 0 12px;
+  border-radius: 16px;
+  align-items: center;
+  gap: 12px;
+}
+
+.active {
+  background: linear-gradient(
+    135deg,
+    rgba(78, 107, 255, 0.82),
+    rgba(102, 227, 255, 0.28)
+  );
+  border-color: rgba(160, 213, 255, 0.65);
+}
+
+.dragging {
+  opacity: 50%;
+}
+
+.layerOptions {
+  display: flex;
+  background: none;
+  gap: 6px;
+}

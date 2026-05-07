@@ -1,6 +1,7 @@
 import { BiRegularDuplicate } from "solid-icons/bi";
 import { API } from "../../../projectConfig/projectConfigProvider";
 import { SquareButton } from "../../shared/squareButton";
+import styles from "./LayerActionButton.module.css";
 
 interface DuplicateLayerButtonProps {
   layerId: string;
@@ -17,7 +18,7 @@ export const DuplicateLayerButton = ({
   };
 
   return (
-    <SquareButton class="layer-btn-icon" size="xs" onClick={onDuplicate}>
+    <SquareButton class={styles.button} size="xs" onClick={onDuplicate}>
       <BiRegularDuplicate />
     </SquareButton>
   );

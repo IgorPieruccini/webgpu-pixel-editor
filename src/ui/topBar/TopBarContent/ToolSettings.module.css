@@ -1,4 +1,4 @@
-#tool-settings {
+.toolSettings {
   position: relative;
   z-index: 10;
   gap: 12px;
@@ -11,14 +11,14 @@
   border: 1px solid var(--surface-border);
   box-shadow: var(--shadow-md);
   backdrop-filter: blur(18px);
-  padding: 0px 12px 0px 12px;
+  padding: 0 12px;
 }
 
-#menu-section {
+.menuSection {
   width: 240px;
 }
 
-#general-section {
+.generalSection {
   display: flex;
   flex: 1;
   justify-content: end;

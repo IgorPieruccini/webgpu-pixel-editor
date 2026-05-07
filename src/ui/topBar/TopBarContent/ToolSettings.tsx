@@ -2,7 +2,7 @@ import { ACTIVATE_TOOL } from "../../../editor/constant";
 import { useEditor } from "../../../editor/editortContext";
 import { BrushOpacitySlider } from "./BrushOpacitySlider";
 import { BrushThicknessSlider } from "./BrushThicknessSlider";
-import "./ToolSettings.css";
+import styles from "./ToolSettings.module.css";
 import { MenuOptions } from "../../menuPanels/menu/menuOptions";
 import { FiMenu } from "solid-icons/fi";
 import { SquareButton } from "../../shared/squareButton";
@@ -23,17 +23,12 @@ export const ToolSettings = () => {
   };
 
   return (
-    <div id="tool-settings">
-      <div id="menu-section">
+    <div class={styles.toolSettings}>
+      <div class={styles.menuSection}>
         <AnchoredPopover
           side="bottom"
           trigger={({ toggle }) => (
-            <SquareButton
-              id="menu"
-              class="square-tool-button"
-              size="sm"
-              onClick={toggle}
-            >
+            <SquareButton size="sm" onClick={toggle}>
               <FiMenu />
             </SquareButton>
           )}
@@ -49,7 +44,7 @@ export const ToolSettings = () => {
       <BrushOpacitySlider />
 
       <div class="separator separator-vertical" aria-hidden="true" />
-      <div id="general-section">
+      <div class={styles.generalSection}>
         <SquareButton onClick={onExport} size="sm">
           <AiOutlineExport />
         </SquareButton>

@@ -3,6 +3,7 @@ import { HiSolidXMark } from "solid-icons/hi";
 import { API } from "../../../projectConfig/projectConfigProvider";
 import { useMenu } from "../menuProvider";
 import { SquareButton } from "../../shared/squareButton";
+import styles from "./ExportImagePanel.module.css";
 
 const MIN_MULTIPLIER = 1;
 const MAX_MULTIPLIER = 10;
@@ -42,9 +43,9 @@ export const ExportImagePanel = () => {
   };
 
   return (
-    <div class="menu-panel">
-      <div id="top-section">
-        <span class="panel-title">Export PNG</span>
+    <div class={styles.panel}>
+      <div class={styles.topSection}>
+        <span class={styles.panelTitle}>Export PNG</span>
         <SquareButton
           type="button"
           size="sm"
@@ -54,10 +55,10 @@ export const ExportImagePanel = () => {
           <HiSolidXMark />
         </SquareButton>
       </div>
-      <div class="panel-field">
+      <div class={styles.field}>
         <label for="export-multiplier-input">Multiplier</label>
         <input
-          class="panel-number-input"
+          class={styles.numberInput}
           id="export-multiplier-input"
           type="number"
           min={MIN_MULTIPLIER}
@@ -66,7 +67,7 @@ export const ExportImagePanel = () => {
           onInput={onMultiplierInput}
           onFocusOut={onMultiplierFocusOut}
         />
-        <p class="panel-helper-text">
+        <p class={styles.helperText}>
           Multiplier increases the original size of exported image by{" "}
           {multiplier()}
         </p>
