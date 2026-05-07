@@ -12,5 +12,9 @@
     align-items: center;
     gap: 10px;
     flex: 1;
+
+    p {
+      min-width: 40px;
+    }
   }
 }
