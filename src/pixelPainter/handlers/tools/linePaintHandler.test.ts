@@ -1,6 +1,6 @@
 import type { Vec2 } from "../../../editor/types";
 import { describe, expect, it } from "vitest";
-import { createLineHandler } from "./line";
+import { createLinePaintHandler } from "./linePaintHanlder";
 
 describe("Line", () => {
   it("getPixelsToPaint", () => {
@@ -18,16 +18,12 @@ describe("Line", () => {
       paint: () => true,
       clearCurrentPaintedPixels: () => {},
     } as never;
-    const historyChangeHandler = {
-      addAction: () => {},
-    } as never;
 
-    const lineHandler = createLineHandler(
+    const lineHandler = createLinePaintHandler(
       gridSize,
       uniformBufferHandler,
       layerHandler,
       brushHandler,
-      historyChangeHandler,
     );
 
     const line = lineHandler.getPixelToPaint({

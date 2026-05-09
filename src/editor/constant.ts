@@ -56,6 +56,9 @@ export const INITIAL_PIXEL_PAINTER: PixelPainterMethods = {
     resetLineStartPosition: () => {},
     draw: () => {},
   },
+  bucketPaint: {
+    paint: () => {},
+  },
   render: {
     draw: () => {},
     setCanvasSize: () => {},

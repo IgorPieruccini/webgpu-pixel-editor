@@ -10,7 +10,7 @@ import { createLayerPreview } from "./layerPreview";
 import { LAYER_PREVIEW_SIZE } from "../constants";
 import { calculateZoomFromGridAndCanvasSize } from "../utils";
 import { createColorPaletteHandler } from "./handlers/colorPaletteHandler";
-import { createLineHandler } from "./handlers/tools/line";
+import { createLinePaintHandler } from "./handlers/tools/linePaintHanlder";
 import { createBucketPaintHandler } from "./handlers/tools/bucketPaintHandler";
 
 export const pixelPainter = async (
@@ -52,7 +52,7 @@ export const pixelPainter = async (
     canvas,
   );
 
-  const lineHandler = createLineHandler(
+  const lineHandler = createLinePaintHandler(
     gridSize,
     uniformBufferHandler,
     layerHandler,

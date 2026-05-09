@@ -16,7 +16,7 @@ export type Line = {
  * @param gridSize - The size of the grid (width and height).
  * @returns An object with the getPixelToPaint method.
  */
-export const createLineHandler = (
+export const createLinePaintHandler = (
   gridSize: Vec2,
   uniformBufferHandler: UniformBufferHandler,
   layerHandler: LayerHandler,
