@@ -140,19 +140,21 @@ export const initializeEditor = async (
   });
 
   canvas.addEventListener("mousedown", (e) => {
+    const currentTool = activeTool();
+
     const cell = pickCell(
       { x: e.clientX, y: e.clientY },
       { x: canvas.offsetLeft, y: canvas.offsetTop },
     );
 
-    if (activeTool() === ACTIVATE_TOOL.PAINT) {
+    if (currentTool === ACTIVATE_TOOL.PAINT) {
       pixel.brush.paint({
         x: cell.x * BYTES_PER_PIXEL,
         y: cell.y * BYTES_PER_PIXEL,
       });
     }
 
-    if (activeTool() === ACTIVATE_TOOL.DELETE) {
+    if (currentTool === ACTIVATE_TOOL.DELETE) {
       pixel.brush.erase({
         x: cell.x * BYTES_PER_PIXEL,
         y: cell.y * BYTES_PER_PIXEL,
@@ -161,11 +163,11 @@ export const initializeEditor = async (
 
     isLeftMouseDown = true;
 
-    if (activeTool() === ACTIVATE_TOOL.LINE) {
+    if (currentTool === ACTIVATE_TOOL.LINE) {
       pixel.line.setLineStartPosition(cell);
     }
 
-    if (activeTool() === ACTIVATE_TOOL.PAINT_SELECTION) {
+    if (currentTool === ACTIVATE_TOOL.PAINT_SELECTION) {
       const cell = pickCell(
         { x: e.clientX, y: e.clientY },
         { x: canvas.offsetLeft, y: canvas.offsetTop },
@@ -173,6 +175,10 @@ export const initializeEditor = async (
 
       pixel.render.setSelectedCellsPosition({ x: cell.x, y: cell.y });
       pixel.render.setSelectedCellsSize({ x: cell.x, y: cell.y });
+    }
+
+    if (currentTool === ACTIVATE_TOOL.BUCKET_PAINT) {
+      // DO STUFF
     }
   });
 
