@@ -6,6 +6,7 @@ import {
   BiRegularPencil,
   BiSolidPencil,
 } from "solid-icons/bi";
+import { RiDesignPaintLine, RiDesignPaintFill } from "solid-icons/ri";
 import { BsBrushFill, BsBrush } from "solid-icons/bs";
 
 import styles from "./Tools.module.css";
@@ -84,6 +85,24 @@ export const Tools = () => {
             <BiSolidPencil />
           ) : (
             <BiRegularPencil />
+          )}
+        </SquareButton>
+
+        <SquareButton
+          class={styles.toolButton}
+          size="lg"
+          classList={{
+            [styles.active]:
+              project?.().activeTool() === ACTIVATE_TOOL.BUCKET_PAINT,
+          }}
+          onClick={() => {
+            project?.().setActiveTool(ACTIVATE_TOOL.BUCKET_PAINT);
+          }}
+        >
+          {project?.().activeTool() === ACTIVATE_TOOL.BUCKET_PAINT ? (
+            <RiDesignPaintFill />
+          ) : (
+            <RiDesignPaintLine />
           )}
         </SquareButton>
       </div>

@@ -5,6 +5,7 @@ export const ACTIVATE_TOOL = {
   PAINT_SELECTION: 1,
   DELETE: 2,
   LINE: 3,
+  BUCKET_PAINT: 4,
 };
 
 function getSelectedColor(): number;
