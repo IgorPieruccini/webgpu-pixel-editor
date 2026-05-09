@@ -1,2 +1,2 @@
-export { Tools } from "./tools";
+export { Tools } from "../leftPanel/tools";
 export { ToolSettings } from "./TopBarContent/ToolSettings";
