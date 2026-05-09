@@ -11,6 +11,7 @@ import { LAYER_PREVIEW_SIZE } from "../constants";
 import { calculateZoomFromGridAndCanvasSize } from "../utils";
 import { createColorPaletteHandler } from "./handlers/colorPaletteHandler";
 import { createLineHandler } from "./handlers/tools/line";
+import { createBucketPaintHandler } from "./handlers/tools/bucketPaintHandler";
 
 export const pixelPainter = async (
   projectName: string,
@@ -56,6 +57,13 @@ export const pixelPainter = async (
     uniformBufferHandler,
     layerHandler,
     brushHandler,
+  );
+
+  const bucketPaint = createBucketPaintHandler(
+    gridSize,
+    layerHandler,
+    brushHandler,
+    historyChangeHandler,
   );
 
   const middlewareHandler = createMiddlewareHandler(
@@ -110,6 +118,9 @@ export const pixelPainter = async (
       setLineStartPosition: lineHandler.setStartLinePosition,
       resetLineStartPosition: lineHandler.resetStartLinePosition,
       draw: lineHandler.draw,
+    },
+    bucketPaint: {
+      paint: bucketPaint.floodFill,
     },
     render: {
       draw: middlewareHandler.draw,

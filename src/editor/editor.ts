@@ -178,7 +178,7 @@ export const initializeEditor = async (
     }
 
     if (currentTool === ACTIVATE_TOOL.BUCKET_PAINT) {
-      // DO STUFF
+      pixel.bucketPaint.paint(cell);
     }
   });
 
