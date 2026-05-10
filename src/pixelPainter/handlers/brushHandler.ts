@@ -1,10 +1,10 @@
 import { createSignal } from "solid-js";
-import type { Vec2 } from "../../editor/types";
 import type { LayerHandler } from "./layerHandler";
 import { alphaComposite, numberToRGBA, rgbaToHex } from "../utils";
 import type { HistoryChangeHandler } from "./historyChangeHandler";
 import { BYTES_PER_PIXEL, RGBA_OFFSET } from "../../constants";
 import type { ColorPaletteHandler } from "./colorPaletteHandler";
+import type { Vec2 } from "../types";
 
 export type BrushHandler = ReturnType<typeof createBrushHandler>;
 

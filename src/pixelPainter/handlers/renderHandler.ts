@@ -1,4 +1,3 @@
-import type { Vec2 } from "../../editor/types";
 import { createVertexBuffer } from "../createBufferLayout";
 import { createPipeline, createTexturePipeline } from "../createPipeline";
 import { material } from "../material";
@@ -6,6 +5,7 @@ import type { BindPixelTexture } from "../material/pixel";
 import type { UniformBufferHandler } from "./uniformBuffersHandler";
 import { webGPUSetup } from "../webGPUSetup";
 import type { LayerHandler } from "./layerHandler";
+import type { Vec2 } from "../types";
 
 export type RenderHandler = Awaited<ReturnType<typeof createRenderHandler>>;
 

@@ -1,11 +1,11 @@
 import { BYTES_PER_PIXEL } from "../../../constants";
-import type { Vec2 } from "../../../editor/types";
 import { serialization } from "../../../serialization";
 import { type SerializedProject } from "../../../serialization/project";
 import type { LayerHandler } from "../layerHandler";
 import * as jsondiffpatch from "jsondiffpatch";
 import { storageLocal } from "../../../storageLocal";
 import type { RenderHandler } from "../renderHandler";
+import type { Vec2 } from "../../types";
 
 const SNAPSHOT_INTERVAL = 5;
 
@@ -14,9 +14,9 @@ export type HistoryChangeHandler = ReturnType<
 >;
 
 type AddActionProps = {
-  captureCurrentBuffer?: boolean,
-  paintedPixels?: Set<number>,
-}
+  captureCurrentBuffer?: boolean;
+  paintedPixels?: Set<number>;
+};
 
 type LayerDiff = {
   id: string;
@@ -28,7 +28,7 @@ type Diff = {
   type: "diff";
   diff: jsondiffpatch.Delta;
   layerDiff: LayerDiff | null;
-  bufferDiff: { id: string, buffer: Uint8Array<ArrayBuffer> } | null
+  bufferDiff: { id: string; buffer: Uint8Array<ArrayBuffer> } | null;
 };
 
 type SerializedProjectSnapshot = {
@@ -131,12 +131,12 @@ const copyLayersBuffer = (
 };
 
 const copyBuffer = (
-  buffer: Uint8Array<ArrayBuffer>
+  buffer: Uint8Array<ArrayBuffer>,
 ): Uint8Array<ArrayBuffer> => {
   const copiedBuffer = new Uint8Array(buffer.length);
   copiedBuffer.set(buffer);
   return copiedBuffer;
-}
+};
 
 const copyProject = (project: SerializedProject): SerializedProject => {
   return structuredClone(project);
@@ -161,7 +161,7 @@ export const createHistoryChangeHandler = (
       gridSize,
       layerHandler.getList(),
       emptyBufferMap,
-      activeLayer?.id
+      activeLayer?.id,
     );
   };
 
@@ -184,7 +184,7 @@ export const createHistoryChangeHandler = (
     let paintedPixels = undefined;
     if (props) {
       captureCurrentBuffer = props.captureCurrentBuffer ?? false;
-      paintedPixels = props.paintedPixels
+      paintedPixels = props.paintedPixels;
     }
 
     if (historyIndex < historyDiff.length && historyIndex > 0) {
@@ -208,7 +208,9 @@ export const createHistoryChangeHandler = (
     let bounds: { tl: Vec2; br: Vec2 } | null = null;
     if (paintedPixels) {
       if (paintedPixels.size === 0) {
-        throw new Error('Can not get bounds of painted pixels if the painted pixels size is equal 0');
+        throw new Error(
+          "Can not get bounds of painted pixels if the painted pixels size is equal 0",
+        );
       }
       bounds = getBoundsOfPaintedPixels(paintedPixels, gridSize);
       paintedBuffer = getPortionOfBuffer(
@@ -219,15 +221,15 @@ export const createHistoryChangeHandler = (
       );
     }
 
-    let bufferDiff: Diff['bufferDiff'] | null = null;
+    let bufferDiff: Diff["bufferDiff"] | null = null;
     if (captureCurrentBuffer) {
       const currentLayer = layerHandler.getActive();
-      const currentBuffer = layerHandler.getBufferById(currentLayer.id)
+      const currentBuffer = layerHandler.getBufferById(currentLayer.id);
       if (currentBuffer) {
         const copiedBuffer = copyBuffer(currentBuffer);
         bufferDiff = {
           id: currentLayer.id,
-          buffer: copiedBuffer
+          buffer: copiedBuffer,
         };
       }
     }
@@ -238,14 +240,13 @@ export const createHistoryChangeHandler = (
       layerDiff:
         paintedBuffer && bounds
           ? {
-            id: layerHandler.getActive().id,
-            binary: paintedBuffer,
-            bounds: bounds,
-          }
+              id: layerHandler.getActive().id,
+              binary: paintedBuffer,
+              bounds: bounds,
+            }
           : null,
-      bufferDiff: bufferDiff
+      bufferDiff: bufferDiff,
     });
-
 
     historyIndex++;
   };
@@ -262,15 +263,11 @@ export const createHistoryChangeHandler = (
 
     const currentSnapshot = Math.floor(historyIndex / SNAPSHOT_INTERVAL);
 
-
     let start = currentSnapshot * SNAPSHOT_INTERVAL;
     if (start === historyIndex) {
       start -= SNAPSHOT_INTERVAL;
     }
-    const replaySteps = historyDiff.slice(
-      start,
-      historyIndex,
-    );
+    const replaySteps = historyDiff.slice(start, historyIndex);
 
     for (const change of replaySteps) {
       if (change.type === "snapshot") {
@@ -285,12 +282,11 @@ export const createHistoryChangeHandler = (
         }
         const activeLayerId = change.project.activeLayer;
         if (activeLayerId) {
-          const updatedLayer = layerHandler.getLayerById(activeLayerId)
+          const updatedLayer = layerHandler.getLayerById(activeLayerId);
           if (updatedLayer) {
             layerHandler.setActive(updatedLayer);
           }
         }
-
 
         storageLocal.saveLayers(projectName, currentProject.layers);
       }
@@ -308,14 +304,14 @@ export const createHistoryChangeHandler = (
           layerHandler.setList(copiedProject);
           const bufferDiff = change.bufferDiff;
           if (bufferDiff) {
-            const copiedBuffer = copyBuffer(bufferDiff.buffer)
-            layerHandler.setLayerBuffer(bufferDiff.id, copiedBuffer)
+            const copiedBuffer = copyBuffer(bufferDiff.buffer);
+            layerHandler.setLayerBuffer(bufferDiff.id, copiedBuffer);
             renderHandler.addLayerTexture(bufferDiff.id);
             const activeLayerId = currentProject.activeLayer;
             if (activeLayerId) {
-              const updatedLayer = layerHandler.getLayerById(activeLayerId)
+              const updatedLayer = layerHandler.getLayerById(activeLayerId);
               if (updatedLayer) {
-                layerHandler.setActive(updatedLayer)
+                layerHandler.setActive(updatedLayer);
               }
             }
           }

@@ -1,6 +1,6 @@
-import type { Vec2 } from "../../../editor/types";
 import { describe, expect, it } from "vitest";
 import { createLinePaintHandler } from "./linePaintHanlder";
+import type { Vec2 } from "../../types";
 
 describe("Line", () => {
   it("getPixelsToPaint", () => {

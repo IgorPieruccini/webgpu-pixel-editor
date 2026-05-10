@@ -1,7 +1,6 @@
 import { createLayerHandler } from "./handlers/layerHandler";
 import { createBrushHandler } from "./handlers/brushHandler";
 import { createRenderHandler } from "./handlers/renderHandler";
-import type { Vec2 } from "../editor/types";
 import { createUniformBufferHandler } from "./handlers/uniformBuffersHandler";
 import { createMiddlewareHandler } from "./handlers/middlewareHandler";
 import { createHistoryChangeHandler } from "./handlers/historyChangeHandler/historyChangeHandler";
@@ -12,6 +11,7 @@ import { calculateZoomFromGridAndCanvasSize } from "../utils";
 import { createColorPaletteHandler } from "./handlers/colorPaletteHandler";
 import { createLinePaintHandler } from "./handlers/tools/linePaintHanlder";
 import { createBucketPaintHandler } from "./handlers/tools/bucketPaintHandler";
+import type { Vec2 } from "../lib";
 
 export const pixelPainter = async (
   projectName: string,

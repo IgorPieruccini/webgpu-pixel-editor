@@ -25,3 +25,6 @@ export type RGBA = {
 };
 
 export type ShaderType = "ui" | "pixel" | "alpha";
+
+export type Vec2 = { x: number; y: number };
+export type Vec4 = { x: number; y: number; z: number; w: number };
