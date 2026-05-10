@@ -1,5 +1,4 @@
 import { ACTIVATE_TOOL } from "../../../editor/constant";
-import { useEditor } from "../../../editor/editortContext";
 import { BrushOpacitySlider } from "./BrushOpacitySlider";
 import { BrushThicknessSlider } from "./BrushThicknessSlider";
 import styles from "./ToolSettings.module.css";
@@ -10,15 +9,18 @@ import { AnchoredPopover } from "../../shared/anchoredPopover";
 import { AiOutlineExport } from "solid-icons/ai";
 import { useMenu } from "../../menuPanels/menuProvider";
 import { OPENED_OPTIONS } from "../constants";
+import { useEditor } from "../../../editor/editortContext";
 
 export const ToolSettings = () => {
   const project = useEditor();
   const menu = useMenu();
 
   const showThickness = () => {
+    const activeTool = project?.().activeTool();
+
     return (
-      project?.().activeTool() !== ACTIVATE_TOOL.PAINT_SELECTION &&
-      project?.().activeTool() !== ACTIVATE_TOOL.BUCKET_PAINT
+      activeTool !== ACTIVATE_TOOL.PAINT_SELECTION &&
+      activeTool !== ACTIVATE_TOOL.BUCKET_PAINT
     );
   };
 

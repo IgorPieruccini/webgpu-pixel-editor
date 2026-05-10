@@ -91,5 +91,6 @@ export const INITIAL_PIXEL_PAINTER: PixelPainterMethods = {
   },
   tool: {
     set: () => {},
+    get: () => 0,
   },
 };

@@ -104,9 +104,15 @@ const getColorPalette = () => {
   return () => context.pixel().colorPalette;
 };
 
+const getTool = () => {
+  const context = useContext(ProjectConfigContext);
+  return () => context.pixel().tool;
+};
+
 export const API = {
   layers: getLayers,
   brush: getBrush,
   export: getExport,
   colorPalette: getColorPalette,
+  tool: getTool,
 };

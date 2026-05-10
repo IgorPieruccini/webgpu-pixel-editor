@@ -152,6 +152,7 @@ export const pixelPainter = async (
     },
     tool: {
       set: uniformBufferHandler.setActiveTool,
+      get: uniformBufferHandler.getActiveTool,
     },
   };
 };
