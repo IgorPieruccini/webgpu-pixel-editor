@@ -101,11 +101,15 @@ fn fragmentMain(@location(0) canvasPixelCoord: vec2f) -> @location(0) vec4f {
     let snappedCenter = cell + vec2f(0.5);
     let activeTool = uiParams.activeTool;
     let uiColor = uiParams.selectedColor;
+    var brushThickness = 1.0;
+    if activeTool == 0 || activeTool == 2 || activeTool == 3 {
+        brushThickness = uiParams.brushThickness;
+    }
 
     // Highlight the pixel under the cursor 
-    if (activeTool == 0 || activeTool == 2 || activeTool == 4) && uiParams.mouseCellX >= 0.0 && uiParams.mouseCellY >= 0.0 {
+    if uiParams.mouseCellX >= 0.0 && uiParams.mouseCellY >= 0.0 {
         let brushCenterPx = vec2f(uiParams.mouseCellX, uiParams.mouseCellY) + vec2f(0.5);
-        let radiusPx = max(uiParams.brushThickness, 0.5);
+        let radiusPx = max(brushThickness, 0.5);
         let dist = distance(snappedCenter, brushCenterPx);
         let fill = select(0.0, 1.0, dist < radiusPx);
         let alpha = fill * uiColor.a;
@@ -123,7 +127,7 @@ fn fragmentMain(@location(0) canvasPixelCoord: vec2f) -> @location(0) vec4f {
         uiParams.mouseCellY >= 0.0 {
         let lineStart = vec2f(uiParams.lineStartX, uiParams.lineStartY);
         let lineEnd = vec2f(uiParams.mouseCellX, uiParams.mouseCellY);
-        let thickness = max(uiParams.brushThickness, 0.5);
+        let thickness = max(brushThickness, 0.5);
         let fill = lineMask(cell, lineStart, lineEnd, thickness);
         let alpha = fill * uiColor.a;
 

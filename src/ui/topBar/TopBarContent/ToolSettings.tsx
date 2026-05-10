@@ -15,8 +15,12 @@ export const ToolSettings = () => {
   const project = useEditor();
   const menu = useMenu();
 
-  const showThickness = () =>
-    project?.().activeTool() !== ACTIVATE_TOOL.PAINT_SELECTION;
+  const showThickness = () => {
+    return (
+      project?.().activeTool() !== ACTIVATE_TOOL.PAINT_SELECTION &&
+      project?.().activeTool() !== ACTIVATE_TOOL.BUCKET_PAINT
+    );
+  };
 
   const onExport = () => {
     menu.openOption(OPENED_OPTIONS.EXPORT_PNG);
