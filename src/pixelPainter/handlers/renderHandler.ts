@@ -3,7 +3,7 @@ import { createVertexBuffer } from "../createBufferLayout";
 import { createPipeline, createTexturePipeline } from "../createPipeline";
 import { material } from "../material";
 import type { BindPixelTexture } from "../material/pixel";
-import type { UniformBufferHandler } from "../uniformBuffersHandler";
+import type { UniformBufferHandler } from "./uniformBuffersHandler";
 import { webGPUSetup } from "../webGPUSetup";
 import type { LayerHandler } from "./layerHandler";
 

@@ -1,5 +1,5 @@
-import type { Vec2 } from "../editor/types";
-import { numberToRGBA } from "./utils";
+import type { Vec2 } from "../../editor/types";
+import { numberToRGBA } from ".././utils";
 
 export type UniformBufferHandler = ReturnType<
   typeof createUniformBufferHandler

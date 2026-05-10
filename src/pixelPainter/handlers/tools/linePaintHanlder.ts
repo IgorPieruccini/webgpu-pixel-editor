@@ -1,6 +1,6 @@
 import { BYTES_PER_PIXEL } from "../../../constants";
 import type { Vec2 } from "../../../editor/types";
-import type { UniformBufferHandler } from "../../uniformBuffersHandler";
+import type { UniformBufferHandler } from "../uniformBuffersHandler";
 import type { BrushHandler } from "../brushHandler";
 import type { LayerHandler } from "../layerHandler";
 

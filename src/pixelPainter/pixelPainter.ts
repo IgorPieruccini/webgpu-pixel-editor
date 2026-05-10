@@ -2,7 +2,7 @@ import { createLayerHandler } from "./handlers/layerHandler";
 import { createBrushHandler } from "./handlers/brushHandler";
 import { createRenderHandler } from "./handlers/renderHandler";
 import type { Vec2 } from "../editor/types";
-import { createUniformBufferHandler } from "./uniformBuffersHandler";
+import { createUniformBufferHandler } from "./handlers/uniformBuffersHandler";
 import { createMiddlewareHandler } from "./handlers/middlewareHandler";
 import { createHistoryChangeHandler } from "./handlers/historyChangeHandler/historyChangeHandler";
 import { createExportHandler } from "./handlers/exportHandler";

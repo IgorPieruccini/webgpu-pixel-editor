@@ -1,6 +1,6 @@
 import type { Vec2 } from "../../editor/types";
 import { calculateZoomFromGridAndCanvasSize } from "../../utils";
-import { createUniformBufferHandler } from "../uniformBuffersHandler";
+import { createUniformBufferHandler } from "./uniformBuffersHandler";
 import type { LayerHandler } from "./layerHandler";
 import { createRenderHandler } from "./renderHandler";
 

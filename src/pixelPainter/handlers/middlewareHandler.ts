@@ -1,6 +1,6 @@
 import type { LayerPreviewHandler } from "../layerPreview";
 import type { Layers } from "../types";
-import type { UniformBufferHandler } from "../uniformBuffersHandler";
+import type { UniformBufferHandler } from "./uniformBuffersHandler";
 import type { BrushHandler } from "./brushHandler";
 import type { HistoryChangeHandler } from "./historyChangeHandler";
 import type { LayerHandler } from "./layerHandler";
