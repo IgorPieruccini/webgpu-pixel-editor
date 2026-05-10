@@ -1,3 +1,8 @@
+import {
+  ACTIVATE_TOOL,
+  type ActiveToolType,
+  type ActiveToolValue,
+} from "../../editor/constant";
 import { numberToRGBA } from ".././utils";
 import type { Vec2 } from "../types";
 
@@ -38,6 +43,7 @@ export const createUniformBufferHandler = (
     1, // selectedColor.a
     -1, // startLineX
     -1, // startLineY
+    0, // selected tool
   ]);
 
   const updatePan = (pan: Vec2) => {
@@ -107,6 +113,14 @@ export const createUniformBufferHandler = (
     return { x: uiUniforms[12], y: uiUniforms[13] };
   };
 
+  const setActiveTool = (tool: ActiveToolType) => {
+    uiUniforms[14] = ACTIVATE_TOOL[tool];
+  };
+
+  const getActiveTool = () => {
+    return uiUniforms[14] as ActiveToolValue;
+  };
+
   return {
     commonUniforms,
     layerUniforms,
@@ -138,5 +152,7 @@ export const createUniformBufferHandler = (
     setLineStartPosition,
     resetStartLinePosition,
     getStartLinePosition,
+    setActiveTool,
+    getActiveTool,
   };
 };

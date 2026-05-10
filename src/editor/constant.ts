@@ -1,5 +1,8 @@
 import type { PixelPainterMethods } from "../pixelPainter/types";
 
+export type ActiveToolType = keyof typeof ACTIVATE_TOOL;
+export type ActiveToolValue = (typeof ACTIVATE_TOOL)[ActiveToolType];
+
 export const ACTIVATE_TOOL = {
   PAINT: 0,
   PAINT_SELECTION: 1,

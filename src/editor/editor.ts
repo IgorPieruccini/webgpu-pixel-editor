@@ -6,8 +6,7 @@ import {
 } from "../constants";
 import { ACTIVATE_TOOL, INITIAL_PIXEL_PAINTER } from "./constant";
 import { createSignal } from "solid-js";
-import type { PixelPainterMethods } from "../pixelPainter/types";
-import type { Vec2 } from "./types";
+import type { PixelPainterMethods, Vec2 } from "../pixelPainter/types";
 import { calculateZoomFromGridAndCanvasSize } from "../utils";
 
 export type EditorType = Awaited<ReturnType<typeof initializeEditor>>;
