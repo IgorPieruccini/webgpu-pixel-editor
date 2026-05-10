@@ -1,8 +1,3 @@
-import {
-  ACTIVATE_TOOL,
-  type ActiveToolType,
-  type ActiveToolValue,
-} from "../../editor/constant";
 import { numberToRGBA } from ".././utils";
 import type { Vec2 } from "../types";
 
@@ -14,6 +9,8 @@ export const createUniformBufferHandler = (
   canvasSize: Vec2,
   gridSize: Vec2,
 ) => {
+  let selectionToolEnabled = false;
+
   const commonUniforms = new Float32Array([
     0, // pan.x
     0, // pan.y
@@ -29,21 +26,22 @@ export const createUniformBufferHandler = (
   ]);
 
   const uiUniforms = new Float32Array([
-    0, // cellPos.x
-    0, // cellPos.y
-    -1, // selectedCells.x
-    -1, // selectedCells.y
-    0, // selectedCells.w
-    0, // selectedCells.h
-    1, // brushThickness
-    0, // selection tool activated
-    0, // selectedColor.r
-    0, // selectedColor.g
-    0, // selectedColor.b
-    1, // selectedColor.a
-    -1, // startLineX
-    -1, // startLineY
-    0, // selected tool
+    0, // cellPos.x -- 0
+    0, // cellPos.y -- 1
+    -1, // selectedCells.x -- 2
+    -1, // selectedCells.y -- 3
+    0, // selectedCells.w -- 4
+    0, // selectedCells.h -- 5
+    1, // brushThickness -- 6
+    0, // padding -- 7
+    0, // selectedColor.r -- 8
+    0, // selectedColor.g -- 9
+    0, // selectedColor.b -- 10
+    1, // selectedColor.a -- 11
+    -1, // startLineX -- 12
+    -1, // startLineY -- 13
+    0, // selected tool -- 14
+    0, // padding -- 15
   ]);
 
   const updatePan = (pan: Vec2) => {
@@ -83,7 +81,7 @@ export const createUniformBufferHandler = (
   };
 
   const setSelectionTool = (value: boolean) => {
-    value == true ? (uiUniforms[7] = 1) : (uiUniforms[7] = 0);
+    selectionToolEnabled = value;
   };
 
   const updateSelectedColor = (color: number | string) => {
@@ -113,12 +111,12 @@ export const createUniformBufferHandler = (
     return { x: uiUniforms[12], y: uiUniforms[13] };
   };
 
-  const setActiveTool = (tool: ActiveToolType) => {
-    uiUniforms[14] = ACTIVATE_TOOL[tool];
+  const setActiveTool = (tool: number) => {
+    uiUniforms[14] = tool;
   };
 
   const getActiveTool = () => {
-    return uiUniforms[14] as ActiveToolValue;
+    return uiUniforms[14];
   };
 
   return {
@@ -148,7 +146,7 @@ export const createUniformBufferHandler = (
     setSelectionTool,
     updateSelectedColor,
     updateBrushOpacity,
-    isSelectionToolEnabled: () => (uiUniforms[7] === 1 ? true : false),
+    isSelectionToolEnabled: () => selectionToolEnabled,
     setLineStartPosition,
     resetStartLinePosition,
     getStartLinePosition,

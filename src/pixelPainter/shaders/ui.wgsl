@@ -16,10 +16,10 @@ struct UIParams {
     selectionRectW: f32,
     selectionRectH: f32,
     brushThickness: f32,
-    selectionToolActivated: f32,
     selectedColor: vec4f,
     lineStartX: f32,
     lineStartY: f32,
+    activeTool: f32,
 }
 
 @group(0) @binding(0) var<uniform> commonValues: CommonValues;
@@ -99,10 +99,24 @@ fn vertexMain(@location(0) pos: vec2f) -> VertexOutput {
 fn fragmentMain(@location(0) canvasPixelCoord: vec2f) -> @location(0) vec4f {
     let cell = floor(canvasPixelCoord);
     let snappedCenter = cell + vec2f(0.5);
-    let selectionActive = uiParams.selectionToolActivated > 0.5;
+    let activeTool = uiParams.activeTool;
     let uiColor = uiParams.selectedColor;
 
-    if !selectionActive &&
+    // Highlight the pixel under the cursor 
+    if (activeTool == 0 || activeTool == 2 || activeTool == 4) && uiParams.mouseCellX >= 0.0 && uiParams.mouseCellY >= 0.0 {
+        let brushCenterPx = vec2f(uiParams.mouseCellX, uiParams.mouseCellY) + vec2f(0.5);
+        let radiusPx = max(uiParams.brushThickness, 0.5);
+        let dist = distance(snappedCenter, brushCenterPx);
+        let fill = select(0.0, 1.0, dist < radiusPx);
+        let alpha = fill * uiColor.a;
+
+        if alpha > 0.0 {
+            return vec4f(uiColor.rgb, alpha);
+        }
+    }
+
+    // Line
+    if activeTool == 3 &&
         uiParams.lineStartX >= 0.0 &&
         uiParams.lineStartY >= 0.0 &&
         uiParams.mouseCellX >= 0.0 &&
@@ -118,23 +132,12 @@ fn fragmentMain(@location(0) canvasPixelCoord: vec2f) -> @location(0) vec4f {
         }
     }
 
-    if !selectionActive && uiParams.mouseCellX >= 0.0 && uiParams.mouseCellY >= 0.0 {
-        let brushCenterPx = vec2f(uiParams.mouseCellX, uiParams.mouseCellY) + vec2f(0.5);
-        let radiusPx = max(uiParams.brushThickness, 0.5);
-        let dist = distance(snappedCenter, brushCenterPx);
-        let fill = select(0.0, 1.0, dist < radiusPx);
-        let alpha = fill * uiColor.a;
-
-        if alpha > 0.0 {
-            return vec4f(uiColor.rgb, alpha);
-        }
-    }
-
-    let hasSelectionRect = uiParams.selectionRectX >= 0.0 &&
+    let hasSelectionRect = uiParams.activeTool == 1 && uiParams.selectionRectX >= 0.0 &&
         uiParams.selectionRectY >= 0.0 &&
         uiParams.selectionRectW >= 0.0 &&
         uiParams.selectionRectH >= 0.0;
 
+    // Paint rect
     if hasSelectionRect {
         let rectMin = min(
             vec2f(uiParams.selectionRectX, uiParams.selectionRectY),

@@ -150,5 +150,8 @@ export const pixelPainter = async (
       getColors: colorPaletteHandler.getColors,
       isLoading: colorPaletteHandler.isLoadingColors,
     },
+    tool: {
+      set: uniformBufferHandler.setActiveTool,
+    },
   };
 };

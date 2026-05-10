@@ -44,6 +44,8 @@ export const initializeEditor = async (
   const setActiveTool = (activeTool: number) => {
     _setActiveTool(activeTool);
 
+    pixel.tool.set(activeTool);
+
     // When using paint selection tool (or perhaps other tools that will be implemented), these tools might not need
     // custom brush thickness, so it's set to 1.
     if (activeTool === ACTIVATE_TOOL.PAINT_SELECTION) {
