@@ -1,8 +1,8 @@
 .toolSettings {
   position: relative;
   z-index: 10;
-  gap: 12px;
-  min-height: 52px;
+  gap: 10px;
+  min-height: 46px;
   display: flex;
   align-items: center;
   flex-wrap: wrap;
@@ -11,11 +11,11 @@
   border: 1px solid var(--surface-border);
   box-shadow: var(--shadow-md);
   backdrop-filter: blur(18px);
-  padding: 0 12px;
+  padding: 0 10px;
 }
 
 .menuSection {
-  width: 240px;
+  width: 210px;
 }
 
 .generalSection {

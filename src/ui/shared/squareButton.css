@@ -13,8 +13,8 @@
 }
 
 .square-button-xs {
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
   border-radius: 10px;
 }
 
@@ -24,9 +24,9 @@
 }
 
 .square-button-sm {
-  width: 32px;
-  height: 32px;
-  border-radius: 12px;
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
 }
 
 .square-button-sm svg {
@@ -35,18 +35,18 @@
 }
 
 .square-button-md {
-  width: 40px;
-  height: 40px;
-  border-radius: 14px;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
 }
 
 .square-button-lg {
-  width: 44px;
-  height: 44px;
-  border-radius: 14px;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
 }
 
 .square-button-lg svg {
-  width: 19px;
-  height: 19px;
+  width: 18px;
+  height: 18px;
 }

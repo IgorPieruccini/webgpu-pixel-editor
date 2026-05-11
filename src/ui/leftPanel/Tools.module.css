@@ -1,11 +1,11 @@
 .tools {
   margin: 0;
-  max-width: 250px;
-  padding: 14px 10px;
+  max-width: 232px;
+  padding: 10px 8px;
   display: flex;
   flex-direction: column;
   justify-items: center;
-  gap: 10px;
+  gap: 8px;
   align-items: center;
   background: var(--surface);
   border: 1px solid var(--surface-border);
@@ -17,7 +17,7 @@
 .toolsContainer {
   display: flex;
   justify-content: space-between;
-  gap: 8px;
+  gap: 6px;
 }
 
 .toolButton:focus {

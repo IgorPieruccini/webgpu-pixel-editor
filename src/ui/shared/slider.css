@@ -1,16 +1,16 @@
 .slider {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   align-items: center;
   justify-content: space-between;
   flex-direction: row;
-  min-height: 32px;
+  min-height: 30px;
 
   .slider-container {
     display: flex;
     justify-content: stretch;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     flex: 1;
 
     p {

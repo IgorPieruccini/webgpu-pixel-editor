@@ -2,11 +2,11 @@
   display: flex;
   justify-content: space-between;
   width: 100%;
-  min-height: 48px;
-  padding: 0 12px;
-  border-radius: 16px;
+  min-height: 42px;
+  padding: 0 10px;
+  border-radius: 14px;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .active {
@@ -25,5 +25,5 @@
 .layerOptions {
   display: flex;
   background: none;
-  gap: 6px;
+  gap: 4px;
 }

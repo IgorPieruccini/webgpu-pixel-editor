@@ -124,7 +124,7 @@ hr {
     rgba(136, 166, 255, 0.45),
     transparent
   );
-  margin: 10px 0;
+  margin: 8px 0;
 }
 
 .separator {
@@ -134,7 +134,7 @@ hr {
 .separator-vertical {
   width: 1px;
   align-self: stretch;
-  margin: 8px 0;
+  margin: 6px 0;
   background: linear-gradient(
     180deg,
     transparent,
@@ -153,7 +153,7 @@ button {
   border-radius: var(--radius-sm);
   border: 1px solid var(--surface-border);
   box-sizing: border-box;
-  min-height: 32px;
+  min-height: 30px;
   font-size: 0.8em;
   font-weight: 600;
   font-family: inherit;
@@ -202,20 +202,20 @@ input[type="number"] {
   border: 1px solid var(--surface-border);
   border-radius: var(--radius-sm);
   background: rgba(8, 16, 30, 0.82);
-  min-height: 36px;
-  padding: 0 12px;
+  min-height: 34px;
+  padding: 0 10px;
 }
 
 input[type="range"] {
   accent-color: var(--primary-color-light);
-  height: 5px;
+  height: 4px;
 }
 
 input[type="color"] {
-  width: 44px;
-  height: 44px;
-  padding: 4px;
-  border-radius: 14px;
+  width: 40px;
+  height: 40px;
+  padding: 3px;
+  border-radius: 12px;
   border: 1px solid var(--surface-border);
   background: rgba(8, 16, 30, 0.92);
   box-shadow: var(--shadow-md);
@@ -236,8 +236,8 @@ input[type="color"]::-webkit-color-swatch {
 }
 
 *::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
 }
 
 *::-webkit-scrollbar-thumb {
