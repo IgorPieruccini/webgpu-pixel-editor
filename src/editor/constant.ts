@@ -9,6 +9,7 @@ export const ACTIVATE_TOOL = {
   DELETE: 2,
   LINE: 3,
   BUCKET_PAINT: 4,
+  EYE_DROPPER: 5,
 };
 
 function getSelectedColor(): number;

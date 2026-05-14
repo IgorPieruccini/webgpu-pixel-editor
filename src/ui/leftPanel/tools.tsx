@@ -14,9 +14,15 @@ import { useEditor } from "../../editor/editortContext";
 import { ACTIVATE_TOOL } from "../../editor/constant";
 import { ColorPicker } from "../color/colorPicker";
 import { SquareButton } from "../shared/squareButton";
+import { TbOutlineColorPicker, TbOutlineColorPickerOff } from "solid-icons/tb";
+import { createMemo } from "solid-js";
 
 export const Tools = () => {
   const project = useEditor();
+
+  const activeTool = createMemo(() => {
+    return project?.().activeTool();
+  });
 
   return (
     <div class={styles.tools}>
@@ -25,30 +31,25 @@ export const Tools = () => {
           class={styles.toolButton}
           size="lg"
           classList={{
-            [styles.active]: project?.().activeTool() === ACTIVATE_TOOL.PAINT,
+            [styles.active]: activeTool() === ACTIVATE_TOOL.PAINT,
           }}
           onClick={() => {
             project?.().setActiveTool(ACTIVATE_TOOL.PAINT);
           }}
         >
-          {project?.().activeTool() === ACTIVATE_TOOL.PAINT ? (
-            <BsBrushFill />
-          ) : (
-            <BsBrush />
-          )}
+          {activeTool() === ACTIVATE_TOOL.PAINT ? <BsBrushFill /> : <BsBrush />}
         </SquareButton>
         <SquareButton
           class={styles.toolButton}
           size="lg"
           classList={{
-            [styles.active]:
-              project?.().activeTool() === ACTIVATE_TOOL.PAINT_SELECTION,
+            [styles.active]: activeTool() === ACTIVATE_TOOL.PAINT_SELECTION,
           }}
           onClick={() => {
             project?.().setActiveTool(ACTIVATE_TOOL.PAINT_SELECTION);
           }}
         >
-          {project?.().activeTool() === ACTIVATE_TOOL.PAINT_SELECTION ? (
+          {activeTool() === ACTIVATE_TOOL.PAINT_SELECTION ? (
             <BiSolidBrush />
           ) : (
             <BiRegularBrush />
@@ -58,13 +59,13 @@ export const Tools = () => {
           class={styles.toolButton}
           size="lg"
           classList={{
-            [styles.active]: project?.().activeTool() === ACTIVATE_TOOL.DELETE,
+            [styles.active]: activeTool() === ACTIVATE_TOOL.DELETE,
           }}
           onClick={() => {
             project?.().setActiveTool(ACTIVATE_TOOL.DELETE);
           }}
         >
-          {project?.().activeTool() === ACTIVATE_TOOL.DELETE ? (
+          {activeTool() === ACTIVATE_TOOL.DELETE ? (
             <BiSolidEraser />
           ) : (
             <BiRegularEraser />
@@ -75,13 +76,13 @@ export const Tools = () => {
           class={styles.toolButton}
           size="lg"
           classList={{
-            [styles.active]: project?.().activeTool() === ACTIVATE_TOOL.LINE,
+            [styles.active]: activeTool() === ACTIVATE_TOOL.LINE,
           }}
           onClick={() => {
             project?.().setActiveTool(ACTIVATE_TOOL.LINE);
           }}
         >
-          {project?.().activeTool() === ACTIVATE_TOOL.LINE ? (
+          {activeTool() === ACTIVATE_TOOL.LINE ? (
             <BiSolidPencil />
           ) : (
             <BiRegularPencil />
@@ -92,17 +93,29 @@ export const Tools = () => {
           class={styles.toolButton}
           size="lg"
           classList={{
-            [styles.active]:
-              project?.().activeTool() === ACTIVATE_TOOL.BUCKET_PAINT,
+            [styles.active]: activeTool() === ACTIVATE_TOOL.BUCKET_PAINT,
           }}
           onClick={() => {
             project?.().setActiveTool(ACTIVATE_TOOL.BUCKET_PAINT);
           }}
         >
-          {project?.().activeTool() === ACTIVATE_TOOL.BUCKET_PAINT ? (
+          {activeTool() === ACTIVATE_TOOL.BUCKET_PAINT ? (
             <RiDesignPaintFill />
           ) : (
             <RiDesignPaintLine />
+          )}
+        </SquareButton>
+
+        <SquareButton
+          classList={{
+            [styles.active]: activeTool() === ACTIVATE_TOOL.EYE_DROPPER,
+          }}
+          onClick={() => project?.().setActiveTool(ACTIVATE_TOOL.EYE_DROPPER)}
+        >
+          {activeTool() === ACTIVATE_TOOL.EYE_DROPPER ? (
+            <TbOutlineColorPicker />
+          ) : (
+            <TbOutlineColorPickerOff />
           )}
         </SquareButton>
       </div>
