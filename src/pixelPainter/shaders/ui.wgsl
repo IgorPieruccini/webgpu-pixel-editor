@@ -107,7 +107,7 @@ fn fragmentMain(@location(0) canvasPixelCoord: vec2f) -> @location(0) vec4f {
     }
 
     // Highlight the pixel under the cursor 
-    if uiParams.mouseCellX >= 0.0 && uiParams.mouseCellY >= 0.0 {
+    if activeTool != 5 && uiParams.mouseCellX >= 0.0 && uiParams.mouseCellY >= 0.0 {
         let brushCenterPx = vec2f(uiParams.mouseCellX, uiParams.mouseCellY) + vec2f(0.5);
         let radiusPx = max(brushThickness, 0.5);
         let dist = distance(snappedCenter, brushCenterPx);
