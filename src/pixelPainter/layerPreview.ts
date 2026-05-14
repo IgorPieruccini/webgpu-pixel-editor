@@ -1,8 +1,8 @@
 import { LAYER_PREVIEW_SIZE } from "../constants";
-import type { Vec2 } from "../editor/types";
 import { createTexturePipeline } from "./createPipeline";
 import type { LayerHandler } from "./handlers/layerHandler";
 import { material } from "./material";
+import type { Vec2 } from "./types";
 import { webGPUSetup } from "./webGPUSetup";
 
 export type LayerPreviewHandler = Awaited<

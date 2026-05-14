@@ -12,6 +12,7 @@ import { createColorPaletteHandler } from "./handlers/colorPaletteHandler";
 import { createLinePaintHandler } from "./handlers/tools/linePaintHanlder";
 import { createBucketPaintHandler } from "./handlers/tools/bucketPaintHandler";
 import type { Vec2 } from "../lib";
+import { createEyeDropperHandler } from "./handlers/EyeDropperHandler";
 
 export const pixelPainter = async (
   projectName: string,
@@ -50,6 +51,13 @@ export const pixelPainter = async (
     colorPaletteHandler,
     gridSize,
     canvas,
+  );
+
+  const eyeDropperHandler = createEyeDropperHandler(
+    layerHandler,
+    brushHandler,
+    uniformBufferHandler,
+    gridSize,
   );
 
   const lineHandler = createLinePaintHandler(
@@ -153,6 +161,9 @@ export const pixelPainter = async (
     tool: {
       set: uniformBufferHandler.setActiveTool,
       get: uniformBufferHandler.getActiveTool,
+    },
+    eyeDropper: {
+      eyeDropAtCell: eyeDropperHandler.eyeDropAtCell,
     },
   };
 };

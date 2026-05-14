@@ -1,4 +1,4 @@
-import type { PixelPainterMethods } from "../pixelPainter/types";
+import type { PixelPainterMethods, Vec2 } from "../pixelPainter/types";
 
 export type ActiveToolType = keyof typeof ACTIVATE_TOOL;
 export type ActiveToolValue = (typeof ACTIVATE_TOOL)[ActiveToolType];
@@ -93,5 +93,8 @@ export const INITIAL_PIXEL_PAINTER: PixelPainterMethods = {
   tool: {
     set: () => {},
     get: () => 0,
+  },
+  eyeDropper: {
+    eyeDropAtCell: () => {},
   },
 };

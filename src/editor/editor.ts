@@ -181,6 +181,10 @@ export const initializeEditor = async (
     if (currentTool === ACTIVATE_TOOL.BUCKET_PAINT) {
       pixel.bucketPaint.paint(cell);
     }
+
+    if (activeTool() === ACTIVATE_TOOL.EYE_DROPPER) {
+      pixel.eyeDropper.eyeDropAtCell(cell);
+    }
   });
 
   canvas.addEventListener("mouseup", (e) => {
