@@ -16,6 +16,7 @@ import { ColorPicker } from "../color/colorPicker";
 import { SquareButton } from "../shared/squareButton";
 import { TbOutlineColorPicker, TbOutlineColorPickerOff } from "solid-icons/tb";
 import { createEffect, createMemo } from "solid-js";
+import { createActiveObjectGuard } from "../guard";
 
 export const Tools = () => {
   const project = useEditor();
@@ -24,12 +25,14 @@ export const Tools = () => {
     return project().activeTool();
   });
 
+  const { isActiveTool } = createActiveObjectGuard();
+
   createEffect(() => {
     const currentProject = project();
     if (
       currentProject &&
-      (currentProject.activeTool() !== ACTIVATE_TOOL.EYE_DROPPER ||
-        currentProject.activeTool() !== ACTIVATE_TOOL.BUCKET_PAINT)
+      (!isActiveTool(ACTIVATE_TOOL.EYE_DROPPER) ||
+        !isActiveTool(ACTIVATE_TOOL.BUCKET_PAINT))
     ) {
       currentProject.canvas.style.cursor = "default";
     }
@@ -42,19 +45,19 @@ export const Tools = () => {
           class={styles.toolButton}
           size="lg"
           classList={{
-            [styles.active]: activeTool() === ACTIVATE_TOOL.PAINT,
+            [styles.active]: isActiveTool(ACTIVATE_TOOL.PAINT),
           }}
           onClick={() => {
             project().setActiveTool(ACTIVATE_TOOL.PAINT);
           }}
         >
-          {activeTool() === ACTIVATE_TOOL.PAINT ? <BsBrushFill /> : <BsBrush />}
+          {isActiveTool(ACTIVATE_TOOL.PAINT) ? <BsBrushFill /> : <BsBrush />}
         </SquareButton>
         <SquareButton
           class={styles.toolButton}
           size="lg"
           classList={{
-            [styles.active]: activeTool() === ACTIVATE_TOOL.PAINT_SELECTION,
+            [styles.active]: isActiveTool(ACTIVATE_TOOL.PAINT_SELECTION),
           }}
           onClick={() => {
             project().setActiveTool(ACTIVATE_TOOL.PAINT_SELECTION);
@@ -70,13 +73,13 @@ export const Tools = () => {
           class={styles.toolButton}
           size="lg"
           classList={{
-            [styles.active]: activeTool() === ACTIVATE_TOOL.DELETE,
+            [styles.active]: isActiveTool(ACTIVATE_TOOL.DELETE),
           }}
           onClick={() => {
             project().setActiveTool(ACTIVATE_TOOL.DELETE);
           }}
         >
-          {activeTool() === ACTIVATE_TOOL.DELETE ? (
+          {isActiveTool(ACTIVATE_TOOL.DELETE) ? (
             <BiSolidEraser />
           ) : (
             <BiRegularEraser />
@@ -87,13 +90,13 @@ export const Tools = () => {
           class={styles.toolButton}
           size="lg"
           classList={{
-            [styles.active]: activeTool() === ACTIVATE_TOOL.LINE,
+            [styles.active]: isActiveTool(ACTIVATE_TOOL.LINE),
           }}
           onClick={() => {
             project().setActiveTool(ACTIVATE_TOOL.LINE);
           }}
         >
-          {activeTool() === ACTIVATE_TOOL.LINE ? (
+          {isActiveTool(ACTIVATE_TOOL.LINE) ? (
             <BiSolidPencil />
           ) : (
             <BiRegularPencil />
@@ -104,7 +107,7 @@ export const Tools = () => {
           class={styles.toolButton}
           size="lg"
           classList={{
-            [styles.active]: activeTool() === ACTIVATE_TOOL.BUCKET_PAINT,
+            [styles.active]: isActiveTool(ACTIVATE_TOOL.BUCKET_PAINT),
           }}
           onClick={() => {
             const currentProject = project();
@@ -115,7 +118,7 @@ export const Tools = () => {
             }
           }}
         >
-          {activeTool() === ACTIVATE_TOOL.BUCKET_PAINT ? (
+          {isActiveTool(ACTIVATE_TOOL.BUCKET_PAINT) ? (
             <RiDesignPaintFill />
           ) : (
             <RiDesignPaintLine />
@@ -124,7 +127,7 @@ export const Tools = () => {
 
         <SquareButton
           classList={{
-            [styles.active]: activeTool() === ACTIVATE_TOOL.EYE_DROPPER,
+            [styles.active]: isActiveTool(ACTIVATE_TOOL.EYE_DROPPER),
           }}
           onClick={() => {
             const currentProject = project();
@@ -135,7 +138,7 @@ export const Tools = () => {
             }
           }}
         >
-          {activeTool() === ACTIVATE_TOOL.EYE_DROPPER ? (
+          {isActiveTool(ACTIVATE_TOOL.EYE_DROPPER) ? (
             <TbOutlineColorPicker />
           ) : (
             <TbOutlineColorPickerOff />
