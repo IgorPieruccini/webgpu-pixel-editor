@@ -4,7 +4,6 @@ import {
   type EditorType,
   type InitializeEditorOptions,
 } from "../editor/editor";
-import { editorInitialValue } from "../editor/editortContext";
 import { DEFAULT_GRID_SIZE } from "../constants";
 import { INITIAL_PIXEL_PAINTER } from "../pixelPainter/constants";
 import type { LoadedProject } from "../serialization/project";
@@ -14,6 +13,7 @@ import type {
   CreateProjectConfigControllerOptions,
   ProjectConfigController,
 } from "./types";
+import { INITIAL_EDITOR } from "../editor/constant";
 
 export const createProjectConfigController = (
   options: CreateProjectConfigControllerOptions = {},
@@ -38,7 +38,7 @@ export const createProjectConfigController = (
   const [projects, setProjects] = createSignal<ProjectType[]>(
     options.storage?.getProjects() ?? [],
   );
-  const [project, setProject] = createSignal<EditorType>(editorInitialValue);
+  const [project, setProject] = createSignal<EditorType>(INITIAL_EDITOR);
   const [pixel, setPixel] = createSignal<PixelPainterMethods>(
     INITIAL_PIXEL_PAINTER,
   );

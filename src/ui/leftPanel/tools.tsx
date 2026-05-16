@@ -21,11 +21,11 @@ export const Tools = () => {
   const project = useEditor();
 
   const activeTool = createMemo(() => {
-    return project?.().activeTool();
+    return project().activeTool();
   });
 
   createEffect(() => {
-    const currentProject = project?.();
+    const currentProject = project();
     if (
       currentProject &&
       (currentProject.activeTool() !== ACTIVATE_TOOL.EYE_DROPPER ||
@@ -33,7 +33,7 @@ export const Tools = () => {
     ) {
       currentProject.canvas.style.cursor = "default";
     }
-  }, project?.().activeTool());
+  }, project().activeTool());
 
   return (
     <div class={styles.tools}>
@@ -45,7 +45,7 @@ export const Tools = () => {
             [styles.active]: activeTool() === ACTIVATE_TOOL.PAINT,
           }}
           onClick={() => {
-            project?.().setActiveTool(ACTIVATE_TOOL.PAINT);
+            project().setActiveTool(ACTIVATE_TOOL.PAINT);
           }}
         >
           {activeTool() === ACTIVATE_TOOL.PAINT ? <BsBrushFill /> : <BsBrush />}
@@ -57,7 +57,7 @@ export const Tools = () => {
             [styles.active]: activeTool() === ACTIVATE_TOOL.PAINT_SELECTION,
           }}
           onClick={() => {
-            project?.().setActiveTool(ACTIVATE_TOOL.PAINT_SELECTION);
+            project().setActiveTool(ACTIVATE_TOOL.PAINT_SELECTION);
           }}
         >
           {activeTool() === ACTIVATE_TOOL.PAINT_SELECTION ? (
@@ -73,7 +73,7 @@ export const Tools = () => {
             [styles.active]: activeTool() === ACTIVATE_TOOL.DELETE,
           }}
           onClick={() => {
-            project?.().setActiveTool(ACTIVATE_TOOL.DELETE);
+            project().setActiveTool(ACTIVATE_TOOL.DELETE);
           }}
         >
           {activeTool() === ACTIVATE_TOOL.DELETE ? (
@@ -90,7 +90,7 @@ export const Tools = () => {
             [styles.active]: activeTool() === ACTIVATE_TOOL.LINE,
           }}
           onClick={() => {
-            project?.().setActiveTool(ACTIVATE_TOOL.LINE);
+            project().setActiveTool(ACTIVATE_TOOL.LINE);
           }}
         >
           {activeTool() === ACTIVATE_TOOL.LINE ? (
@@ -107,7 +107,7 @@ export const Tools = () => {
             [styles.active]: activeTool() === ACTIVATE_TOOL.BUCKET_PAINT,
           }}
           onClick={() => {
-            const currentProject = project?.();
+            const currentProject = project();
             if (currentProject) {
               currentProject.setActiveTool(ACTIVATE_TOOL.BUCKET_PAINT);
               currentProject.canvas.style.cursor =
@@ -127,7 +127,7 @@ export const Tools = () => {
             [styles.active]: activeTool() === ACTIVATE_TOOL.EYE_DROPPER,
           }}
           onClick={() => {
-            const currentProject = project?.();
+            const currentProject = project();
             if (currentProject) {
               currentProject.setActiveTool(ACTIVATE_TOOL.EYE_DROPPER);
               currentProject.canvas.style.cursor =

@@ -79,11 +79,6 @@ export const useProjectConfig = () => {
   return context;
 };
 
-export const useProject = () => {
-  const context = useContext(ProjectConfigContext);
-  return context;
-};
-
 const getLayers = () => {
   const context = useContext(ProjectConfigContext);
   return () => context.pixel().layer;
