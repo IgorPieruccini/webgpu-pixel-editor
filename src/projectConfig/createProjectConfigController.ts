@@ -6,7 +6,7 @@ import {
 } from "../editor/editor";
 import { editorInitialValue } from "../editor/editortContext";
 import { DEFAULT_GRID_SIZE } from "../constants";
-import { INITIAL_PIXEL_PAINTER } from "../editor/constant";
+import { INITIAL_PIXEL_PAINTER } from "../pixelPainter/constants";
 import type { LoadedProject } from "../serialization/project";
 import type { ProjectType } from "../editor/types";
 import type { PixelPainterMethods } from "../pixelPainter/types";

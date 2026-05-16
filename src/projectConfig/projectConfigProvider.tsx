@@ -4,7 +4,7 @@ import { useMenu } from "../ui/menuPanels/menuProvider";
 import { storageLocal } from "../storageLocal";
 import { storageDB } from "../storageDB";
 import { DEFAULT_GRID_SIZE } from "../constants";
-import { INITIAL_PIXEL_PAINTER } from "../editor/constant";
+import { INITIAL_PIXEL_PAINTER } from "../pixelPainter/constants";
 import { createProjectConfigController } from "./createProjectConfigController";
 import type { ProjectConfigContextType, ProjectConfigStorage } from "./types";
 
