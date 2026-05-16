@@ -28,13 +28,11 @@ export const Tools = () => {
   const { isActiveTool } = createActiveObjectGuard();
 
   createEffect(() => {
-    const currentProject = project();
     if (
-      currentProject &&
-      (!isActiveTool(ACTIVATE_TOOL.EYE_DROPPER) ||
-        !isActiveTool(ACTIVATE_TOOL.BUCKET_PAINT))
+      !isActiveTool(ACTIVATE_TOOL.EYE_DROPPER) ||
+      !isActiveTool(ACTIVATE_TOOL.BUCKET_PAINT)
     ) {
-      currentProject.canvas.style.cursor = "default";
+      project().canvas.style.cursor = "default";
     }
   }, project().activeTool());
 
@@ -110,12 +108,9 @@ export const Tools = () => {
             [styles.active]: isActiveTool(ACTIVATE_TOOL.BUCKET_PAINT),
           }}
           onClick={() => {
-            const currentProject = project();
-            if (currentProject) {
-              currentProject.setActiveTool(ACTIVATE_TOOL.BUCKET_PAINT);
-              currentProject.canvas.style.cursor =
-                "url('bucket-icon.svg') 30 30, auto";
-            }
+            project().setActiveTool(ACTIVATE_TOOL.BUCKET_PAINT);
+            project().canvas.style.cursor =
+              "url('bucket-icon.svg') 30 30, auto";
           }}
         >
           {isActiveTool(ACTIVATE_TOOL.BUCKET_PAINT) ? (
@@ -130,12 +125,9 @@ export const Tools = () => {
             [styles.active]: isActiveTool(ACTIVATE_TOOL.EYE_DROPPER),
           }}
           onClick={() => {
-            const currentProject = project();
-            if (currentProject) {
-              currentProject.setActiveTool(ACTIVATE_TOOL.EYE_DROPPER);
-              currentProject.canvas.style.cursor =
-                "url('eye-drop-icon.svg') 4 24, auto";
-            }
+            project().setActiveTool(ACTIVATE_TOOL.EYE_DROPPER);
+            project().canvas.style.cursor =
+              "url('eye-drop-icon.svg') 4 24, auto";
           }}
         >
           {isActiveTool(ACTIVATE_TOOL.EYE_DROPPER) ? (
