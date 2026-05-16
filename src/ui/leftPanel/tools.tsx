@@ -15,7 +15,7 @@ import { ACTIVATE_TOOL } from "../../editor/constant";
 import { ColorPicker } from "../color/colorPicker";
 import { SquareButton } from "../shared/squareButton";
 import { TbOutlineColorPicker, TbOutlineColorPickerOff } from "solid-icons/tb";
-import { createMemo } from "solid-js";
+import { createEffect, createMemo } from "solid-js";
 
 export const Tools = () => {
   const project = useEditor();
@@ -23,6 +23,16 @@ export const Tools = () => {
   const activeTool = createMemo(() => {
     return project?.().activeTool();
   });
+
+  createEffect(() => {
+    const currentProject = project?.();
+    if (
+      currentProject &&
+      currentProject.activeTool() !== ACTIVATE_TOOL.EYE_DROPPER
+    ) {
+      currentProject.canvas.style.cursor = "default";
+    }
+  }, project?.().activeTool());
 
   return (
     <div class={styles.tools}>
@@ -110,7 +120,14 @@ export const Tools = () => {
           classList={{
             [styles.active]: activeTool() === ACTIVATE_TOOL.EYE_DROPPER,
           }}
-          onClick={() => project?.().setActiveTool(ACTIVATE_TOOL.EYE_DROPPER)}
+          onClick={() => {
+            const currentProject = project?.();
+            if (currentProject) {
+              currentProject.setActiveTool(ACTIVATE_TOOL.EYE_DROPPER);
+              currentProject.canvas.style.cursor =
+                "url('eye-drop-icon.svg') 4 24, auto";
+            }
+          }}
         >
           {activeTool() === ACTIVATE_TOOL.EYE_DROPPER ? (
             <TbOutlineColorPicker />

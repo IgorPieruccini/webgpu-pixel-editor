@@ -315,5 +315,6 @@ export const initializeEditor = async (
     createNewPainter,
     activeTool,
     setActiveTool,
+    canvas,
   };
 };
