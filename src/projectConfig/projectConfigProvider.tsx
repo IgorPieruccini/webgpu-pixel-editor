@@ -16,7 +16,7 @@ const initialProjectConfig: ProjectConfigContextType = {
   pixel: () => INITIAL_PIXEL_PAINTER,
   projectName: () => "new-project",
   setProjectName: notImplemented,
-  setProjectGridSize: notImplemented,
+  setProjectGridSize: () => undefined,
   getProjectGridSize: () => DEFAULT_GRID_SIZE,
   createNewProject: notImplemented,
   deleteProject: async () => undefined,
