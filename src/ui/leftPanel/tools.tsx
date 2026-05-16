@@ -28,7 +28,8 @@ export const Tools = () => {
     const currentProject = project?.();
     if (
       currentProject &&
-      currentProject.activeTool() !== ACTIVATE_TOOL.EYE_DROPPER
+      (currentProject.activeTool() !== ACTIVATE_TOOL.EYE_DROPPER ||
+        currentProject.activeTool() !== ACTIVATE_TOOL.BUCKET_PAINT)
     ) {
       currentProject.canvas.style.cursor = "default";
     }
@@ -106,7 +107,12 @@ export const Tools = () => {
             [styles.active]: activeTool() === ACTIVATE_TOOL.BUCKET_PAINT,
           }}
           onClick={() => {
-            project?.().setActiveTool(ACTIVATE_TOOL.BUCKET_PAINT);
+            const currentProject = project?.();
+            if (currentProject) {
+              currentProject.setActiveTool(ACTIVATE_TOOL.BUCKET_PAINT);
+              currentProject.canvas.style.cursor =
+                "url('bucket-icon.svg') 30 30, auto";
+            }
           }}
         >
           {activeTool() === ACTIVATE_TOOL.BUCKET_PAINT ? (
