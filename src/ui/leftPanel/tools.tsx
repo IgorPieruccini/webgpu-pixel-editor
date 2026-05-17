@@ -8,7 +8,8 @@ import {
 } from "solid-icons/bi";
 import { RiDesignPaintLine, RiDesignPaintFill } from "solid-icons/ri";
 import { BsBrushFill, BsBrush } from "solid-icons/bs";
-
+import { FiMove } from "solid-icons/fi";
+import { VsMove } from "solid-icons/vs";
 import styles from "./Tools.module.css";
 import { useEditor } from "../../editor/editortContext";
 import { ACTIVATE_TOOL } from "../../editor/constant";
@@ -135,6 +136,20 @@ export const Tools = () => {
           ) : (
             <TbOutlineColorPickerOff />
           )}
+        </SquareButton>
+
+        <SquareButton
+          class={styles.toolButton}
+          size="lg"
+          classList={{
+            [styles.active]: isActiveTool(ACTIVATE_TOOL.MOVE_LAYER),
+          }}
+          onClick={() => {
+            project().setActiveTool(ACTIVATE_TOOL.MOVE_LAYER);
+            project().canvas.style.cursor = "move";
+          }}
+        >
+          {isActiveTool(ACTIVATE_TOOL.MOVE_LAYER) ? <VsMove /> : <FiMove />}
         </SquareButton>
       </div>
 

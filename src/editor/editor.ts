@@ -36,6 +36,7 @@ export const initializeEditor = async (
 
   let pressingSpace = false;
   let isLeftMouseDown = false;
+  let lastMoveLayerCell: Vec2 | null = null;
 
   let pixel: PixelPainterMethods = INITIAL_PIXEL_PAINTER;
   let gridSize: Vec2 = DEFAULT_GRID_SIZE;
@@ -134,6 +135,21 @@ export const initializeEditor = async (
           y: cell.y * BYTES_PER_PIXEL,
         });
       }
+
+      if (
+        activeTool() === ACTIVATE_TOOL.MOVE_LAYER &&
+        lastMoveLayerCell !== null
+      ) {
+        const delta = {
+          x: cell.x - lastMoveLayerCell.x,
+          y: cell.y - lastMoveLayerCell.y,
+        };
+
+        if (delta.x !== 0 || delta.y !== 0) {
+          pixel.layer.move(pixel.layer.getActive().id, delta);
+          lastMoveLayerCell = cell;
+        }
+      }
     }
 
     if (activeTool() === ACTIVATE_TOOL.PAINT_SELECTION && isLeftMouseDown) {
@@ -186,10 +202,15 @@ export const initializeEditor = async (
     if (activeTool() === ACTIVATE_TOOL.EYE_DROPPER) {
       pixel.eyeDropper.eyeDropAtCell(cell);
     }
+
+    if (currentTool === ACTIVATE_TOOL.MOVE_LAYER) {
+      lastMoveLayerCell = cell;
+    }
   });
 
   canvas.addEventListener("mouseup", (e) => {
     isLeftMouseDown = false;
+    lastMoveLayerCell = null;
 
     if (activeTool() === ACTIVATE_TOOL.LINE) {
       const cell = pickCell(

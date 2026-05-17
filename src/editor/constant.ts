@@ -11,6 +11,7 @@ export const ACTIVATE_TOOL = {
   LINE: 3,
   BUCKET_PAINT: 4,
   EYE_DROPPER: 5,
+  MOVE_LAYER: 6,
 };
 
 const createInitialCanvas = (): HTMLCanvasElement => {
