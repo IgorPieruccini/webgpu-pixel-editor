@@ -27,6 +27,7 @@ struct TileValues {
 struct VertexOutput {
     @builtin(position) position: vec4f,
     @location(0) uv: vec2f,
+    @location(1) worldPos: vec2f,
 };
 
 @vertex
@@ -72,11 +73,24 @@ fn vertexMain(@builtin(vertex_index) i: u32) -> VertexOutput {
     var out: VertexOutput;
     out.position = vec4f(transformPan, 0.0, 1.0);
     out.uv = uvs[i];
+    out.worldPos = vec2f(worldX, worldY);
     return out;
 }
 
 @fragment
-fn fragmentMain(@location(0) uv: vec2f) -> @location(0) vec4f {
+fn fragmentMain(
+    @location(0) uv: vec2f,
+    @location(1) worldPos: vec2f,
+) -> @location(0) vec4f {
+    if (
+        worldPos.x < 0.0 ||
+        worldPos.y < 0.0 ||
+        worldPos.x >= commonValues.gridX ||
+        worldPos.y >= commonValues.gridY
+    ) {
+        discard;
+    }
+
     let color = textureSample(layerTexture, layerSampler, uv);
     return vec4f(color.rgb, color.a * tileValues.opacity);
 }
