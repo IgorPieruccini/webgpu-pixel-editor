@@ -7,6 +7,7 @@ export type Layer = {
   name: string;
   display: boolean;
   opacity: number;
+  offset: Vec2;
 };
 
 export type Layers = Layer[];

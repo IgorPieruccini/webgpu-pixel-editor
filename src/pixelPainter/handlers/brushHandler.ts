@@ -2,9 +2,10 @@ import { createSignal } from "solid-js";
 import type { LayerHandler } from "./layerHandler";
 import { alphaComposite, numberToRGBA, rgbaToHex } from "../utils";
 import type { HistoryChangeHandler } from "./historyChangeHandler";
-import { BYTES_PER_PIXEL, RGBA_OFFSET } from "../../constants";
+import { BYTES_PER_PIXEL } from "../../constants";
 import type { ColorPaletteHandler } from "./colorPaletteHandler";
 import type { Vec2 } from "../types";
+import { getPixelAtLocal, setPixelAtLocal } from "../tiledLayer";
 
 export type BrushHandler = ReturnType<typeof createBrushHandler>;
 
@@ -46,23 +47,42 @@ export const createBrushHandler = (
   };
 
   const getColor = (pos: Vec2, format: "number" | "string" = "number") => {
-    const i = pos.x + pos.y * gridSize.x;
-    const color = layerHandler.getCurrentBuffer()[i];
-    if (format === "string") {
-      return `#${color.toString(16).padStart(6, "0")}`;
+    const currentLayer = layerHandler.getActive();
+    const buffer = layerHandler.getBufferById(currentLayer.id);
+    if (!buffer) {
+      throw new Error(`Buffer for layer ${currentLayer.id} not found`);
     }
-    return color;
+
+    const color = getPixelAtLocal(
+      buffer,
+      pos.x - currentLayer.offset.x,
+      pos.y - currentLayer.offset.y,
+    );
+
+    const packed = (color.r << 24) | (color.g << 16) | (color.b << 8) | color.a;
+    if (format === "string") {
+      return `#${(packed >>> 8).toString(16).padStart(6, "0")}`;
+    }
+    return packed >>> 0;
   };
 
-  const composeColors = (index: number) => {
-    index;
-    const curBuffer = layerHandler.getCurrentBuffer();
-    const _r = curBuffer[index + RGBA_OFFSET.RED];
-    const _g = curBuffer[index + RGBA_OFFSET.GREEN];
-    const _b = curBuffer[index + RGBA_OFFSET.BLUE];
-    const _a = curBuffer[index + RGBA_OFFSET.ALPHA] / 255;
+  const composeColors = (worldPos: Vec2) => {
+    const currentLayer = layerHandler.getActive();
+    const currentBuffer = layerHandler.getBufferById(currentLayer.id);
+    if (!currentBuffer) {
+      throw new Error(`Buffer for layer ${currentLayer.id} not found`);
+    }
 
-    const destRGBA = { r: _r, g: _g, b: _b, a: _a };
+    const localX = worldPos.x - currentLayer.offset.x;
+    const localY = worldPos.y - currentLayer.offset.y;
+    const destColor = getPixelAtLocal(currentBuffer, localX, localY);
+
+    const destRGBA = {
+      r: destColor.r,
+      g: destColor.g,
+      b: destColor.b,
+      a: destColor.a / 255,
+    };
 
     const sourceRGBA = numberToRGBA(_getSelectedColor());
     sourceRGBA.a = getOpacity() / 100;
@@ -76,12 +96,8 @@ export const createBrushHandler = (
     const b = (rgba >>> 8) & 0xff;
     const a = rgba & 0xff;
 
-    layerHandler.getCurrentBuffer()[index + RGBA_OFFSET.RED] = r;
-    layerHandler.getCurrentBuffer()[index + RGBA_OFFSET.GREEN] = g;
-    layerHandler.getCurrentBuffer()[index + RGBA_OFFSET.BLUE] = b;
-    layerHandler.getCurrentBuffer()[index + RGBA_OFFSET.ALPHA] = a;
-
-    currentPaintedPixels.add(index);
+    setPixelAtLocal(currentBuffer, localX, localY, { r, g, b, a });
+    currentPaintedPixels.add((worldPos.y * gridSize.x + worldPos.x) * BYTES_PER_PIXEL);
   };
 
   const paint = (
@@ -98,7 +114,6 @@ export const createBrushHandler = (
       for (let x = -thickness; x <= thickness; x++) {
         const _x = cellPos.x + x * BYTES_PER_PIXEL;
         const _y = cellPos.y + y * BYTES_PER_PIXEL;
-        const i = _x + _y * gridSize.x;
         const cellX = _x / BYTES_PER_PIXEL;
         const cellY = _y / BYTES_PER_PIXEL;
 
@@ -111,13 +126,14 @@ export const createBrushHandler = (
           continue;
         }
 
-        if (!forcePaint && currentPaintedPixels.has(i)) {
+        const pixelIndex = (cellY * gridSize.x + cellX) * BYTES_PER_PIXEL;
+        if (!forcePaint && currentPaintedPixels.has(pixelIndex)) {
           continue;
         }
 
         const distance = Math.hypot(x, y);
         if (distance < thickness) {
-          composeColors(i);
+          composeColors({ x: cellX, y: cellY });
           hasAppliedPaint = true;
         }
       }
@@ -134,7 +150,6 @@ export const createBrushHandler = (
       for (let x = -thickness; x <= thickness; x++) {
         const _x = cellPos.x + x * BYTES_PER_PIXEL;
         const _y = cellPos.y + y * BYTES_PER_PIXEL;
-        const index = _x + _y * gridSize.x;
         const cellX = _x / BYTES_PER_PIXEL;
         const cellY = _y / BYTES_PER_PIXEL;
 
@@ -147,19 +162,29 @@ export const createBrushHandler = (
           continue;
         }
 
+        const index = (cellY * gridSize.x + cellX) * BYTES_PER_PIXEL;
         if (currentPaintedPixels.has(index)) {
           continue;
         }
 
         const distance = Math.hypot(x, y);
         if (distance < thickness) {
-          const curBuffer = layerHandler.getCurrentBuffer();
-          const _r = curBuffer[index + RGBA_OFFSET.RED];
-          const _g = curBuffer[index + RGBA_OFFSET.GREEN];
-          const _b = curBuffer[index + RGBA_OFFSET.BLUE];
-          const _a = curBuffer[index + RGBA_OFFSET.ALPHA] / 255;
+          const currentLayer = layerHandler.getActive();
+          const currentBuffer = layerHandler.getBufferById(currentLayer.id);
+          if (!currentBuffer) {
+            throw new Error(`Buffer for layer ${currentLayer.id} not found`);
+          }
 
-          const destRGBA = { r: _r, g: _g, b: _b, a: _a };
+          const localX = cellX - currentLayer.offset.x;
+          const localY = cellY - currentLayer.offset.y;
+          const destColor = getPixelAtLocal(currentBuffer, localX, localY);
+
+          const destRGBA = {
+            r: destColor.r,
+            g: destColor.g,
+            b: destColor.b,
+            a: destColor.a / 255,
+          };
 
           if (destRGBA.a === 0) {
             continue;
@@ -169,14 +194,23 @@ export const createBrushHandler = (
           const resultRGBA = { ...destRGBA, a: opacity >= 0 ? opacity : 0 };
 
           if (resultRGBA.a === 0) {
-            layerHandler.getCurrentBuffer()[index + RGBA_OFFSET.ALPHA] = 0;
+            setPixelAtLocal(currentBuffer, localX, localY, {
+              r: 0,
+              g: 0,
+              b: 0,
+              a: 0,
+            });
             currentPaintedPixels.add(index);
             continue;
           }
 
           const blendedHex = rgbaToHex(resultRGBA);
-          layerHandler.getCurrentBuffer()[index + RGBA_OFFSET.ALPHA] =
-            blendedHex;
+          setPixelAtLocal(currentBuffer, localX, localY, {
+            r: (blendedHex >>> 24) & 0xff,
+            g: (blendedHex >>> 16) & 0xff,
+            b: (blendedHex >>> 8) & 0xff,
+            a: blendedHex & 0xff,
+          });
           currentPaintedPixels.add(index);
         }
       }

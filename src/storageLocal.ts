@@ -1,6 +1,13 @@
 import type { ProjectType } from "./editor/types";
-import type { Layers } from "./pixelPainter/types";
+import type { Layer, Layers } from "./pixelPainter/types";
 import { generateUUID } from "./utils";
+
+const normalizeLayer = (layer: Layer | Omit<Layer, "offset">): Layer => {
+  return {
+    ...layer,
+    offset: "offset" in layer ? layer.offset : { x: 0, y: 0 },
+  };
+};
 
 const getLayers = (projectName: string) => {
   return window.localStorage.getItem(`${projectName}-layers`);
@@ -17,13 +24,19 @@ const createLayers = (projectName: string): Layers => {
   let stringLayers = getLayers(projectName);
   if (!stringLayers) {
     const layer: Layers = [
-      { id: generateUUID(), name: "Layer", display: true, opacity: 1 },
+      {
+        id: generateUUID(),
+        name: "Layer",
+        display: true,
+        opacity: 1,
+        offset: { x: 0, y: 0 },
+      },
     ];
     stringLayers = JSON.stringify(layer);
     saveLayers(projectName, stringLayers);
   }
 
-  return JSON.parse(stringLayers);
+  return JSON.parse(stringLayers).map(normalizeLayer);
 };
 
 const setActiveProject = (project: ProjectType) => {

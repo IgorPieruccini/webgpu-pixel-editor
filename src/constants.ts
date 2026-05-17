@@ -2,7 +2,7 @@
  * @fileoverview Declare all constants of the application
  */
 
-import type { Vec2 } from "./editor/types";
+import type { Vec2 } from "./pixelPainter/types";
 
 export const ZOOM_SENSITIVITY = 0.001;
 

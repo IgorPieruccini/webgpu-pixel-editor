@@ -1,56 +1,26 @@
 import { createSignal } from "solid-js";
-import type { Layer, Layers } from "../types";
+import type { Layer, Layers, Vec2 } from "../types";
 import { generateUUID } from "../../utils";
 import { localDataBase } from "../../storageDB";
-import type { Vec2 } from "../../editor/types";
 import { storageLocal } from "../../storageLocal";
-import { BYTES_PER_PIXEL } from "../../constants";
+import {
+  cloneTiledLayerBuffer,
+  createTiledLayerBuffer,
+  type TiledLayerBuffer,
+} from "../tiledLayer";
 
 export type LayerHandler = Awaited<ReturnType<typeof createLayerHandler>>;
 
-/**
- * Creates a layer handler for managing layers in a pixel painting project.
- *
- * @description The layer handler provides comprehensive layer management functionality including
- * creating, removing, duplicating, reordering layers, and managing their buffers and properties.
- * It integrates with local storage and IndexedDB for persistence, and manages the active layer
- * state and pixel buffers for each layer.
- *
- * @param projectName - The name of the project for storage identification
- * @param gridSize - The dimensions of the pixel grid (width and height)
- *
- * @returns An object containing methods for layer management and state access;
- *
- * @throws {Error} Throws if no layers exist in the project
- * @throws {Error} Throws if the first layer buffer cannot be accessed
- * @throws {Error} Throws if layer operations reference non-existent layers
- *
- * @example
- * ```typescript
- * const layerHandler = await createLayerHandler("myProject", { x: 800, y: 600 });
- *
- * // Add a new layer
- * const newLayerId = layerHandler.add();
- *
- * // Select a layer
- * layerHandler.select(newLayerId);
- *
- * // Set layer properties
- * layerHandler.setOpacity(newLayerId, 0.8);
- * layerHandler.rename("Background Layer");
- *
- * // Duplicate a layer
- * const duplicatedId = layerHandler.duplicate(newLayerId);
- *
- * // Save current work
- * layerHandler.saveCurrentBuffer();
- * ```
- */
+const normalizeLayer = (layer: Layer): Layer => ({
+  ...layer,
+  offset: layer.offset ?? { x: 0, y: 0 },
+});
+
 export const createLayerHandler = async (
   projectName: string,
   gridSize: Vec2,
 ) => {
-  const stringLayers = storageLocal.createLayers(projectName);
+  const stringLayers = storageLocal.createLayers(projectName).map(normalizeLayer);
 
   const [getList, setList] = createSignal<Layers>(stringLayers);
   const dirtyStatus: Set<string> = new Set(
@@ -66,37 +36,17 @@ export const createLayerHandler = async (
 
   const [getActive, setActive] = createSignal<Layer>(firstLayer);
 
-  const buffers: Map<string, Uint8Array<ArrayBuffer>> = new Map();
-  const db = await localDataBase(projectName);
+  const buffers: Map<string, TiledLayerBuffer> = new Map();
+  const db = await localDataBase(projectName, gridSize);
 
   for (const layer of getList()) {
     try {
       const layerBuffer = await db.load(layer.id);
-      if (layerBuffer) {
-        buffers.set(layer.id, layerBuffer);
-      } else {
-        buffers.set(
-          layer.id,
-          new Uint8Array(gridSize.x * gridSize.y * BYTES_PER_PIXEL),
-        );
-      }
+      buffers.set(layer.id, layerBuffer);
     } catch {
-      buffers.set(
-        layer.id,
-        new Uint8Array(gridSize.x * gridSize.y * BYTES_PER_PIXEL),
-      );
+      buffers.set(layer.id, createTiledLayerBuffer());
     }
   }
-
-  const firstBuffer = buffers.get(firstLayer.id);
-  if (!firstBuffer) {
-    throw new Error(
-      "Something went wrong accessing the buffer from first layer",
-    );
-  }
-
-  const [getCurrentBuffer, setCurrentBuffer] =
-    createSignal<Uint8Array<ArrayBuffer>>(firstBuffer);
 
   const isLayerDirty = (id: string) => {
     return dirtyStatus.has(id);
@@ -120,28 +70,28 @@ export const createLayerHandler = async (
     dirtyStatus.delete(id);
   };
 
+  const saveLayers = (layers: Layers) => {
+    const normalized = layers.map(normalizeLayer);
+    storageLocal.saveLayers(projectName, normalized);
+  };
+
   const add = (): string => {
     const layers = getList();
 
     const layer: Layer = {
       id: generateUUID(),
-      name: `Layer`,
+      name: "Layer",
       display: true,
       opacity: 1,
+      offset: { x: 0, y: 0 },
     };
 
-    const _layers: Layers = [...layers, layer];
-    setList(_layers);
-
-    storageLocal.saveLayers(projectName, _layers);
-
+    const nextLayers: Layers = [...layers, layer];
+    setList(nextLayers);
+    saveLayers(nextLayers);
     setActive(layer);
 
-    const newBuffer = new Uint8Array(gridSize.x * gridSize.y * BYTES_PER_PIXEL);
-
-    buffers.set(layer.id, newBuffer);
-    setCurrentBuffer(newBuffer);
-
+    buffers.set(layer.id, createTiledLayerBuffer());
     dirtyStatus.add(layer.id);
 
     return layer.id;
@@ -154,96 +104,74 @@ export const createLayerHandler = async (
       throw new Error(`Layer with id ${layer.id} not found`);
     }
 
-    const _layers: Layers = [...layers];
-    _layers[index] = layer;
-    setList(_layers);
-
-    storageLocal.saveLayers(projectName, _layers);
+    const nextLayers: Layers = [...layers];
+    nextLayers[index] = normalizeLayer(layer);
+    setList(nextLayers);
+    saveLayers(nextLayers);
   };
 
   const remove = (id: string): string | null => {
-    const _layers = [...getList()];
+    const layers = [...getList()];
 
-    if (_layers.length === 1) {
-      // At least one layer per project needs to exist
+    if (layers.length === 1) {
       return null;
     }
 
-    const index = _layers.findIndex((layer) => layer.id === id);
+    const index = layers.findIndex((layer) => layer.id === id);
     const newActiveLayerIndex = index >= 1 ? index - 1 : index + 1;
-    const newActiveLayer = _layers[newActiveLayerIndex];
+    const newActiveLayer = layers[newActiveLayerIndex];
 
-    // re-assign current layer id
     if (getActive().id === id) {
       setActive(newActiveLayer);
-      const newBuffer = buffers.get(newActiveLayer.id);
-      if (!newBuffer) {
-        throw new Error(
-          `layer buffer with id ${newActiveLayer} could not be found`,
-        );
-      }
-      setCurrentBuffer(newBuffer);
     }
 
-    _layers.splice(index, 1);
-    setList(_layers);
+    layers.splice(index, 1);
+    setList(layers);
     buffers.delete(id);
-
-    storageLocal.saveLayers(projectName, _layers);
-
+    saveLayers(layers);
     dirtyStatus.delete(id);
 
     return id;
   };
 
   const sort = (dragged: string, dropped: string) => {
-    const _layers = [...getList()];
-
+    const layers = [...getList()];
     let draggedIndex = 0;
     let droppedIndex = 0;
 
-    for (let i = 0; i < _layers.length; i++) {
-      const layer = _layers[i];
+    for (let i = 0; i < layers.length; i++) {
+      const layer = layers[i];
       if (layer.id === dragged) {
         draggedIndex = i;
       }
-      if (layer.id == dropped) {
+      if (layer.id === dropped) {
         droppedIndex = i;
       }
     }
 
-    const draggedLayer = _layers.splice(draggedIndex, 1);
-
-    const first = _layers.slice(0, droppedIndex);
-    const second = _layers.slice(droppedIndex, _layers.length);
+    const draggedLayer = layers.splice(draggedIndex, 1);
+    const first = layers.slice(0, droppedIndex);
+    const second = layers.slice(droppedIndex, layers.length);
     const newLayers = [...first, ...draggedLayer, ...second];
 
     setList(newLayers);
-
-    storageLocal.saveLayers(projectName, _layers);
+    saveLayers(newLayers);
   };
 
   const rename = (name: string) => {
-    const _layers = getList().map((layer: Layer) => {
+    const layers = getList().map((layer) => {
       if (layer.id === getActive().id) {
-        return {
-          ...layer,
-          name,
-        };
+        return { ...layer, name };
       }
-
       return layer;
     });
 
-    storageLocal.saveLayers(projectName, _layers);
-
-    setList(_layers);
+    setList(layers);
+    saveLayers(layers);
   };
 
   const toggleDisplay = (id: string) => {
-    const _layers = [...getList()];
-
-    const newLayers = _layers.map((layer) => {
+    const newLayers = getList().map((layer) => {
       if (layer.id === id) {
         return {
           ...layer,
@@ -254,45 +182,30 @@ export const createLayerHandler = async (
     });
 
     setList(newLayers);
-
-    storageLocal.saveLayers(projectName, newLayers);
+    saveLayers(newLayers);
+    dirtyStatus.add(id);
   };
 
   const select = (layerId: string) => {
-    const layer = getList().find((layer) => layer.id === layerId);
+    const layer = getList().find((item) => item.id === layerId);
     if (!layer) {
-      throw new Error(`Could not find current layer bt id ${layerId}`);
+      throw new Error(`Could not find current layer by id ${layerId}`);
     }
 
     setActive(layer);
-
-    const buffer = buffers.get(layerId);
-    if (!buffer) {
-      throw new Error(`Could not find buffer corresponded to id: ${layerId}`);
-    }
-
-    setCurrentBuffer(buffer);
-
-    // By making the current layer dirty, it makes sure the preview updates correctly
     makeCurrentLayerDirty();
   };
 
   const setOpacity = (layerId: string, opacity: number) => {
-    const _layers = [...getList()];
-
-    const newLayers = _layers.map((layer) => {
+    const newLayers = getList().map((layer) => {
       if (layer.id === layerId) {
-        return {
-          ...layer,
-          opacity,
-        };
+        return { ...layer, opacity };
       }
       return layer;
     });
 
     setList(newLayers);
-
-    storageLocal.saveLayers(projectName, newLayers);
+    saveLayers(newLayers);
 
     if (layerId === getActive().id) {
       setActive({
@@ -304,8 +217,46 @@ export const createLayerHandler = async (
     dirtyStatus.add(layerId);
   };
 
+  const setOffset = (layerId: string, offset: Vec2) => {
+    const newLayers = getList().map((layer) => {
+      if (layer.id === layerId) {
+        return { ...layer, offset };
+      }
+      return layer;
+    });
+
+    setList(newLayers);
+    saveLayers(newLayers);
+
+    if (layerId === getActive().id) {
+      setActive({
+        ...getActive(),
+        offset,
+      });
+    }
+
+    dirtyStatus.add(layerId);
+  };
+
+  const move = (layerId: string, delta: Vec2) => {
+    const layer = getList().find((item) => item.id === layerId);
+    if (!layer) {
+      throw new Error(`Layer with id ${layerId} not found`);
+    }
+
+    setOffset(layerId, {
+      x: layer.offset.x + delta.x,
+      y: layer.offset.y + delta.y,
+    });
+  };
+
   const saveCurrentBuffer = () => {
-    db.save(getCurrentBuffer(), getActive().id);
+    const currentLayer = getActive();
+    const buffer = buffers.get(currentLayer.id);
+    if (!buffer) {
+      throw new Error(`Layer buffer with id ${currentLayer.id} not found`);
+    }
+    db.save(buffer, currentLayer.id);
   };
 
   const duplicate = (layerId: string): string => {
@@ -324,17 +275,13 @@ export const createLayerHandler = async (
     };
 
     const targetBuffer = buffers.get(targetLayer.id);
-
     if (!targetBuffer) {
       throw new Error(
         `Could not find layer buffer linked to id ${layerId} to duplicate`,
       );
     }
 
-    const newBuffer: Uint8Array<ArrayBuffer> = new Uint8Array([
-      ...targetBuffer,
-    ]);
-
+    const newBuffer = cloneTiledLayerBuffer(targetBuffer);
     buffers.set(newLayer.id, newBuffer);
     db.save(newBuffer, newLayer.id);
 
@@ -344,67 +291,51 @@ export const createLayerHandler = async (
 
     setList(newLayers);
     sort(newLayer.id, targetLayer.id);
-
-    storageLocal.saveLayers(projectName, newLayers);
-
+    saveLayers(newLayers);
     setActive(newLayer);
-    setCurrentBuffer(newBuffer);
-
     dirtyStatus.add(newLayer.id);
 
     return newLayer.id;
   };
 
-  const getBufferById = (
-    layerId: string,
-  ): Uint8Array<ArrayBuffer> | undefined => {
+  const getBufferById = (layerId: string): TiledLayerBuffer | undefined => {
     return buffers.get(layerId);
   };
 
-  const setLayerBuffer = (layerId: string, buffer: Uint8Array<ArrayBuffer>) => {
-    buffers.set(layerId, buffer);
-    db.save(buffer, layerId);
-    setCurrentBuffer(buffer);
+  const setLayerBuffer = (layerId: string, buffer: TiledLayerBuffer) => {
+    const copiedBuffer = cloneTiledLayerBuffer(buffer);
+    buffers.set(layerId, copiedBuffer);
+    db.save(copiedBuffer, layerId);
     dirtyStatus.add(layerId);
   };
 
   const load = (
     serializedLayers: Layers,
-    serializedBuffer: Record<string, Uint8Array<ArrayBuffer>>,
+    serializedBuffer: Record<string, TiledLayerBuffer>,
   ): string[] => {
-    const layerCopy: Layers = JSON.parse(JSON.stringify(serializedLayers));
+    const layerCopy = JSON.parse(JSON.stringify(serializedLayers)).map(
+      normalizeLayer,
+    ) as Layers;
     setList(layerCopy);
 
+    buffers.clear();
     for (const layer of layerCopy) {
+      const buffer = serializedBuffer[layer.id] ?? createTiledLayerBuffer();
+      buffers.set(layer.id, cloneTiledLayerBuffer(buffer));
       dirtyStatus.add(layer.id);
+      db.save(buffers.get(layer.id) as TiledLayerBuffer, layer.id);
     }
 
-    storageLocal.saveLayers(projectName, layerCopy);
+    saveLayers(layerCopy);
 
-    for (const [id, buffer] of Object.entries(serializedBuffer)) {
-      setLayerBuffer(id, buffer);
-    }
-
-    const activeLayerIsPresent = layerCopy.find(
-      (layer) => layer.id === getActive().id,
-    );
-
-    if (!activeLayerIsPresent) {
-      setActive(layerCopy[0]);
-      const buffer = buffers.get(layerCopy[0].id);
-      if (!buffer) {
-        throw new Error(
-          `Could not find buffer corresponded to id: ${layerCopy[0].id}`,
-        );
-      }
-      setCurrentBuffer(buffer);
-    }
+    const activeLayer = layerCopy.find((layer) => layer.id === getActive().id);
+    setActive(activeLayer ?? layerCopy[0]);
 
     return layerCopy.map((layer) => layer.id);
   };
 
   const getLayerById = (id: string) => {
-    return getList().find((l) => l.id === id);
+    return getList().find((layer) => layer.id === id);
   };
 
   return {
@@ -417,6 +348,8 @@ export const createLayerHandler = async (
     toggleDisplay,
     select,
     setOpacity,
+    setOffset,
+    move,
     getList,
     setList,
     getLayerById,
@@ -424,7 +357,6 @@ export const createLayerHandler = async (
     getActive,
     setActive,
     saveCurrentBuffer,
-    getCurrentBuffer,
     buffers,
     getBufferById,
     load,

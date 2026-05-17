@@ -1,8 +1,10 @@
 import { LAYER_PREVIEW_SIZE } from "../constants";
 import { createTexturePipeline } from "./createPipeline";
+import type { Layer } from "./types";
 import type { LayerHandler } from "./handlers/layerHandler";
 import { material } from "./material";
 import type { Vec2 } from "./types";
+import type { TiledLayerBuffer, TileKey } from "./tiledLayer";
 import { webGPUSetup } from "./webGPUSetup";
 
 export type LayerPreviewHandler = Awaited<
@@ -19,7 +21,7 @@ export const createLayerPreview = async (
   const pixelPipeline = createTexturePipeline(device, "pixel");
   const alphaPipeline = createTexturePipeline(device, "alpha");
 
-  const layerTexture = material.pixel(device, pixelPipeline, gridSize);
+  const tileTextures = new Map<TileKey, ReturnType<typeof material.pixel>>();
   const GPUBindAlpha = material.alpha(device, alphaPipeline);
 
   const commonUniformBuffer = new Float32Array([
@@ -32,7 +34,25 @@ export const createLayerPreview = async (
     zoom,
   ]);
 
-  const drawPreview = (buffer: Uint8Array<ArrayBuffer>, opacity: number) => {
+  const syncPreviewTiles = (buffer: TiledLayerBuffer) => {
+    const activeKeys = new Set(buffer.tiles.keys());
+    for (const key of tileTextures.keys()) {
+      if (!activeKeys.has(key)) {
+        tileTextures.delete(key);
+      }
+    }
+
+    for (const [key, tile] of buffer.tiles) {
+      let tileTexture = tileTextures.get(key);
+      if (!tileTexture) {
+        tileTexture = material.pixel(device, pixelPipeline, buffer.tileSize);
+        tileTextures.set(key, tileTexture);
+      }
+      tileTexture.writeTexture(tile);
+    }
+  };
+
+  const drawPreview = (layer: Layer, buffer: TiledLayerBuffer) => {
     // Provides an interface for recording GPU commands.
     const encoder = device.createCommandEncoder({
       label: "preview",
@@ -61,16 +81,28 @@ export const createLayerPreview = async (
     pass.setPipeline(pixelPipeline);
 
     if (layerHandler.isCurrentLayerDirty()) {
-      layerTexture.writeTexture(buffer);
+      syncPreviewTiles(buffer);
     }
 
-    layerTexture.writeUniforms(
-      commonUniformBuffer,
-      new Float32Array([opacity]),
-    );
+    for (const [key, tileTexture] of tileTextures) {
+      const [tileX, tileY] = key.split(",").map(Number);
+      tileTexture.writeUniforms(
+        commonUniformBuffer,
+        new Float32Array([
+          layer.opacity,
+          layer.offset.x,
+          layer.offset.y,
+          tileX * buffer.tileSize,
+          tileY * buffer.tileSize,
+          buffer.tileSize,
+          buffer.tileSize,
+          0,
+        ]),
+      );
 
-    pass.setBindGroup(0, layerTexture.bindGroup);
-    pass.draw(6);
+      pass.setBindGroup(0, tileTexture.bindGroup);
+      pass.draw(6);
+    }
     pass.end();
     const commandBuffer = encoder.finish();
     device.queue.submit([commandBuffer]);

@@ -1,7 +1,8 @@
 import type { Accessor, Setter } from "solid-js";
 import type { EditorType } from "../editor/editor";
-import type { ProjectType, Vec2 } from "../editor/types";
+import type { ProjectType } from "../editor/types";
 import type { PixelPainterMethods } from "../pixelPainter/types";
+import type { Vec2 } from "../pixelPainter/types";
 import type { LoadedProject } from "../serialization/project";
 
 export type ProjectConfigStorage = {

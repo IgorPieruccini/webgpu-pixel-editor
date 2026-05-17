@@ -2,17 +2,16 @@ import { createVertexBuffer } from "../createBufferLayout";
 import { createPipeline, createTexturePipeline } from "../createPipeline";
 import { material } from "../material";
 import type { BindPixelTexture } from "../material/pixel";
+import type { TileKey } from "../tiledLayer";
 import type { UniformBufferHandler } from "./uniformBuffersHandler";
 import { webGPUSetup } from "../webGPUSetup";
 import type { LayerHandler } from "./layerHandler";
-import type { Vec2 } from "../types";
 
 export type RenderHandler = Awaited<ReturnType<typeof createRenderHandler>>;
 
 export const createRenderHandler = async (
   layerHandler: LayerHandler,
   uniformBufferHandler: UniformBufferHandler,
-  gridSize: Vec2,
   canvas?: HTMLCanvasElement,
   initialRenderUI = true,
 ) => {
@@ -22,7 +21,7 @@ export const createRenderHandler = async (
     renderUI = value;
   };
 
-  const pixelBindTextureMap = new Map<string, BindPixelTexture>();
+  const pixelBindTextureMap = new Map<string, Map<TileKey, BindPixelTexture>>();
 
   const { device, canvasFormat, context } = await webGPUSetup(
     canvas ?? "main-canvas",
@@ -44,11 +43,39 @@ export const createRenderHandler = async (
 
   const GPUBindUi = material.ui(device, uiPipeline, "UI");
 
+  const syncLayerTileTextures = (layerId: string) => {
+    const buffer = layerHandler.getBufferById(layerId);
+    if (!buffer) {
+      throw new Error(`Layer buffer with id ${layerId} not found`);
+    }
+
+    let layerTextures = pixelBindTextureMap.get(layerId);
+    if (!layerTextures) {
+      layerTextures = new Map<TileKey, BindPixelTexture>();
+      pixelBindTextureMap.set(layerId, layerTextures);
+    }
+
+    const currentKeys = new Set(buffer.tiles.keys());
+    for (const key of layerTextures.keys()) {
+      if (!currentKeys.has(key)) {
+        layerTextures.delete(key);
+      }
+    }
+
+    for (const [key, tile] of buffer.tiles) {
+      let bindTexture = layerTextures.get(key);
+      if (!bindTexture) {
+        bindTexture = material.pixel(device, pixelPipeline, buffer.tileSize);
+        layerTextures.set(key, bindTexture);
+      }
+
+      bindTexture.writeTexture(tile);
+    }
+  };
+
   const addLayerTexture = (layerId: string) => {
     if (!pixelBindTextureMap.has(layerId)) {
-      const _bindTexture = material.pixel(device, pixelPipeline, gridSize);
-      pixelBindTextureMap.set(layerId, _bindTexture);
-      return;
+      pixelBindTextureMap.set(layerId, new Map());
     }
   };
 
@@ -92,14 +119,13 @@ export const createRenderHandler = async (
     pass.setPipeline(pixelPipeline);
 
     for (const layer of layerHandler.getList()) {
-      const buffer = layerHandler.buffers.get(layer.id);
+      const buffer = layerHandler.getBufferById(layer.id);
       if (!buffer) {
         throw new Error(`Layer buffer with id ${layer.id} not found`);
       }
 
-      const layerTexture = pixelBindTextureMap.get(layer.id);
-
-      if (!layerTexture) {
+      const layerTextures = pixelBindTextureMap.get(layer.id);
+      if (!layerTextures) {
         throw new Error(`Layer texture with id ${layer.id} not found`);
       }
 
@@ -107,20 +133,29 @@ export const createRenderHandler = async (
         continue;
       }
 
-      // write texture if the layer buffer has been modified
       if (layerHandler.isLayerDirty(layer.id)) {
-        layerTexture.writeTexture(buffer);
+        syncLayerTileTextures(layer.id);
         layerHandler.makeLayerClean(layer.id);
       }
 
-      // Write uniforms for this layer
-      layerTexture.writeUniforms(
-        uniformBufferHandler.commonUniforms,
-        new Float32Array([layer.opacity]),
-      );
-      pass.setBindGroup(0, layerTexture.bindGroup);
-
-      pass.draw(6);
+      for (const [key, layerTexture] of layerTextures) {
+        const [tileX, tileY] = key.split(",").map(Number);
+        layerTexture.writeUniforms(
+          uniformBufferHandler.commonUniforms,
+          new Float32Array([
+            layer.opacity,
+            layer.offset.x,
+            layer.offset.y,
+            tileX * buffer.tileSize,
+            tileY * buffer.tileSize,
+            buffer.tileSize,
+            buffer.tileSize,
+            0,
+          ]),
+        );
+        pass.setBindGroup(0, layerTexture.bindGroup);
+        pass.draw(6);
+      }
     }
 
     // DRAW UI

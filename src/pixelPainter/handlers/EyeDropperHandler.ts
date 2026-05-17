@@ -1,6 +1,6 @@
-import { BYTES_PER_PIXEL, RGBA_OFFSET } from "../../constants";
 import { alphaComposite, rgbaToHex } from "../utils";
 import type { RGBA, Vec2 } from "../types";
+import { getPixelAtLocal } from "../tiledLayer";
 import type { LayerHandler } from "./layerHandler";
 import type { BrushHandler } from "./brushHandler";
 import type { UniformBufferHandler } from "./uniformBuffersHandler";
@@ -16,7 +16,6 @@ export const createEyeDropperHandler = (
       return;
     }
 
-    const index = (pos.y * gridSize.x + pos.x) * BYTES_PER_PIXEL;
     let currentColor: RGBA = { r: 0, g: 0, b: 0, a: 0 };
 
     for (const layer of layerHandler.getList()) {
@@ -29,18 +28,21 @@ export const createEyeDropperHandler = (
         continue;
       }
 
-      const alpha =
-        (buffer[index + RGBA_OFFSET.ALPHA] / 255) *
-        Math.max(0, Math.min(1, layer.opacity));
+      const pixel = getPixelAtLocal(
+        buffer,
+        pos.x - layer.offset.x,
+        pos.y - layer.offset.y,
+      );
+      const alpha = (pixel.a / 255) * Math.max(0, Math.min(1, layer.opacity));
 
       if (alpha <= 0) {
         continue;
       }
 
       const sourceColor: RGBA = {
-        r: buffer[index + RGBA_OFFSET.RED],
-        g: buffer[index + RGBA_OFFSET.GREEN],
-        b: buffer[index + RGBA_OFFSET.BLUE],
+        r: pixel.r,
+        g: pixel.g,
+        b: pixel.b,
         a: alpha,
       };
 

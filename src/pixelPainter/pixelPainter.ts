@@ -11,8 +11,8 @@ import { calculateZoomFromGridAndCanvasSize } from "../utils";
 import { createColorPaletteHandler } from "./handlers/colorPaletteHandler";
 import { createLinePaintHandler } from "./handlers/tools/linePaintHanlder";
 import { createBucketPaintHandler } from "./handlers/tools/bucketPaintHandler";
-import type { Vec2 } from "../lib";
 import { createEyeDropperHandler } from "./handlers/EyeDropperHandler";
+import type { Vec2 } from "./types";
 
 export const pixelPainter = async (
   projectName: string,
@@ -28,7 +28,6 @@ export const pixelPainter = async (
   const renderHandler = await createRenderHandler(
     layerHandler,
     uniformBufferHandler,
-    gridSize,
     canvas,
   );
 
@@ -103,6 +102,8 @@ export const pixelPainter = async (
       toggleDisplay: layerHandler.toggleDisplay,
       select: layerHandler.select,
       setOpacity: middlewareHandler.setOpacity,
+      setOffset: layerHandler.setOffset,
+      move: layerHandler.move,
       getList: layerHandler.getList,
       getActive: layerHandler.getActive,
       getBufferById: layerHandler.getBufferById,

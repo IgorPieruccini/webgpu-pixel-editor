@@ -3,7 +3,7 @@ import { useProjectConfig } from "../../../projectConfig/projectConfigProvider";
 import { useMenu } from "../menuProvider";
 import styles from "./NewProjectPanel.module.css";
 import { HiSolidXMark } from "solid-icons/hi";
-import type { Vec2 } from "../../../editor/types";
+import type { Vec2 } from "../../../pixelPainter/types";
 import {
   DEFAULT_GRID_SIZE,
   MAX_GRID_SIZE,

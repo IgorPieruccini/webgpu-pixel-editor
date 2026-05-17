@@ -9,6 +9,7 @@ import {
 import { generateUUID } from "../../../utils";
 import type { Layer } from "../../../lib";
 import { parseBlobToUint8Array } from "../../../pixelPainter/utils";
+import { createTiledLayerBufferFromFlat } from "../../../pixelPainter/tiledLayer";
 
 export const ProjectTool = () => {
   const project = useProjectConfig();
@@ -63,6 +64,7 @@ export const ProjectTool = () => {
         name: "imported Image",
         display: true,
         opacity: 1,
+        offset: { x: 0, y: 0 },
       };
 
       project.createNewProject({
@@ -70,7 +72,7 @@ export const ProjectTool = () => {
         gridSize: { x: width, y: height },
         layers: [layer],
         buffers: {
-          [id]: buffer,
+          [id]: createTiledLayerBufferFromFlat(buffer, { x: width, y: height }),
         },
       });
     };

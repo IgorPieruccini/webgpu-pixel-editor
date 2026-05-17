@@ -1,4 +1,5 @@
 import type { PixelPainterMethods } from "./types";
+import { createTiledLayerBuffer } from "./tiledLayer";
 
 function getSelectedColor(): number;
 function getSelectedColor(format: "number"): number;
@@ -23,12 +24,15 @@ export const INITIAL_PIXEL_PAINTER: PixelPainterMethods = {
       opacity: 1,
       display: true,
       id: "",
+      offset: { x: 0, y: 0 },
     }),
     setOpacity: () => {},
+    setOffset: () => {},
+    move: () => {},
     getBufferById: () => undefined,
     duplicate: (id: string) => id,
     setLayerBuffer: () => {},
-    buffers: new Map<string, Uint8Array<ArrayBuffer>>(),
+    buffers: new Map<string, ReturnType<typeof createTiledLayerBuffer>>(),
     load: () => [],
     set: () => {},
   },

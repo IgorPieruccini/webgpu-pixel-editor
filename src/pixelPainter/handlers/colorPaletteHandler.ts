@@ -20,8 +20,9 @@ export const createColorPaletteHandler = (layerHandler: LayerHandler) => {
 
   const calculateColorPalette = () => {
     setIsLoading(true);
-    const buffers = Array.from(layerHandler.buffers.values());
-    const workerBuffers = buffers.map((buffer) => new Uint8Array(buffer));
+    const workerBuffers = Array.from(layerHandler.buffers.values()).flatMap(
+      (buffer) => Array.from(buffer.tiles.values()).map((tile) => new Uint8Array(tile)),
+    );
 
     const message: WorkerRequest = {
       buffers: workerBuffers,

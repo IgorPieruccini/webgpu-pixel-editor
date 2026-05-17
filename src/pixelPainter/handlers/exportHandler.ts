@@ -28,7 +28,6 @@ export const createExportHandler = (
     const renderHandler = await createRenderHandler(
       layerHandler,
       uniformBufferHandler,
-      gridSize,
       canvas,
       false, // don't render UI
     );

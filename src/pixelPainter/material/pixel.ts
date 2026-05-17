@@ -1,4 +1,3 @@
-import type { Vec2 } from "../../editor/types";
 import { BYTES_PER_PIXEL } from "../../constants";
 
 export type BindPixelTexture = ReturnType<typeof bindTexture>;
@@ -6,10 +5,10 @@ export type BindPixelTexture = ReturnType<typeof bindTexture>;
 export const bindTexture = (
   device: GPUDevice,
   pipeline: GPURenderPipeline,
-  gridSize: Vec2,
+  tileSize: number,
 ) => {
   const layerTexture = device.createTexture({
-    size: { width: gridSize.x, height: gridSize.y },
+    size: { width: tileSize, height: tileSize },
     format: "rgba8unorm",
     usage:
       GPUTextureUsage.TEXTURE_BINDING |
@@ -30,7 +29,7 @@ export const bindTexture = (
 
   const layerBuffer = device.createBuffer({
     label: "pixel grid values uniform",
-    size: 1 * 4,
+    size: 8 * 4,
     usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
   });
 
@@ -50,11 +49,11 @@ export const bindTexture = (
       { texture: layerTexture },
       buffer,
       {
-        bytesPerRow: gridSize.x * BYTES_PER_PIXEL,
+        bytesPerRow: tileSize * BYTES_PER_PIXEL,
       },
       {
-        width: gridSize.x,
-        height: gridSize.y,
+        width: tileSize,
+        height: tileSize,
       },
     );
   };

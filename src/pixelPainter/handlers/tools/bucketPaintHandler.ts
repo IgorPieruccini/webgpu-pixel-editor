@@ -1,9 +1,10 @@
-import { BYTES_PER_PIXEL, RGBA_OFFSET } from "../../../constants";
-import type { Vec2 } from "../../../lib";
+import { BYTES_PER_PIXEL } from "../../../constants";
 import { numberToRGBA } from "../../utils";
+import { getPixelAtLocal, setPixelAtLocal } from "../../tiledLayer";
 import type { BrushHandler } from "../brushHandler";
 import type { HistoryChangeHandler } from "../historyChangeHandler";
 import type { LayerHandler } from "../layerHandler";
+import type { Vec2 } from "../../types";
 
 export const createBucketPaintHandler = (
   gridSize: Vec2,
@@ -12,25 +13,25 @@ export const createBucketPaintHandler = (
   historyChangeHandler: HistoryChangeHandler,
 ) => {
   const floodFill = (cell: Vec2) => {
-    const getIndex = (pos: Vec2) =>
-      (pos.y * gridSize.x + pos.x) * BYTES_PER_PIXEL;
+    const currentLayer = layerHandler.getActive();
+    const currentBuffer = layerHandler.getBufferById(currentLayer.id);
+    if (!currentBuffer) {
+      throw new Error(`Buffer for layer ${currentLayer.id} not found`);
+    }
 
-    const startIndex = getIndex(cell);
+    const getIndex = (pos: Vec2) => (pos.y * gridSize.x + pos.x) * BYTES_PER_PIXEL;
+    const toLocal = (pos: Vec2) => ({
+      x: pos.x - currentLayer.offset.x,
+      y: pos.y - currentLayer.offset.y,
+    });
 
-    const currentBuffer = layerHandler.getCurrentBuffer();
-
-    const targetColor = [
-      currentBuffer[startIndex + RGBA_OFFSET.RED],
-      currentBuffer[startIndex + RGBA_OFFSET.GREEN],
-      currentBuffer[startIndex + RGBA_OFFSET.BLUE],
-      currentBuffer[startIndex + RGBA_OFFSET.ALPHA],
-    ];
+    const startLocal = toLocal(cell);
+    const target = getPixelAtLocal(currentBuffer, startLocal.x, startLocal.y);
+    const targetColor = [target.r, target.g, target.b, target.a];
 
     const currentColor = brushHandler.getSelectedColor();
-
     const { r, g, b, a } = numberToRGBA(currentColor);
 
-    // Avoid infinity fill
     if (
       targetColor[0] === r &&
       targetColor[1] === g &&
@@ -57,26 +58,27 @@ export const createBucketPaintHandler = (
       }
 
       const i = getIndex(cell);
+      const local = toLocal(cell);
+      const pixel = getPixelAtLocal(currentBuffer, local.x, local.y);
 
-      // Only paint pixels that still match the original target color.
       if (
-        targetColor[0] !== currentBuffer[i + RGBA_OFFSET.RED] ||
-        targetColor[1] !== currentBuffer[i + RGBA_OFFSET.GREEN] ||
-        targetColor[2] !== currentBuffer[i + RGBA_OFFSET.BLUE] ||
-        targetColor[3] !== currentBuffer[i + RGBA_OFFSET.ALPHA]
+        targetColor[0] !== pixel.r ||
+        targetColor[1] !== pixel.g ||
+        targetColor[2] !== pixel.b ||
+        targetColor[3] !== pixel.a
       ) {
         continue;
       }
 
-      // Paint cell
-      currentBuffer[i + RGBA_OFFSET.RED] = r;
-      currentBuffer[i + RGBA_OFFSET.GREEN] = g;
-      currentBuffer[i + RGBA_OFFSET.BLUE] = b;
-      currentBuffer[i + RGBA_OFFSET.ALPHA] = a * 255;
+      setPixelAtLocal(currentBuffer, local.x, local.y, {
+        r,
+        g,
+        b,
+        a: a * 255,
+      });
 
       paintedPixels.add(i);
 
-      //add neighbors to stack
       stack.push({ x: x + 1, y });
       stack.push({ x: x - 1, y });
       stack.push({ x, y: y + 1 });

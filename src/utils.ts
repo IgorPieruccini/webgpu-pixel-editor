@@ -1,4 +1,4 @@
-import type { Vec2 } from "./lib";
+import type { Vec2 } from "./pixelPainter/types";
 
 export const generateUUID = () => {
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {

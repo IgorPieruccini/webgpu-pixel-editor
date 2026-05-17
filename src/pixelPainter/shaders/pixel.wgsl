@@ -8,16 +8,22 @@ struct CommonValues {
     zoom: f32,
 }
 
-struct LayerValues {
+struct TileValues {
     opacity: f32,
+    layerOffsetX: f32,
+    layerOffsetY: f32,
+    tileOriginX: f32,
+    tileOriginY: f32,
+    tileWidth: f32,
+    tileHeight: f32,
+    padding: f32,
 }
 
 @group(0) @binding(0) var layerSampler: sampler;
 @group(0) @binding(1) var layerTexture: texture_2d<f32>;
 @group(0) @binding(2) var<uniform> commonValues: CommonValues;
-@group(0) @binding(3) var<uniform> layerValues: LayerValues;
+@group(0) @binding(3) var<uniform> tileValues: TileValues;
 
-// Export to fragment
 struct VertexOutput {
     @builtin(position) position: vec4f,
     @location(0) uv: vec2f,
@@ -25,14 +31,13 @@ struct VertexOutput {
 
 @vertex
 fn vertexMain(@builtin(vertex_index) i: u32) -> VertexOutput {
-
-    var positions = array<vec2f, 6>(
-        vec2f(-1.0, -1.0),
-        vec2f(1.0, -1.0),
-        vec2f(-1.0, 1.0),
-        vec2f(-1.0, 1.0),
-        vec2f(1.0, -1.0),
+    var localPositions = array<vec2f, 6>(
+        vec2f(0.0, 1.0),
         vec2f(1.0, 1.0),
+        vec2f(0.0, 0.0),
+        vec2f(0.0, 0.0),
+        vec2f(1.0, 1.0),
+        vec2f(1.0, 0.0),
     );
 
     var uvs = array<vec2f, 6>(
@@ -44,30 +49,27 @@ fn vertexMain(@builtin(vertex_index) i: u32) -> VertexOutput {
         vec2f(1.0, 0.0),
     );
 
-    var out: VertexOutput;
+    let local = localPositions[i];
 
-    let pos = positions[i];
+    let worldX = tileValues.layerOffsetX + tileValues.tileOriginX + local.x * tileValues.tileWidth;
+    let worldY = tileValues.layerOffsetY + tileValues.tileOriginY + local.y * tileValues.tileHeight;
 
-    // Apply pan and zoom transformations
-    let panX = commonValues.panX;
-    let panY = commonValues.panY;
-    let zoom = commonValues.zoom;
-    let canvasW = commonValues.canvasW;
-    let canvasH = commonValues.canvasH;
-    let gridX = commonValues.gridX;
-    let gridY = commonValues.gridY;
-    let gridSizeRatio = gridX / gridY;
-    let aspectRatio = canvasW / canvasH;
+    let clipX = (worldX / commonValues.gridX) * 2.0 - 1.0;
+    let clipY = 1.0 - (worldY / commonValues.gridY) * 2.0;
+
+    let gridSizeRatio = commonValues.gridX / commonValues.gridY;
+    let aspectRatio = commonValues.canvasW / commonValues.canvasH;
 
     let panVec2 = vec2f(
-        (panX / canvasW / aspectRatio) * 2.0,
-        (panY / canvasH * gridSizeRatio) * 2.0
+        (commonValues.panX / commonValues.canvasW / aspectRatio) * 2.0,
+        (commonValues.panY / commonValues.canvasH * gridSizeRatio) * 2.0
     );
 
-    let transformAspectRatio = vec2f(pos.x / aspectRatio, pos.y / gridSizeRatio);
-    let transformZoom = vec2f(transformAspectRatio * zoom);
-    let transformPan = vec2(transformZoom + panVec2);
+    let transformAspectRatio = vec2f(clipX / aspectRatio, clipY / gridSizeRatio);
+    let transformZoom = vec2f(transformAspectRatio * commonValues.zoom);
+    let transformPan = vec2f(transformZoom + panVec2);
 
+    var out: VertexOutput;
     out.position = vec4f(transformPan, 0.0, 1.0);
     out.uv = uvs[i];
     return out;
@@ -76,6 +78,5 @@ fn vertexMain(@builtin(vertex_index) i: u32) -> VertexOutput {
 @fragment
 fn fragmentMain(@location(0) uv: vec2f) -> @location(0) vec4f {
     let color = textureSample(layerTexture, layerSampler, uv);
-    let opacity = layerValues.opacity;
-    return vec4f(color.rgb, color.a * opacity);
+    return vec4f(color.rgb, color.a * tileValues.opacity);
 }

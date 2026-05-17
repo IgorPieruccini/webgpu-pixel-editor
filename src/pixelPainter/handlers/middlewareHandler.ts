@@ -5,6 +5,7 @@ import type { BrushHandler } from "./brushHandler";
 import type { HistoryChangeHandler } from "./historyChangeHandler";
 import type { LayerHandler } from "./layerHandler";
 import type { RenderHandler } from "./renderHandler";
+import type { TiledLayerBuffer } from "../tiledLayer";
 
 export const createMiddlewareHandler = (
   brushHandler: BrushHandler,
@@ -77,7 +78,7 @@ export const createMiddlewareHandler = (
     if (currentLayer) {
       const currentBuffer = layerHandler.getBufferById(currentLayer.id);
       if (currentBuffer) {
-        layerPreview.drawPreview(currentBuffer, currentLayer.opacity);
+        layerPreview.drawPreview(currentLayer, currentBuffer);
       }
     }
     renderHandler.draw();
@@ -85,7 +86,7 @@ export const createMiddlewareHandler = (
 
   const loadLayers = (
     serializedLayers: Layers,
-    serializedBuffer: Record<string, Uint8Array<ArrayBuffer>>,
+    serializedBuffer: Record<string, TiledLayerBuffer>,
   ) => {
     loadTextureLayers(serializedLayers);
     layerHandler.load(serializedLayers, serializedBuffer);
