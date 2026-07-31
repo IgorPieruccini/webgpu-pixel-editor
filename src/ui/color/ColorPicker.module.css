@@ -1,14 +1,14 @@
 .container :global(.sketch-picker) {
-  background: transparent !important;
+  background: var(--transparent) !important;
   box-shadow: none !important;
 }
 
 .container :global(.sketch-picker input) {
   color: var(--text-primary) !important;
-  background: rgba(8, 16, 30, 0.82) !important;
-  border: 1px solid var(--surface-border) !important;
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
   border-radius: 10px !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--text-primary) 4%, var(--transparent)) !important;
 }
 
 .container :global(.sketch-picker label) {

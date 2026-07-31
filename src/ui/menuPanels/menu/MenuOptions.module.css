@@ -1,6 +1,6 @@
 .menuOptions {
   background: var(--surface-strong);
-  border: 1px solid var(--surface-border);
+  border: 1px solid var(--border);
   border-radius: 16px;
   padding: 10px;
   min-width: 200px;

@@ -1,5 +1,5 @@
 .button {
   background: none;
-  border: 1px solid transparent;
+  border: 1px solid var(--transparent);
   color: var(--text-secondary);
 }

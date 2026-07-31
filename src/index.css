@@ -1,252 +1,219 @@
 :root {
-  --primary-color-highlight: #66e3ff;
-  --primary-color-light: #7c9cff;
-  --primary-color-dark: #3150d8;
-  --primary-color: #4e6bff;
-  --accent-secondary: #22c55e;
-  --background: #09111f;
-  --background-darker: #050b16;
-  --surface: rgba(12, 22, 39, 0.84);
-  --surface-strong: rgba(15, 27, 47, 0.96);
-  --surface-muted: rgba(117, 139, 185, 0.12);
-  --surface-border: rgba(136, 166, 255, 0.18);
-  --text-primary: #e8eefc;
-  --text-secondary: #9dadcf;
-  --shadow-lg: 0 24px 60px rgba(1, 6, 17, 0.45);
-  --shadow-md: 0 16px 32px rgba(1, 6, 17, 0.35);
-  --radius-lg: 24px;
-  --radius-md: 18px;
-  --radius-sm: 12px;
+	--primary-color-highlight: #f5a623;
+	--primary-color-light: #e89a3a;
+	--primary-color-dark: #a95700;
+	--primary-color: #d97800;
+	--background: #2b2b2b;
+	--background-darker: #1e1e1e;
+	--background-canvas: #000000;
+	--surface: #383838d6;
+	--surface-strong: #424242f5;
+	--surface-muted: color-mix(in srgb, var(--surface) 18%, var(--transparent));
+	--border: color-mix(in srgb, var(--text-primary) 12%, var(--transparent));
+	--text-primary: #e6e6e6;
+	--text-secondary: #a0a0a0;
+	--transparent: transparent;
+	--highlight: var(--primary-color-highlight);
+	--highlight-soft: color-mix(
+		in srgb,
+		var(--primary-color) 22%,
+		var(--transparent)
+	);
+	--shadow-lg: 0 24px 60px
+		color-mix(in srgb, var(--background-darker) 45%, var(--transparent));
+	--shadow-md: 0 16px 32px
+		color-mix(in srgb, var(--background-darker) 35%, var(--transparent));
+	--radius-lg: 24px;
+	--radius-md: 18px;
+	--radius-sm: 12px;
 }
 
 #root {
-  font-family:
-    Inter,
-    "SF Pro Text",
-    "Segoe UI",
-    -apple-system,
-    BlinkMacSystemFont,
-    sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-  color: var(--text-primary);
-  background:
-    radial-gradient(
-      circle at top left,
-      rgba(78, 107, 255, 0.22),
-      transparent 28%
-    ),
-    radial-gradient(
-      circle at top right,
-      rgba(102, 227, 255, 0.14),
-      transparent 24%
-    ),
-    linear-gradient(
-      180deg,
-      #0d1730 0%,
-      var(--background) 38%,
-      var(--background-darker) 100%
-    );
+	font-family:
+		Inter, "SF Pro Text", "Segoe UI", -apple-system, BlinkMacSystemFont,
+		sans-serif;
+	line-height: 1.5;
+	font-weight: 400;
+	color: var(--text-primary);
+	background: var(--background);
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+	font-synthesis: none;
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 
-  height: 100vh;
-  overflow: hidden;
+	height: 100vh;
+	overflow: hidden;
 }
 
 a {
-  font-weight: 500;
-  color: var(--primary-color-light);
-  text-decoration: inherit;
+	font-weight: 500;
+	color: var(--primary-color-light);
+	text-decoration: inherit;
 }
 
 a:hover {
-  color: var(--primary-color-highlight);
+	color: var(--primary-color-highlight);
 }
 
 body {
-  margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
-  color: var(--text-primary);
-  background:
-    radial-gradient(
-      circle at top left,
-      rgba(78, 107, 255, 0.22),
-      transparent 28%
-    ),
-    radial-gradient(
-      circle at top right,
-      rgba(102, 227, 255, 0.14),
-      transparent 24%
-    ),
-    linear-gradient(
-      180deg,
-      #0d1730 0%,
-      var(--background) 38%,
-      var(--background-darker) 100%
-    );
+	margin: 0;
+	min-width: 320px;
+	min-height: 100vh;
+	color: var(--text-primary);
+	background: var(--background);
 }
 
 h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+	font-size: 3.2em;
+	line-height: 1.1;
 }
 
 p {
-  margin: 4px;
-  font-size: 0.8em;
-  color: var(--text-secondary);
+	margin: 4px;
+	font-size: 0.8em;
+	color: var(--text-secondary);
 }
 
 label {
-  color: var(--text-secondary);
-  font-size: 12px;
-  margin: 0px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+	color: var(--text-secondary);
+	font-size: 12px;
+	margin: 0px;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
 }
 
 span {
-  font-size: 0.8em;
+	font-size: 0.8em;
 }
 
 hr {
-  border: none;
-  min-height: 1px;
-  width: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(136, 166, 255, 0.45),
-    transparent
-  );
-  margin: 8px 0;
+	border: none;
+	min-height: 1px;
+	width: 100%;
+	background: var(--border);
+	margin: 8px 0;
 }
 
 .separator {
-  flex: none;
+	flex: none;
 }
 
 .separator-vertical {
-  width: 1px;
-  align-self: stretch;
-  margin: 6px 0;
-  background: linear-gradient(
-    180deg,
-    transparent,
-    rgba(136, 166, 255, 0.45),
-    transparent
-  );
+	width: 1px;
+	align-self: stretch;
+	margin: 6px 0;
+	background: var(--border);
 }
 
 br::after {
-  content: "";
-  display: block;
-  margin-bottom: 10px;
+	content: "";
+	display: block;
+	margin-bottom: 10px;
 }
 
 button {
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--surface-border);
-  box-sizing: border-box;
-  min-height: 30px;
-  font-size: 0.8em;
-  font-weight: 600;
-  font-family: inherit;
-  color: var(--text-primary);
-  background:
-    linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.05),
-      rgba(255, 255, 255, 0.02)
-    ),
-    var(--surface);
-  cursor: pointer;
-  transition:
-    border-color 0.2s ease,
-    transform 0.2s ease,
-    background-color 0.2s ease,
-    box-shadow 0.2s ease;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+	border-radius: var(--radius-sm);
+	border: 1px solid var(--border);
+	box-sizing: border-box;
+	min-height: 30px;
+	font-size: 0.8em;
+	font-weight: 600;
+	font-family: inherit;
+	color: var(--text-primary);
+	background: var(--surface);
+	cursor: pointer;
+	transition:
+		border-color 0.2s ease,
+		transform 0.2s ease,
+		background-color 0.2s ease,
+		box-shadow 0.2s ease;
+	box-shadow: inset 0 1px 0
+		color-mix(in srgb, var(--text-primary) 3%, var(--transparent));
 }
 
 button:hover {
-  border-color: var(--primary-color-highlight);
-  background-color: rgba(22, 38, 64, 0.96);
-  transform: translateY(-1px);
-  box-shadow: 0 10px 24px rgba(1, 8, 19, 0.28);
+	border-color: var(--primary-color-highlight);
+	background-color: var(--surface-strong);
+	transform: translateY(-1px);
+	box-shadow: var(--shadow-md);
 }
 
 button:focus {
-  outline: none;
+	outline: none;
 }
 
 button:focus-visible,
 input:focus-visible {
-  outline: 2px solid rgba(102, 227, 255, 0.85);
-  outline-offset: 2px;
+	outline: 2px solid var(--highlight);
+	outline-offset: 2px;
 }
 
 input,
 select {
-  font: inherit;
-  color: var(--text-primary);
+	font: inherit;
+	color: var(--text-primary);
 }
 
 input[type="text"],
 input[type="number"] {
-  border: 1px solid var(--surface-border);
-  border-radius: var(--radius-sm);
-  background: rgba(8, 16, 30, 0.82);
-  min-height: 34px;
-  padding: 0 10px;
+	border: 1px solid var(--border);
+	border-radius: var(--radius-sm);
+	background: var(--surface);
+	min-height: 34px;
+	padding: 0 10px;
 }
 
 input[type="range"] {
-  accent-color: var(--primary-color-light);
-  height: 4px;
+	accent-color: var(--primary-color-light);
+	height: 4px;
 }
 
 input[type="color"] {
-  width: 40px;
-  height: 40px;
-  padding: 3px;
-  border-radius: 12px;
-  border: 1px solid var(--surface-border);
-  background: rgba(8, 16, 30, 0.92);
-  box-shadow: var(--shadow-md);
+	width: 40px;
+	height: 40px;
+	padding: 3px;
+	border-radius: 12px;
+	border: 1px solid var(--border);
+	background: var(--surface-strong);
+	box-shadow: var(--shadow-md);
 }
 
 input[type="color"]::-webkit-color-swatch-wrapper {
-  padding: 0;
+	padding: 0;
 }
 
 input[type="color"]::-webkit-color-swatch {
-  border: none;
-  border-radius: 10px;
+	border: none;
+	border-radius: 10px;
 }
 
 * {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(136, 166, 255, 0.55) transparent;
+	scrollbar-width: thin;
+	scrollbar-color: color-mix(
+			in srgb,
+			var(--primary-color-light) 45%,
+			var(--transparent)
+		)
+		var(--transparent);
 }
 
 *::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+	width: 8px;
+	height: 8px;
 }
 
 *::-webkit-scrollbar-thumb {
-  background: rgba(136, 166, 255, 0.45);
-  border-radius: 999px;
-  border: 2px solid transparent;
-  background-clip: padding-box;
+	background: color-mix(
+		in srgb,
+		var(--primary-color-light) 45%,
+		var(--transparent)
+	);
+	border-radius: 999px;
+	border: 2px solid var(--transparent);
+	background-clip: padding-box;
 }
 
 *::-webkit-scrollbar-track {
-  background: transparent;
+	background: var(--transparent);
 }

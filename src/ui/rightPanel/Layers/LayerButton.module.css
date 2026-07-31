@@ -10,12 +10,8 @@
 }
 
 .active {
-  background: linear-gradient(
-    135deg,
-    rgba(78, 107, 255, 0.82),
-    rgba(102, 227, 255, 0.28)
-  );
-  border-color: rgba(160, 213, 255, 0.65);
+  background: var(--primary-color);
+  border-color: color-mix(in srgb, var(--highlight) 65%, var(--transparent));
 }
 
 .dragging {

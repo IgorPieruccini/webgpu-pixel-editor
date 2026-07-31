@@ -8,7 +8,7 @@
   flex-wrap: wrap;
   background: var(--surface);
   border-radius: 16px;
-  border: 1px solid var(--surface-border);
+  border: 1px solid var(--border);
   box-shadow: var(--shadow-md);
   backdrop-filter: blur(18px);
   padding: 0 10px;
