@@ -1,5 +1,5 @@
 import { FILE_FORMAT } from "../constants";
-import { API, type Layer } from "../lib";
+import type { Layer } from "../lib";
 import { createTiledLayerBufferFromFlat } from "../pixelPainter/tiledLayer";
 import { parseBlobToUint8Array } from "../pixelPainter/utils";
 import { serialization } from "../serialization";
