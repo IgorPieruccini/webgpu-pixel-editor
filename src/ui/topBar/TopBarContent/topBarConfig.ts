@@ -1,4 +1,4 @@
-import { ACTIVATE_TOOL, type ActiveToolType } from "../../../editor/constant";
+import { ACTIVATE_TOOL } from "../../../editor/constant";
 
 type TopBarConfigType = {
 	thickness: Array<number>;
@@ -12,5 +12,6 @@ export const TOP_BAR_CONFIG: TopBarConfigType = {
 		ACTIVATE_TOOL.PAINT,
 		ACTIVATE_TOOL.PAINT_SELECTION,
 		ACTIVATE_TOOL.BUCKET_PAINT,
+		ACTIVATE_TOOL.DELETE,
 	],
 };
