@@ -13,8 +13,8 @@ function App() {
 
 	return (
 		<div class={styles.editor}>
-			<ProjectConfigProvider>
-				<MenuProvider>
+			<MenuProvider>
+				<ProjectConfigProvider>
 					<ToolSettings />
 					<div class={styles.row}>
 						<Tools />
@@ -28,8 +28,8 @@ function App() {
 						<MenuPanels />
 					</div>
 					{isDebugMode && <DevTool />}
-				</MenuProvider>
-			</ProjectConfigProvider>
+				</ProjectConfigProvider>
+			</MenuProvider>
 		</div>
 	);
 }
