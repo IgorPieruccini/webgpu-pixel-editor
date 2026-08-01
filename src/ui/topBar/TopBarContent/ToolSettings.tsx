@@ -1,60 +1,76 @@
-import { ACTIVATE_TOOL } from "../../../editor/constant";
+import { AiOutlineExport } from "solid-icons/ai";
+import { FiMenu } from "solid-icons/fi";
+import { useEditor } from "../../../editor/editortContext";
+import { MenuOptions } from "../../menuPanels/menu/menuOptions";
+import { useMenu } from "../../menuPanels/menuProvider";
+import { AnchoredPopover } from "../../shared/anchoredPopover";
+import { SquareButton } from "../../shared/squareButton";
+import { OPENED_OPTIONS } from "../constants";
 import { BrushOpacitySlider } from "./BrushOpacitySlider";
 import { BrushThicknessSlider } from "./BrushThicknessSlider";
 import styles from "./ToolSettings.module.css";
-import { MenuOptions } from "../../menuPanels/menu/menuOptions";
-import { FiMenu } from "solid-icons/fi";
-import { SquareButton } from "../../shared/squareButton";
-import { AnchoredPopover } from "../../shared/anchoredPopover";
-import { AiOutlineExport } from "solid-icons/ai";
-import { useMenu } from "../../menuPanels/menuProvider";
-import { OPENED_OPTIONS } from "../constants";
-import { useEditor } from "../../../editor/editortContext";
+import { TOP_BAR_CONFIG } from "./topBarConfig";
 
 export const ToolSettings = () => {
-  const project = useEditor();
-  const menu = useMenu();
+	const project = useEditor();
+	const menu = useMenu();
 
-  const showThickness = () => {
-    const activeTool = project?.().activeTool();
+	const showThickness = (): boolean => {
+		const activeTool = project?.().activeTool();
 
-    return (
-      activeTool !== ACTIVATE_TOOL.PAINT_SELECTION &&
-      activeTool !== ACTIVATE_TOOL.BUCKET_PAINT
-    );
-  };
+		return (
+			typeof TOP_BAR_CONFIG.thickness.find((tool) => activeTool === tool) ===
+			"number"
+		);
+	};
 
-  const onExport = () => {
-    menu.openOption(OPENED_OPTIONS.EXPORT_PNG);
-  };
+	const showOpacity = (): boolean => {
+		const activeTool = project().activeTool();
+		return (
+			typeof TOP_BAR_CONFIG.opacity.find((tool) => activeTool === tool) ===
+			"number"
+		);
+	};
 
-  return (
-    <div class={styles.toolSettings}>
-      <div class={styles.menuSection}>
-        <AnchoredPopover
-          side="bottom"
-          trigger={({ toggle }) => (
-            <SquareButton size="sm" onClick={toggle}>
-              <FiMenu />
-            </SquareButton>
-          )}
-        >
-          <MenuOptions />
-        </AnchoredPopover>
-      </div>
-      <div class="separator separator-vertical" aria-hidden="true" />
-      {showThickness() && <BrushThicknessSlider />}
-      {showThickness() && (
-        <div class="separator separator-vertical" aria-hidden="true" />
-      )}
-      <BrushOpacitySlider />
+	const onExport = () => {
+		menu.openOption(OPENED_OPTIONS.EXPORT_PNG);
+	};
 
-      <div class="separator separator-vertical" aria-hidden="true" />
-      <div class={styles.generalSection}>
-        <SquareButton onClick={onExport} size="sm">
-          <AiOutlineExport />
-        </SquareButton>
-      </div>
-    </div>
-  );
+	return (
+		<div class={styles.toolSettings}>
+			<div class={styles.menuSection}>
+				<AnchoredPopover
+					side="bottom"
+					trigger={({ toggle }) => (
+						<SquareButton size="sm" onClick={toggle}>
+							<FiMenu />
+						</SquareButton>
+					)}
+				>
+					<MenuOptions />
+				</AnchoredPopover>
+			</div>
+
+			{showThickness() && (
+				<>
+					<div class="separator separator-vertical" aria-hidden="true" />
+					<BrushThicknessSlider />
+				</>
+			)}
+
+			{showOpacity() && (
+				<>
+					<div class="separator separator-vertical" aria-hidden="true" />
+					<BrushOpacitySlider />
+				</>
+			)}
+
+			<div class="separator separator-vertical" aria-hidden="true" />
+			<div class={styles.generalSection}>
+				<SquareButton onClick={onExport} size="sm">
+					<AiOutlineExport />
+				</SquareButton>
+			</div>
+		</div>
+	);
 };
