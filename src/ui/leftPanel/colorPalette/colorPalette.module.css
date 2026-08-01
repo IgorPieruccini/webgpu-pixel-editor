@@ -1,0 +1,19 @@
+.colorPalette {
+	text-align: center;
+}
+
+.colorPaletteContainer {
+	gap: 4px;
+	display: flex;
+	justify-content: center;
+	flex-wrap: wrap;
+}
+
+.colorButton {
+	overflow: hidden;
+
+	span {
+		width: 100%;
+		height: 100%;
+	}
+}
