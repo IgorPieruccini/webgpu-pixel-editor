@@ -1,9 +1,11 @@
 import {
 	closestCenter,
+	createSortable,
 	DragDropProvider,
 	DragDropSensors,
 	type DragEvent,
 	SortableProvider,
+	useDragDropContext,
 } from "@thisbeyond/solid-dnd";
 import { AiOutlineDelete, AiOutlinePlus } from "solid-icons/ai";
 import { createMemo, For } from "solid-js";
@@ -13,6 +15,10 @@ import { SquareButton } from "../../shared/squareButton";
 import styles from "./colorPalette.module.css";
 
 const Color = ({ color }: { color: string }) => {
+	const sortable = createSortable(color);
+	const dropDownContext = useDragDropContext()!;
+	const state = dropDownContext[0];
+
 	const brush = API.brush();
 	const colorPalette = API.colorPalette();
 
@@ -30,17 +36,25 @@ const Color = ({ color }: { color: string }) => {
 	});
 
 	return (
-		<SquareButton
-			onClick={isActive() ? onRemoveColor : onColorClick}
-			class={styles.colorButton}
+		<div
+			use:sortable
 			classList={{
-				[styles.colorButtonActive]: isActive(),
+				[styles.dragging]: sortable.isActiveDraggable,
+				"transition-transform": !!state.active.draggable,
 			}}
 		>
-			<span style={{ "background-color": color }}>
-				{isActive() ? <AiOutlineDelete /> : null}
-			</span>
-		</SquareButton>
+			<SquareButton
+				onClick={isActive() ? onRemoveColor : onColorClick}
+				class={styles.colorButton}
+				classList={{
+					[styles.colorButtonActive]: isActive(),
+				}}
+			>
+				<span style={{ "background-color": color }}>
+					{isActive() ? <AiOutlineDelete /> : null}
+				</span>
+			</SquareButton>
+		</div>
 	);
 };
 
@@ -64,23 +78,20 @@ export const ColorPalette = () => {
 	return (
 		<div class={styles.colorPalette}>
 			<p>Color Palette</p>
-			<div class={styles.colorPaletteContainer}>
-				<DragDropProvider
-					onDragEnd={onDragEnd}
-					collisionDetector={closestCenter}
-				>
-					<DragDropSensors />
+			<DragDropProvider onDragEnd={onDragEnd} collisionDetector={closestCenter}>
+				<DragDropSensors />
+				<div class={styles.colorPaletteContainer}>
 					<SortableProvider ids={colors()}>
 						<For each={colors()}>
 							{(color) => <Color color={color}></Color>}
 						</For>
 					</SortableProvider>
-				</DragDropProvider>
+				</div>
+			</DragDropProvider>
 
-				<SquareButton onClick={onAddColor}>
-					<AiOutlinePlus />
-				</SquareButton>
-			</div>
+			<SquareButton onClick={onAddColor}>
+				<AiOutlinePlus />
+			</SquareButton>
 		</div>
 	);
 };
