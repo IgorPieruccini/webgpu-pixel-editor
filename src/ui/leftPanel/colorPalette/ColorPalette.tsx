@@ -89,12 +89,11 @@ export const ColorPalette = () => {
 							{(color) => <Color color={color}></Color>}
 						</For>
 					</SortableProvider>
+					<SquareButton onClick={onAddColor}>
+						<AiOutlinePlus />
+					</SquareButton>
 				</div>
 			</DragDropProvider>
-
-			<SquareButton onClick={onAddColor}>
-				<AiOutlinePlus />
-			</SquareButton>
 		</div>
 	);
 };
