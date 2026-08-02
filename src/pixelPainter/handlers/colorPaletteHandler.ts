@@ -53,7 +53,16 @@ export const createColorPaletteHandler = (layerHandler: LayerHandler) => {
 	};
 
 	const addColor = (color: string) => {
-		const colors = setColorPalette((prev) => [...prev, color]);
+		const colorPalette = getColorPalette();
+		const alreadyInColorPalette = colorPalette.find(
+			(c) => c.toUpperCase() === color.toUpperCase(),
+		);
+		if (alreadyInColorPalette) {
+			return;
+		}
+
+		const colors = [...colorPalette, color];
+		setColorPalette(colors);
 		storageLocal.colorPalette.set(colors);
 	};
 
