@@ -1,3 +1,5 @@
+import { AiOutlineDelete, AiOutlinePlus } from "solid-icons/ai";
+
 import { API } from "../../../lib";
 import { hexToNumber, numberToHex } from "../../../pixelPainter/utils";
 import { SquareButton } from "../../shared/squareButton";
@@ -31,18 +33,27 @@ export const ColorPalette = () => {
 			<div class={styles.colorPaletteContainer}>
 				{colorPalette()
 					.getColorPalette()
-					.map((color) => (
-						<SquareButton
-							onClick={() => onColorClick(color)}
-							class={styles.colorButton}
-							classList={{
-								[styles.colorButtonActive]: isSameAsActiveColor(color),
-							}}
-						>
-							<span style={{ "background-color": color }} />
-						</SquareButton>
-					))}
-				<SquareButton onClick={onAddColor}>+</SquareButton>
+					.map((color) => {
+						const isActive = isSameAsActiveColor(color);
+						return (
+							<SquareButton
+								onClick={() =>
+									isActive ? onRemoveColor(color) : onColorClick(color)
+								}
+								class={styles.colorButton}
+								classList={{
+									[styles.colorButtonActive]: isActive,
+								}}
+							>
+								<span style={{ "background-color": color }}>
+									{isActive ? <AiOutlineDelete /> : null}
+								</span>
+							</SquareButton>
+						);
+					})}
+				<SquareButton onClick={onAddColor}>
+					<AiOutlinePlus />
+				</SquareButton>
 			</div>
 		</div>
 	);
