@@ -17,3 +17,7 @@
 		height: 100%;
 	}
 }
+.colorButtonActive {
+	border-width: 2px;
+	border-color: var(--primary-color-highlight);
+}

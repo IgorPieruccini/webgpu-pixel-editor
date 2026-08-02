@@ -83,6 +83,7 @@ export const INITIAL_PIXEL_PAINTER: PixelPainterMethods = {
 		isLoading: false,
 		addColor: () => {},
 		removeColor: () => {},
+		getColorPalette: () => [],
 	},
 	tool: {
 		set: () => {},

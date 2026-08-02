@@ -1,4 +1,5 @@
 import { createSignal } from "solid-js";
+import { storageLocal } from "../../storageLocal";
 import type {
 	WorkerRequest,
 	WorkerResponse,
@@ -7,9 +8,12 @@ import type { LayerHandler } from "./layerHandler";
 
 export type ColorPaletteHandler = ReturnType<typeof createColorPaletteHandler>;
 
+const DEFAULT_PALETTE: string[] = ["#D17428", "#28D1D1", "#3F5A8A", "#AD1D41"];
+
 export const createColorPaletteHandler = (layerHandler: LayerHandler) => {
 	const [getIsLoading, setIsLoading] = createSignal(false);
 	const [getColors, setColors] = createSignal<string[]>([]);
+	const [getColorPalette, setColorPalette] = createSignal<string[]>([]);
 
 	const worker = new Worker(
 		new URL("../workers/calculateColorPaletteWorker.ts", import.meta.url),
@@ -41,17 +45,31 @@ export const createColorPaletteHandler = (layerHandler: LayerHandler) => {
 		);
 	};
 
-	const loadColorPalette = () => {};
+	const loadColorPalette = () => {
+		const colorsFromLocal = storageLocal.colorPalette.get();
+		setColorPalette(colorsFromLocal ?? DEFAULT_PALETTE);
+	};
 
-	const addColor = () => {};
+	const addColor = (color: string) => {
+		const colors = setColorPalette((prev) => [...prev, color]);
+		storageLocal.colorPalette.set(colors);
+	};
 
-	const removeColor = () => {};
+	const removeColor = (deleteColor: string) => {
+		const colors = getColorPalette();
+		const newColors = colors.filter((color) => color !== deleteColor);
+		setColorPalette(newColors);
+		storageLocal.colorPalette.set(newColors);
+	};
+
+	loadColorPalette();
 
 	return {
 		calculateColorPalette,
 		isLoadingColors: getIsLoading(),
 		getColors,
 		loadColorPalette,
+		getColorPalette,
 		addColor,
 		removeColor,
 	};
