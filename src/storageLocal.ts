@@ -100,7 +100,7 @@ const setProjectColorPalette = (colors: Array<string>) => {
 		throw new Error("Active project not defined");
 	}
 
-	const key = `${project}-color-palette`;
+	const key = `${project.name}-color-palette`;
 
 	const stringfiedColors = JSON.stringify(colors);
 
@@ -113,7 +113,7 @@ const getProjectColorPalette = (): Array<string> | null => {
 		throw new Error("Active project not defined");
 	}
 
-	const key = `${project}-color-palette`;
+	const key = `${project.name}-color-palette`;
 
 	const stringfiedColors = window.localStorage.getItem(key);
 	if (!stringfiedColors) {

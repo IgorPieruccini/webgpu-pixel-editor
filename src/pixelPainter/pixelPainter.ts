@@ -162,6 +162,7 @@ export const pixelPainter = async (
 			removeColor: colorPaletteHandler.removeColor,
 			getColorPalette: colorPaletteHandler.getColorPalette,
 			sortColorPalette: colorPaletteHandler.sortColorPalette,
+			loadColorPalette: colorPaletteHandler.loadColorPalette,
 		},
 		tool: {
 			set: uniformBufferHandler.setActiveTool,
