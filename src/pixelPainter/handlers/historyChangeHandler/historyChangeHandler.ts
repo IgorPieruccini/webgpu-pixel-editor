@@ -1,145 +1,149 @@
 import { serialization } from "../../../serialization";
-import { type SerializedProject } from "../../../serialization/project";
-import type { LayerHandler } from "../layerHandler";
+import type { SerializedProject } from "../../../serialization/project";
 import { storageLocal } from "../../../storageLocal";
-import type { RenderHandler } from "../renderHandler";
 import type { TiledLayerBuffer } from "../../tiledLayer";
 import { cloneTiledLayerBuffer } from "../../tiledLayer";
 import type { Vec2 } from "../../types";
+import type { ColorPaletteHandler } from "../colorPaletteHandler";
+import type { LayerHandler } from "../layerHandler";
+import type { RenderHandler } from "../renderHandler";
 
 export type HistoryChangeHandler = ReturnType<
-  typeof createHistoryChangeHandler
+	typeof createHistoryChangeHandler
 >;
 
 type AddActionProps = {
-  captureCurrentBuffer?: boolean;
-  paintedPixels?: Set<number>;
+	captureCurrentBuffer?: boolean;
+	paintedPixels?: Set<number>;
 };
 
 type HistorySnapshot = {
-  project: SerializedProject;
-  buffers: Record<string, TiledLayerBuffer>;
+	project: SerializedProject;
+	buffers: Record<string, TiledLayerBuffer>;
 };
 
 const cloneBufferEntries = (
-  entries: Iterable<[string, TiledLayerBuffer]>,
+	entries: Iterable<[string, TiledLayerBuffer]>,
 ): Record<string, TiledLayerBuffer> => {
-  const copy: Record<string, TiledLayerBuffer> = {};
+	const copy: Record<string, TiledLayerBuffer> = {};
 
-  for (const [key, buffer] of entries) {
-    copy[key] = cloneTiledLayerBuffer(buffer);
-  }
+	for (const [key, buffer] of entries) {
+		copy[key] = cloneTiledLayerBuffer(buffer);
+	}
 
-  return copy;
+	return copy;
 };
 
 const cloneProject = (project: SerializedProject): SerializedProject => {
-  return structuredClone(project);
+	return structuredClone(project);
 };
 
 export const createHistoryChangeHandler = (
-  layerHandler: LayerHandler,
-  renderHandler: RenderHandler,
-  projectName: string,
-  gridSize: Vec2,
+	layerHandler: LayerHandler,
+	renderHandler: RenderHandler,
+	colorPaletteHandler: ColorPaletteHandler,
+	projectName: string,
+	gridSize: Vec2,
 ) => {
-  const history: HistorySnapshot[] = [];
-  let historyIndex = -1;
+	const history: HistorySnapshot[] = [];
+	let historyIndex = -1;
 
-  const captureSnapshot = (): HistorySnapshot => {
-    const activeLayer = layerHandler.getActive();
+	const captureSnapshot = (): HistorySnapshot => {
+		const activeLayer = layerHandler.getActive();
+		const colorPalette = colorPaletteHandler.getColorPalette();
 
-    return {
-      project: serialization.project.serialize(
-        projectName,
-        gridSize,
-        layerHandler.getList(),
-        layerHandler.buffers,
-        activeLayer?.id,
-      ),
-      buffers: cloneBufferEntries(layerHandler.buffers.entries()),
-    };
-  };
+		return {
+			project: serialization.project.serialize(
+				projectName,
+				gridSize,
+				layerHandler.getList(),
+				layerHandler.buffers,
+				colorPalette,
+				activeLayer?.id,
+			),
+			buffers: cloneBufferEntries(layerHandler.buffers.entries()),
+		};
+	};
 
-  const restoreSnapshot = (snapshot: HistorySnapshot) => {
-    const currentIds = new Set(layerHandler.getList().map((layer) => layer.id));
-    const nextIds = new Set(snapshot.project.layers.map((layer) => layer.id));
+	const restoreSnapshot = (snapshot: HistorySnapshot) => {
+		const currentIds = new Set(layerHandler.getList().map((layer) => layer.id));
+		const nextIds = new Set(snapshot.project.layers.map((layer) => layer.id));
 
-    for (const id of currentIds) {
-      if (!nextIds.has(id)) {
-        renderHandler.removeLayerTexture(id);
-      }
-    }
+		for (const id of currentIds) {
+			if (!nextIds.has(id)) {
+				renderHandler.removeLayerTexture(id);
+			}
+		}
 
-    for (const id of nextIds) {
-      renderHandler.addLayerTexture(id);
-    }
+		for (const id of nextIds) {
+			renderHandler.addLayerTexture(id);
+		}
 
-    layerHandler.load(snapshot.project.layers, snapshot.buffers);
+		layerHandler.load(snapshot.project.layers, snapshot.buffers);
 
-    const activeLayerId = snapshot.project.activeLayer;
-    if (activeLayerId) {
-      const activeLayer = layerHandler.getLayerById(activeLayerId);
-      if (activeLayer) {
-        layerHandler.setActive(activeLayer);
-      }
-    }
+		const activeLayerId = snapshot.project.activeLayer;
+		if (activeLayerId) {
+			const activeLayer = layerHandler.getLayerById(activeLayerId);
+			if (activeLayer) {
+				layerHandler.setActive(activeLayer);
+			}
+		}
 
-    storageLocal.saveLayers(projectName, snapshot.project.layers);
-  };
+		storageLocal.saveLayers(projectName, snapshot.project.layers);
+	};
 
-  const addSnapshot = () => {
-    if (historyIndex < history.length - 1) {
-      history.splice(historyIndex + 1);
-    }
+	const addSnapshot = () => {
+		if (historyIndex < history.length - 1) {
+			history.splice(historyIndex + 1);
+		}
 
-    const snapshot = captureSnapshot();
-    history.push(snapshot);
-    historyIndex = history.length - 1;
-  };
+		const snapshot = captureSnapshot();
+		history.push(snapshot);
+		historyIndex = history.length - 1;
+	};
 
-  const addAction = (_props?: AddActionProps): void => {
-    addSnapshot();
-  };
+	const addAction = (_props?: AddActionProps): void => {
+		addSnapshot();
+	};
 
-  const undo = (): void => {
-    if (historyIndex <= 0) {
-      return;
-    }
+	const undo = (): void => {
+		if (historyIndex <= 0) {
+			return;
+		}
 
-    historyIndex -= 1;
-    const snapshot = history[historyIndex];
-    if (!snapshot) {
-      return;
-    }
+		historyIndex -= 1;
+		const snapshot = history[historyIndex];
+		if (!snapshot) {
+			return;
+		}
 
-    restoreSnapshot({
-      project: cloneProject(snapshot.project),
-      buffers: cloneBufferEntries(Object.entries(snapshot.buffers)),
-    });
-  };
+		restoreSnapshot({
+			project: cloneProject(snapshot.project),
+			buffers: cloneBufferEntries(Object.entries(snapshot.buffers)),
+		});
+	};
 
-  const redo = (): void => {
-    if (historyIndex >= history.length - 1) {
-      return;
-    }
+	const redo = (): void => {
+		if (historyIndex >= history.length - 1) {
+			return;
+		}
 
-    historyIndex += 1;
-    const snapshot = history[historyIndex];
-    if (!snapshot) {
-      return;
-    }
+		historyIndex += 1;
+		const snapshot = history[historyIndex];
+		if (!snapshot) {
+			return;
+		}
 
-    restoreSnapshot({
-      project: cloneProject(snapshot.project),
-      buffers: cloneBufferEntries(Object.entries(snapshot.buffers)),
-    });
-  };
+		restoreSnapshot({
+			project: cloneProject(snapshot.project),
+			buffers: cloneBufferEntries(Object.entries(snapshot.buffers)),
+		});
+	};
 
-  return {
-    addSnapshot,
-    addAction,
-    undo,
-    redo,
-  };
+	return {
+		addSnapshot,
+		addAction,
+		undo,
+		redo,
+	};
 };

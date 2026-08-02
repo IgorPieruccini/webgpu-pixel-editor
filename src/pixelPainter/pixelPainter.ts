@@ -40,6 +40,7 @@ export const pixelPainter = async (
 	const historyChangeHandler = createHistoryChangeHandler(
 		layerHandler,
 		renderHandler,
+		colorPaletteHandler,
 		projectName,
 		gridSize,
 	);

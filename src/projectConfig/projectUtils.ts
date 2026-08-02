@@ -66,12 +66,14 @@ export const createProjectFromImage = (
 export const saveProject = (projectContext: ProjectConfigContextType) => {
 	const layers = projectContext.pixel().layer.getList();
 	const buffers = projectContext.pixel().layer.buffers;
+	const colorPalette = projectContext.pixel().colorPalette.getColorPalette();
 
 	const serializeProject = serialization.project.serialize(
 		projectContext.projectName(),
 		projectContext.getProjectGridSize(),
 		layers,
 		buffers,
+		colorPalette,
 	);
 	serialization.project.saveProject(serializeProject);
 };

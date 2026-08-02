@@ -45,6 +45,7 @@ export const createProjectConfigController = (
 		gridSize,
 		layers,
 		buffers,
+		colorPalette,
 	}: ProjectType & Partial<LoadedProject>): void => {
 		project()
 			.createNewPainter(name, gridSize)
@@ -58,7 +59,7 @@ export const createProjectConfigController = (
 				options.storage?.addProject({ name, gridSize });
 				setActiveProject({ name, gridSize });
 				setProjects(options.storage?.getProjects() ?? []);
-				value.colorPalette.loadColorPalette();
+				value.colorPalette.loadColorPalette(colorPalette);
 
 				if (layers && buffers) value.layer.load(layers, buffers);
 			});
