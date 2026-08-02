@@ -62,6 +62,30 @@ export const createColorPaletteHandler = (layerHandler: LayerHandler) => {
 		storageLocal.colorPalette.set(newColors);
 	};
 
+	const sortColorPalette = (dragged: string, dropped: string) => {
+		const colors = [...getColorPalette()];
+		let draggedIndex = 0;
+		let droppedIndex = 0;
+
+		for (let i = 0; i < colors.length; i++) {
+			const color = colors[i];
+			if (color === dragged) {
+				draggedIndex = i;
+			}
+			if (color === dropped) {
+				droppedIndex = i;
+			}
+		}
+
+		const draggedLayer = colors.splice(draggedIndex, 1);
+		const first = colors.slice(0, droppedIndex);
+		const second = colors.slice(droppedIndex, colors.length);
+		const newColors = [...first, ...draggedLayer, ...second];
+
+		setColorPalette(newColors);
+		storageLocal.colorPalette.set(newColors);
+	};
+
 	loadColorPalette();
 
 	return {
@@ -72,5 +96,6 @@ export const createColorPaletteHandler = (layerHandler: LayerHandler) => {
 		getColorPalette,
 		addColor,
 		removeColor,
+		sortColorPalette,
 	};
 };

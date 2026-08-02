@@ -69,7 +69,10 @@ export const ColorPalette = () => {
 
 	const onDragEnd = (event: DragEvent) => {
 		if (event.droppable) {
-			console.log(event);
+			colorPalette().sortColorPalette(
+				event.draggable.id as string,
+				event.droppable.id as string,
+			);
 		}
 	};
 

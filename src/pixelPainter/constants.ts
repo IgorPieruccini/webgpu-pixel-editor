@@ -84,6 +84,7 @@ export const INITIAL_PIXEL_PAINTER: PixelPainterMethods = {
 		addColor: () => {},
 		removeColor: () => {},
 		getColorPalette: () => [],
+		sortColorPalette: () => {},
 	},
 	tool: {
 		set: () => {},
