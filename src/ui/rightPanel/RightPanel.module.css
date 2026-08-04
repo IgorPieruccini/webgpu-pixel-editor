@@ -1,63 +1,70 @@
 .rightPanel {
-  gap: 8px;
-  display: flex;
-  flex-direction: column;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
-  padding: 12px;
-  box-sizing: border-box;
-  backdrop-filter: blur(18px);
-  min-width: 276px;
+	gap: 8px;
+	display: flex;
+	flex-direction: column;
+	background: var(--surface);
+	border: 1px solid var(--border);
+	border-radius: var(--radius-lg);
+	box-shadow: var(--shadow-lg);
+	padding: 12px;
+	box-sizing: border-box;
+	backdrop-filter: blur(18px);
+	min-width: 276px;
 }
 
 .projectTitle {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 10px;
+	min-width: 0;
 }
 
 .projectTitle > span:first-child {
-  font-size: 0.95rem;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+	font-size: 0.95rem;
+	font-weight: 700;
+	letter-spacing: -0.01em;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 .meta {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  min-width: 0;
-  flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	min-width: 0;
+	flex-shrink: 0;
 }
 
 .layerPreview {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 12px;
-  border-radius: 16px;
-  background: var(--surface-muted);
-  border: 1px solid var(--border);
-  justify-content: center;
-  align-items: center;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	padding: 12px;
+	border-radius: 16px;
+	background: var(--surface-muted);
+	border: 1px solid var(--border);
+	justify-content: center;
+	align-items: center;
 }
 
 .previewCanvas {
-  width: 100%;
-  height: auto;
-  aspect-ratio: 1;
-  max-width: 220px;
-  border-radius: 16px;
-  background: var(--background-darker);
-  border: 1px solid var(--border);
-  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--text-primary) 4%, var(--transparent));
-  display: flex;
+	width: 100%;
+	height: auto;
+	aspect-ratio: 1;
+	max-width: 220px;
+	border-radius: 16px;
+	background: var(--background-darker);
+	border: 1px solid var(--border);
+	box-shadow: inset 0 1px 0
+		color-mix(in srgb, var(--text-primary) 4%, var(--transparent));
+	display: flex;
+}
+
+.resize {
+	display: flex;
+	align-items: center;
+	gap: 8px;
 }
