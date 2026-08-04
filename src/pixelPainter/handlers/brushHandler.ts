@@ -1,244 +1,250 @@
 import { createSignal } from "solid-js";
-import type { LayerHandler } from "./layerHandler";
-import { alphaComposite, numberToRGBA, rgbaToHex } from "../utils";
-import type { HistoryChangeHandler } from "./historyChangeHandler";
 import { BYTES_PER_PIXEL } from "../../constants";
-import type { ColorPaletteHandler } from "./colorPaletteHandler";
-import type { Vec2 } from "../types";
 import { getPixelAtLocal, setPixelAtLocal } from "../tiledLayer";
+import type { Vec2 } from "../types";
+import { alphaComposite, numberToRGBA, rgbaToHex } from "../utils";
+import type { ColorPaletteHandler } from "./colorPaletteHandler";
+import type { HistoryChangeHandler } from "./historyChangeHandler";
+import type { LayerHandler } from "./layerHandler";
+import type { ProjectConfigHandler } from "./projectConfigHandler";
 
 export type BrushHandler = ReturnType<typeof createBrushHandler>;
 
 export const createBrushHandler = (
-  layerHandler: LayerHandler,
-  historyChangeHandler: HistoryChangeHandler,
-  colorPalette: ColorPaletteHandler,
-  gridSize: Vec2,
-  canvas: HTMLCanvasElement,
+	layerHandler: LayerHandler,
+	historyChangeHandler: HistoryChangeHandler,
+	colorPalette: ColorPaletteHandler,
+	projectConfigHandler: ProjectConfigHandler,
+	canvas: HTMLCanvasElement,
 ) => {
-  const currentPaintedPixels = new Set<number>();
-  canvas.addEventListener("mouseup", () => {
-    if (currentPaintedPixels.size > 0) {
-      layerHandler.saveCurrentBuffer();
-      historyChangeHandler.addAction({ paintedPixels: currentPaintedPixels });
-      colorPalette.calculateColorPalette();
-      clearCurrentPaintedPixels();
-    }
-  });
+	const currentPaintedPixels = new Set<number>();
+	canvas.addEventListener("mouseup", () => {
+		if (currentPaintedPixels.size > 0) {
+			layerHandler.saveCurrentBuffer();
+			historyChangeHandler.addAction({ paintedPixels: currentPaintedPixels });
+			colorPalette.calculateColorPalette();
+			clearCurrentPaintedPixels();
+		}
+	});
 
-  // Default color: magenta RGB (0xff00ff), will be converted to ABGR when set
-  const [_getSelectedColor, _setSelectedColor] = createSignal(0x000000);
-  const [getOpacity, setOpacity] = createSignal(100);
-  const [getThickness, setThickness] = createSignal(1);
+	// Default color: magenta RGB (0xff00ff), will be converted to ABGR when set
+	const [_getSelectedColor, _setSelectedColor] = createSignal(0x000000);
+	const [getOpacity, setOpacity] = createSignal(100);
+	const [getThickness, setThickness] = createSignal(1);
 
-  const clearCurrentPaintedPixels = () => {
-    currentPaintedPixels.clear();
-  };
+	const clearCurrentPaintedPixels = () => {
+		currentPaintedPixels.clear();
+	};
 
-  const setColor = (_color: number | string) => {
-    if (typeof _color === "string") {
-      const hex = parseInt(_color.replace("#", ""), 16);
-      _setSelectedColor(hex);
-    }
+	const setColor = (_color: number | string) => {
+		if (typeof _color === "string") {
+			const hex = parseInt(_color.replace("#", ""), 16);
+			_setSelectedColor(hex);
+		}
 
-    if (typeof _color === "number") {
-      _setSelectedColor(_color);
-    }
-  };
+		if (typeof _color === "number") {
+			_setSelectedColor(_color);
+		}
+	};
 
-  const getColor = (pos: Vec2, format: "number" | "string" = "number") => {
-    const currentLayer = layerHandler.getActive();
-    const buffer = layerHandler.getBufferById(currentLayer.id);
-    if (!buffer) {
-      throw new Error(`Buffer for layer ${currentLayer.id} not found`);
-    }
+	const getColor = (pos: Vec2, format: "number" | "string" = "number") => {
+		const currentLayer = layerHandler.getActive();
+		const buffer = layerHandler.getBufferById(currentLayer.id);
+		if (!buffer) {
+			throw new Error(`Buffer for layer ${currentLayer.id} not found`);
+		}
 
-    const color = getPixelAtLocal(
-      buffer,
-      pos.x - currentLayer.offset.x,
-      pos.y - currentLayer.offset.y,
-    );
+		const color = getPixelAtLocal(
+			buffer,
+			pos.x - currentLayer.offset.x,
+			pos.y - currentLayer.offset.y,
+		);
 
-    const packed = (color.r << 24) | (color.g << 16) | (color.b << 8) | color.a;
-    if (format === "string") {
-      return `#${(packed >>> 8).toString(16).padStart(6, "0")}`;
-    }
-    return packed >>> 0;
-  };
+		const packed = (color.r << 24) | (color.g << 16) | (color.b << 8) | color.a;
+		if (format === "string") {
+			return `#${(packed >>> 8).toString(16).padStart(6, "0")}`;
+		}
+		return packed >>> 0;
+	};
 
-  const composeColors = (worldPos: Vec2) => {
-    const currentLayer = layerHandler.getActive();
-    const currentBuffer = layerHandler.getBufferById(currentLayer.id);
-    if (!currentBuffer) {
-      throw new Error(`Buffer for layer ${currentLayer.id} not found`);
-    }
+	const composeColors = (worldPos: Vec2) => {
+		const gridSize = projectConfigHandler.getSize();
+		const currentLayer = layerHandler.getActive();
+		const currentBuffer = layerHandler.getBufferById(currentLayer.id);
+		if (!currentBuffer) {
+			throw new Error(`Buffer for layer ${currentLayer.id} not found`);
+		}
 
-    const localX = worldPos.x - currentLayer.offset.x;
-    const localY = worldPos.y - currentLayer.offset.y;
-    const destColor = getPixelAtLocal(currentBuffer, localX, localY);
+		const localX = worldPos.x - currentLayer.offset.x;
+		const localY = worldPos.y - currentLayer.offset.y;
+		const destColor = getPixelAtLocal(currentBuffer, localX, localY);
 
-    const destRGBA = {
-      r: destColor.r,
-      g: destColor.g,
-      b: destColor.b,
-      a: destColor.a / 255,
-    };
+		const destRGBA = {
+			r: destColor.r,
+			g: destColor.g,
+			b: destColor.b,
+			a: destColor.a / 255,
+		};
 
-    const sourceRGBA = numberToRGBA(_getSelectedColor());
-    sourceRGBA.a = getOpacity() / 100;
+		const sourceRGBA = numberToRGBA(_getSelectedColor());
+		sourceRGBA.a = getOpacity() / 100;
 
-    const blendedRGBA = alphaComposite(sourceRGBA, destRGBA);
+		const blendedRGBA = alphaComposite(sourceRGBA, destRGBA);
 
-    const rgba = rgbaToHex(blendedRGBA);
+		const rgba = rgbaToHex(blendedRGBA);
 
-    const r = (rgba >>> 24) & 0xff;
-    const g = (rgba >>> 16) & 0xff;
-    const b = (rgba >>> 8) & 0xff;
-    const a = rgba & 0xff;
+		const r = (rgba >>> 24) & 0xff;
+		const g = (rgba >>> 16) & 0xff;
+		const b = (rgba >>> 8) & 0xff;
+		const a = rgba & 0xff;
 
-    setPixelAtLocal(currentBuffer, localX, localY, { r, g, b, a });
-    currentPaintedPixels.add((worldPos.y * gridSize.x + worldPos.x) * BYTES_PER_PIXEL);
-  };
+		setPixelAtLocal(currentBuffer, localX, localY, { r, g, b, a });
+		currentPaintedPixels.add(
+			(worldPos.y * gridSize.x + worldPos.x) * BYTES_PER_PIXEL,
+		);
+	};
 
-  const paint = (
-    cellPos: { x: number; y: number },
-    defaultThickness?: number,
-    forcePaint = false,
-  ): boolean => {
-    // We use this variable to check if we applied paint in at least one pixel,
-    // so we can decide whether to add the paint action to the history or not
-    let hasAppliedPaint = false;
-    const thickness = defaultThickness ?? getThickness();
+	const paint = (
+		cellPos: { x: number; y: number },
+		defaultThickness?: number,
+		forcePaint = false,
+	): boolean => {
+		const gridSize = projectConfigHandler.getSize();
+		// We use this variable to check if we applied paint in at least one pixel,
+		// so we can decide whether to add the paint action to the history or not
+		let hasAppliedPaint = false;
+		const thickness = defaultThickness ?? getThickness();
 
-    for (let y = -thickness; y <= thickness; y++) {
-      for (let x = -thickness; x <= thickness; x++) {
-        const _x = cellPos.x + x * BYTES_PER_PIXEL;
-        const _y = cellPos.y + y * BYTES_PER_PIXEL;
-        const cellX = _x / BYTES_PER_PIXEL;
-        const cellY = _y / BYTES_PER_PIXEL;
+		for (let y = -thickness; y <= thickness; y++) {
+			for (let x = -thickness; x <= thickness; x++) {
+				const _x = cellPos.x + x * BYTES_PER_PIXEL;
+				const _y = cellPos.y + y * BYTES_PER_PIXEL;
+				const cellX = _x / BYTES_PER_PIXEL;
+				const cellY = _y / BYTES_PER_PIXEL;
 
-        if (
-          cellX < 0 ||
-          cellX >= gridSize.x ||
-          cellY < 0 ||
-          cellY >= gridSize.y
-        ) {
-          continue;
-        }
+				if (
+					cellX < 0 ||
+					cellX >= gridSize.x ||
+					cellY < 0 ||
+					cellY >= gridSize.y
+				) {
+					continue;
+				}
 
-        const pixelIndex = (cellY * gridSize.x + cellX) * BYTES_PER_PIXEL;
-        if (!forcePaint && currentPaintedPixels.has(pixelIndex)) {
-          continue;
-        }
+				const pixelIndex = (cellY * gridSize.x + cellX) * BYTES_PER_PIXEL;
+				if (!forcePaint && currentPaintedPixels.has(pixelIndex)) {
+					continue;
+				}
 
-        const distance = Math.hypot(x, y);
-        if (distance < thickness) {
-          composeColors({ x: cellX, y: cellY });
-          hasAppliedPaint = true;
-        }
-      }
-    }
+				const distance = Math.hypot(x, y);
+				if (distance < thickness) {
+					composeColors({ x: cellX, y: cellY });
+					hasAppliedPaint = true;
+				}
+			}
+		}
 
-    layerHandler.makeCurrentLayerDirty();
-    return hasAppliedPaint;
-  };
+		layerHandler.makeCurrentLayerDirty();
+		return hasAppliedPaint;
+	};
 
-  const erase = (cellPos: { x: number; y: number }) => {
-    const thickness = getThickness();
+	const erase = (cellPos: { x: number; y: number }) => {
+		const gridSize = projectConfigHandler.getSize();
+		const thickness = getThickness();
 
-    for (let y = -thickness; y <= thickness; y++) {
-      for (let x = -thickness; x <= thickness; x++) {
-        const _x = cellPos.x + x * BYTES_PER_PIXEL;
-        const _y = cellPos.y + y * BYTES_PER_PIXEL;
-        const cellX = _x / BYTES_PER_PIXEL;
-        const cellY = _y / BYTES_PER_PIXEL;
+		for (let y = -thickness; y <= thickness; y++) {
+			for (let x = -thickness; x <= thickness; x++) {
+				const _x = cellPos.x + x * BYTES_PER_PIXEL;
+				const _y = cellPos.y + y * BYTES_PER_PIXEL;
+				const cellX = _x / BYTES_PER_PIXEL;
+				const cellY = _y / BYTES_PER_PIXEL;
 
-        if (
-          cellX < 0 ||
-          cellX >= gridSize.x ||
-          cellY < 0 ||
-          cellY >= gridSize.y
-        ) {
-          continue;
-        }
+				if (
+					cellX < 0 ||
+					cellX >= gridSize.x ||
+					cellY < 0 ||
+					cellY >= gridSize.y
+				) {
+					continue;
+				}
 
-        const index = (cellY * gridSize.x + cellX) * BYTES_PER_PIXEL;
-        if (currentPaintedPixels.has(index)) {
-          continue;
-        }
+				const index = (cellY * gridSize.x + cellX) * BYTES_PER_PIXEL;
+				if (currentPaintedPixels.has(index)) {
+					continue;
+				}
 
-        const distance = Math.hypot(x, y);
-        if (distance < thickness) {
-          const currentLayer = layerHandler.getActive();
-          const currentBuffer = layerHandler.getBufferById(currentLayer.id);
-          if (!currentBuffer) {
-            throw new Error(`Buffer for layer ${currentLayer.id} not found`);
-          }
+				const distance = Math.hypot(x, y);
+				if (distance < thickness) {
+					const currentLayer = layerHandler.getActive();
+					const currentBuffer = layerHandler.getBufferById(currentLayer.id);
+					if (!currentBuffer) {
+						throw new Error(`Buffer for layer ${currentLayer.id} not found`);
+					}
 
-          const localX = cellX - currentLayer.offset.x;
-          const localY = cellY - currentLayer.offset.y;
-          const destColor = getPixelAtLocal(currentBuffer, localX, localY);
+					const localX = cellX - currentLayer.offset.x;
+					const localY = cellY - currentLayer.offset.y;
+					const destColor = getPixelAtLocal(currentBuffer, localX, localY);
 
-          const destRGBA = {
-            r: destColor.r,
-            g: destColor.g,
-            b: destColor.b,
-            a: destColor.a / 255,
-          };
+					const destRGBA = {
+						r: destColor.r,
+						g: destColor.g,
+						b: destColor.b,
+						a: destColor.a / 255,
+					};
 
-          if (destRGBA.a === 0) {
-            continue;
-          }
+					if (destRGBA.a === 0) {
+						continue;
+					}
 
-          const opacity = destRGBA.a - Math.fround(getOpacity() / 100);
-          const resultRGBA = { ...destRGBA, a: opacity >= 0 ? opacity : 0 };
+					const opacity = destRGBA.a - Math.fround(getOpacity() / 100);
+					const resultRGBA = { ...destRGBA, a: opacity >= 0 ? opacity : 0 };
 
-          if (resultRGBA.a === 0) {
-            setPixelAtLocal(currentBuffer, localX, localY, {
-              r: 0,
-              g: 0,
-              b: 0,
-              a: 0,
-            });
-            currentPaintedPixels.add(index);
-            continue;
-          }
+					if (resultRGBA.a === 0) {
+						setPixelAtLocal(currentBuffer, localX, localY, {
+							r: 0,
+							g: 0,
+							b: 0,
+							a: 0,
+						});
+						currentPaintedPixels.add(index);
+						continue;
+					}
 
-          const blendedHex = rgbaToHex(resultRGBA);
-          setPixelAtLocal(currentBuffer, localX, localY, {
-            r: (blendedHex >>> 24) & 0xff,
-            g: (blendedHex >>> 16) & 0xff,
-            b: (blendedHex >>> 8) & 0xff,
-            a: blendedHex & 0xff,
-          });
-          currentPaintedPixels.add(index);
-        }
-      }
-    }
-    layerHandler.makeCurrentLayerDirty();
-  };
+					const blendedHex = rgbaToHex(resultRGBA);
+					setPixelAtLocal(currentBuffer, localX, localY, {
+						r: (blendedHex >>> 24) & 0xff,
+						g: (blendedHex >>> 16) & 0xff,
+						b: (blendedHex >>> 8) & 0xff,
+						a: blendedHex & 0xff,
+					});
+					currentPaintedPixels.add(index);
+				}
+			}
+		}
+		layerHandler.makeCurrentLayerDirty();
+	};
 
-  function getSelectedColor(): number;
-  function getSelectedColor(format: "number"): number;
-  function getSelectedColor(format: "string"): string;
-  function getSelectedColor(format: "number" | "string" = "number") {
-    if (format === "string") {
-      return `#${_getSelectedColor().toString(16).padStart(6, "0")}`;
-    }
+	function getSelectedColor(): number;
+	function getSelectedColor(format: "number"): number;
+	function getSelectedColor(format: "string"): string;
+	function getSelectedColor(format: "number" | "string" = "number") {
+		if (format === "string") {
+			return `#${_getSelectedColor().toString(16).padStart(6, "0")}`;
+		}
 
-    return _getSelectedColor();
-  }
+		return _getSelectedColor();
+	}
 
-  return {
-    setColor,
-    getColor,
-    paint,
-    erase,
-    getOpacity,
-    setOpacity,
-    getSelectedColor,
-    getThickness,
-    setThickness,
-    clearCurrentPaintedPixels,
-  };
+	return {
+		setColor,
+		getColor,
+		paint,
+		erase,
+		getOpacity,
+		setOpacity,
+		getSelectedColor,
+		getThickness,
+		setThickness,
+		clearCurrentPaintedPixels,
+	};
 };

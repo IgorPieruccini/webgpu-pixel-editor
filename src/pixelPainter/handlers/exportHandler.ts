@@ -1,81 +1,83 @@
 import { calculateZoomFromGridAndCanvasSize } from "../../utils";
-import { createUniformBufferHandler } from "./uniformBuffersHandler";
 import type { LayerHandler } from "./layerHandler";
+import type { ProjectConfigHandler } from "./projectConfigHandler";
 import { createRenderHandler } from "./renderHandler";
-import type { Vec2 } from "../types";
+import { createUniformBufferHandler } from "./uniformBuffersHandler";
 
 export const createExportHandler = (
-  projectName: string,
-  gridSize: Vec2,
-  layerHandler: LayerHandler,
+	projectName: string,
+	projectConfigHandler: ProjectConfigHandler,
+	layerHandler: LayerHandler,
 ) => {
-  const renderToCanvas = async (multiplier: number) => {
-    const canvasSize = {
-      x: gridSize.x * multiplier,
-      y: gridSize.y * multiplier,
-    };
+	const renderToCanvas = async (multiplier: number) => {
+		const gridSize = projectConfigHandler.getSize();
 
-    // Create the canvas and set to the scaled export size.
-    const canvas = document.createElement("canvas");
-    canvas.width = canvasSize.x;
-    canvas.height = canvasSize.y;
+		const canvasSize = {
+			x: gridSize.x * multiplier,
+			y: gridSize.y * multiplier,
+		};
 
-    const uniformBufferHandler = createUniformBufferHandler(
-      canvasSize,
-      gridSize,
-    );
+		// Create the canvas and set to the scaled export size.
+		const canvas = document.createElement("canvas");
+		canvas.width = canvasSize.x;
+		canvas.height = canvasSize.y;
 
-    const renderHandler = await createRenderHandler(
-      layerHandler,
-      uniformBufferHandler,
-      canvas,
-      false, // don't render UI
-    );
+		const uniformBufferHandler = createUniformBufferHandler(
+			canvasSize,
+			projectConfigHandler,
+		);
 
-    for (const layer of layerHandler.getList()) {
-      renderHandler.addLayerTexture(layer.id);
-      layerHandler.makeLayerDirty(layer.id);
-    }
+		const renderHandler = await createRenderHandler(
+			layerHandler,
+			uniformBufferHandler,
+			canvas,
+			false, // don't render UI
+		);
 
-    uniformBufferHandler.updateZoom(
-      calculateZoomFromGridAndCanvasSize(gridSize, canvasSize),
-    );
-    uniformBufferHandler.updateCanvasSize(canvasSize);
+		for (const layer of layerHandler.getList()) {
+			renderHandler.addLayerTexture(layer.id);
+			layerHandler.makeLayerDirty(layer.id);
+		}
 
-    renderHandler.draw();
+		uniformBufferHandler.updateZoom(
+			calculateZoomFromGridAndCanvasSize(gridSize, canvasSize),
+		);
+		uniformBufferHandler.updateCanvasSize(canvasSize);
 
-    return canvas;
-  };
+		renderHandler.draw();
 
-  const getBlob = async (multiplier: number): Promise<Blob> => {
-    const canvas = await renderToCanvas(multiplier);
-    await new Promise<void>((resolve) => {
-      requestAnimationFrame(() => resolve());
-    });
+		return canvas;
+	};
 
-    return new Promise((resolve, reject) => {
-      canvas.toBlob((blob) => {
-        if (!blob) {
-          reject(new Error("Something went wrong while exporting image"));
-          return;
-        }
+	const getBlob = async (multiplier: number): Promise<Blob> => {
+		const canvas = await renderToCanvas(multiplier);
+		await new Promise<void>((resolve) => {
+			requestAnimationFrame(() => resolve());
+		});
 
-        resolve(blob);
-      }, "image/png");
-    });
-  };
+		return new Promise((resolve, reject) => {
+			canvas.toBlob((blob) => {
+				if (!blob) {
+					reject(new Error("Something went wrong while exporting image"));
+					return;
+				}
 
-  const exportImage = async (multiplier: number) => {
-    const blob = await getBlob(multiplier);
-    const url = URL.createObjectURL(blob);
+				resolve(blob);
+			}, "image/png");
+		});
+	};
 
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `${projectName}.png`;
-    link.click();
+	const exportImage = async (multiplier: number) => {
+		const blob = await getBlob(multiplier);
+		const url = URL.createObjectURL(blob);
 
-    URL.revokeObjectURL(url);
-  };
+		const link = document.createElement("a");
+		link.href = url;
+		link.download = `${projectName}.png`;
+		link.click();
 
-  return { exportImage, getBlob };
+		URL.revokeObjectURL(url);
+	};
+
+	return { exportImage, getBlob };
 };

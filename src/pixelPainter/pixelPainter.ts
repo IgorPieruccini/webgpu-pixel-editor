@@ -1,5 +1,3 @@
-import { LAYER_PREVIEW_SIZE } from "../constants";
-import { calculateZoomFromGridAndCanvasSize } from "../utils";
 import { createBrushHandler } from "./handlers/brushHandler";
 import { createColorPaletteHandler } from "./handlers/colorPaletteHandler";
 import { createEyeDropperHandler } from "./handlers/EyeDropperHandler";
@@ -7,6 +5,7 @@ import { createExportHandler } from "./handlers/exportHandler";
 import { createHistoryChangeHandler } from "./handlers/historyChangeHandler/historyChangeHandler";
 import { createLayerHandler } from "./handlers/layerHandler";
 import { createMiddlewareHandler } from "./handlers/middlewareHandler";
+import { createProjectConfigHandler } from "./handlers/projectConfigHandler";
 import { createRenderHandler } from "./handlers/renderHandler";
 import { createBucketPaintHandler } from "./handlers/tools/bucketPaintHandler";
 import { createLinePaintHandler } from "./handlers/tools/linePaintHanlder";
@@ -20,10 +19,19 @@ export const pixelPainter = async (
 	canvasSize: Vec2,
 	canvas: HTMLCanvasElement,
 ) => {
-	const layerHandler = await createLayerHandler(projectName, gridSize);
+	const projectConfigHandler = createProjectConfigHandler(gridSize);
+
+	const layerHandler = await createLayerHandler(
+		projectName,
+		projectConfigHandler,
+	);
+
 	const colorPaletteHandler = createColorPaletteHandler(layerHandler);
 
-	const uniformBufferHandler = createUniformBufferHandler(canvasSize, gridSize);
+	const uniformBufferHandler = createUniformBufferHandler(
+		canvasSize,
+		projectConfigHandler,
+	);
 
 	const renderHandler = await createRenderHandler(
 		layerHandler,
@@ -33,8 +41,7 @@ export const pixelPainter = async (
 
 	const layerPreview = await createLayerPreview(
 		layerHandler,
-		gridSize,
-		calculateZoomFromGridAndCanvasSize(gridSize, LAYER_PREVIEW_SIZE),
+		projectConfigHandler,
 	);
 
 	const historyChangeHandler = createHistoryChangeHandler(
@@ -42,14 +49,14 @@ export const pixelPainter = async (
 		renderHandler,
 		colorPaletteHandler,
 		projectName,
-		gridSize,
+		projectConfigHandler,
 	);
 
 	const brushHandler = createBrushHandler(
 		layerHandler,
 		historyChangeHandler,
 		colorPaletteHandler,
-		gridSize,
+		projectConfigHandler,
 		canvas,
 	);
 
@@ -57,18 +64,18 @@ export const pixelPainter = async (
 		layerHandler,
 		brushHandler,
 		uniformBufferHandler,
-		gridSize,
+		projectConfigHandler,
 	);
 
 	const lineHandler = createLinePaintHandler(
-		gridSize,
+		projectConfigHandler,
 		uniformBufferHandler,
 		layerHandler,
 		brushHandler,
 	);
 
 	const bucketPaint = createBucketPaintHandler(
-		gridSize,
+		projectConfigHandler,
 		layerHandler,
 		brushHandler,
 		historyChangeHandler,
@@ -81,11 +88,12 @@ export const pixelPainter = async (
 		layerHandler,
 		historyChangeHandler,
 		layerPreview,
+		projectConfigHandler,
 	);
 
 	const exportHandler = createExportHandler(
 		projectName,
-		gridSize,
+		projectConfigHandler,
 		layerHandler,
 	);
 
@@ -171,6 +179,10 @@ export const pixelPainter = async (
 		},
 		eyeDropper: {
 			eyeDropAtCell: eyeDropperHandler.eyeDropAtCell,
+		},
+		projectConfig: {
+			setSize: middlewareHandler.setGridSize,
+			getSize: projectConfigHandler.getSize,
 		},
 	};
 };

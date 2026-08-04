@@ -94,4 +94,8 @@ export const INITIAL_PIXEL_PAINTER: PixelPainterMethods = {
 	eyeDropper: {
 		eyeDropAtCell: () => {},
 	},
+	projectConfig: {
+		setSize: () => {},
+		getSize: () => ({ x: 128, y: 128 }),
+	},
 };

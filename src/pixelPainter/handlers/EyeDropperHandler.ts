@@ -1,63 +1,66 @@
-import { alphaComposite, rgbaToHex } from "../utils";
-import type { RGBA, Vec2 } from "../types";
 import { getPixelAtLocal } from "../tiledLayer";
-import type { LayerHandler } from "./layerHandler";
+import type { RGBA, Vec2 } from "../types";
+import { alphaComposite, rgbaToHex } from "../utils";
 import type { BrushHandler } from "./brushHandler";
+import type { LayerHandler } from "./layerHandler";
+import type { ProjectConfigHandler } from "./projectConfigHandler";
 import type { UniformBufferHandler } from "./uniformBuffersHandler";
 
 export const createEyeDropperHandler = (
-  layerHandler: LayerHandler,
-  brushHandler: BrushHandler,
-  uniformBufferHandler: UniformBufferHandler,
-  gridSize: Vec2,
+	layerHandler: LayerHandler,
+	brushHandler: BrushHandler,
+	uniformBufferHandler: UniformBufferHandler,
+	projectConfigHandler: ProjectConfigHandler,
 ) => {
-  const eyeDropAtCell = (pos: Vec2) => {
-    if (pos.x < 0 || pos.x >= gridSize.x || pos.y < 0 || pos.y >= gridSize.y) {
-      return;
-    }
+	const eyeDropAtCell = (pos: Vec2) => {
+		const gridSize = projectConfigHandler.getSize();
 
-    let currentColor: RGBA = { r: 0, g: 0, b: 0, a: 0 };
+		if (pos.x < 0 || pos.x >= gridSize.x || pos.y < 0 || pos.y >= gridSize.y) {
+			return;
+		}
 
-    for (const layer of layerHandler.getList()) {
-      if (!layer.display) {
-        continue;
-      }
+		let currentColor: RGBA = { r: 0, g: 0, b: 0, a: 0 };
 
-      const buffer = layerHandler.getBufferById(layer.id);
-      if (!buffer) {
-        continue;
-      }
+		for (const layer of layerHandler.getList()) {
+			if (!layer.display) {
+				continue;
+			}
 
-      const pixel = getPixelAtLocal(
-        buffer,
-        pos.x - layer.offset.x,
-        pos.y - layer.offset.y,
-      );
-      const alpha = (pixel.a / 255) * Math.max(0, Math.min(1, layer.opacity));
+			const buffer = layerHandler.getBufferById(layer.id);
+			if (!buffer) {
+				continue;
+			}
 
-      if (alpha <= 0) {
-        continue;
-      }
+			const pixel = getPixelAtLocal(
+				buffer,
+				pos.x - layer.offset.x,
+				pos.y - layer.offset.y,
+			);
+			const alpha = (pixel.a / 255) * Math.max(0, Math.min(1, layer.opacity));
 
-      const sourceColor: RGBA = {
-        r: pixel.r,
-        g: pixel.g,
-        b: pixel.b,
-        a: alpha,
-      };
+			if (alpha <= 0) {
+				continue;
+			}
 
-      currentColor =
-        currentColor.a === 0
-          ? sourceColor
-          : alphaComposite(sourceColor, currentColor);
-    }
+			const sourceColor: RGBA = {
+				r: pixel.r,
+				g: pixel.g,
+				b: pixel.b,
+				a: alpha,
+			};
 
-    const hex = rgbaToHex(currentColor);
-    brushHandler.setColor(hex);
-    uniformBufferHandler.updateSelectedColor(brushHandler.getSelectedColor());
-  };
+			currentColor =
+				currentColor.a === 0
+					? sourceColor
+					: alphaComposite(sourceColor, currentColor);
+		}
 
-  return {
-    eyeDropAtCell,
-  };
+		const hex = rgbaToHex(currentColor);
+		brushHandler.setColor(hex);
+		uniformBufferHandler.updateSelectedColor(brushHandler.getSelectedColor());
+	};
+
+	return {
+		eyeDropAtCell,
+	};
 };

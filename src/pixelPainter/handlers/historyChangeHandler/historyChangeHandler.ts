@@ -3,9 +3,9 @@ import type { SerializedProject } from "../../../serialization/project";
 import { storageLocal } from "../../../storageLocal";
 import type { TiledLayerBuffer } from "../../tiledLayer";
 import { cloneTiledLayerBuffer } from "../../tiledLayer";
-import type { Vec2 } from "../../types";
 import type { ColorPaletteHandler } from "../colorPaletteHandler";
 import type { LayerHandler } from "../layerHandler";
+import type { ProjectConfigHandler } from "../projectConfigHandler";
 import type { RenderHandler } from "../renderHandler";
 
 export type HistoryChangeHandler = ReturnType<
@@ -43,7 +43,7 @@ export const createHistoryChangeHandler = (
 	renderHandler: RenderHandler,
 	colorPaletteHandler: ColorPaletteHandler,
 	projectName: string,
-	gridSize: Vec2,
+	projectConfigHandler: ProjectConfigHandler,
 ) => {
 	const history: HistorySnapshot[] = [];
 	let historyIndex = -1;
@@ -51,6 +51,7 @@ export const createHistoryChangeHandler = (
 	const captureSnapshot = (): HistorySnapshot => {
 		const activeLayer = layerHandler.getActive();
 		const colorPalette = colorPaletteHandler.getColorPalette();
+		const gridSize = projectConfigHandler.getSize();
 
 		return {
 			project: serialization.project.serialize(

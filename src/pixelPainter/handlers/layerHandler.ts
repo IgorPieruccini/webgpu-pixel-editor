@@ -8,6 +8,7 @@ import {
 	type TiledLayerBuffer,
 } from "../tiledLayer";
 import type { Layer, Layers, Vec2 } from "../types";
+import type { ProjectConfigHandler } from "./projectConfigHandler";
 
 export type LayerHandler = Awaited<ReturnType<typeof createLayerHandler>>;
 
@@ -18,7 +19,7 @@ const normalizeLayer = (layer: Layer): Layer => ({
 
 export const createLayerHandler = async (
 	projectName: string,
-	gridSize: Vec2,
+	projectConfigHandler: ProjectConfigHandler,
 ) => {
 	const stringLayers = storageLocal
 		.createLayers(projectName)
@@ -39,7 +40,7 @@ export const createLayerHandler = async (
 	const [getActive, setActive] = createSignal<Layer>(firstLayer);
 
 	const buffers: Map<string, TiledLayerBuffer> = new Map();
-	const db = await localDataBase(projectName, gridSize);
+	const db = await localDataBase(projectName, projectConfigHandler);
 
 	for (const layer of getList()) {
 		try {
