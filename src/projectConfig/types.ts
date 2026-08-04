@@ -1,4 +1,4 @@
-import type { Accessor, Setter } from "solid-js";
+import type { Accessor } from "solid-js";
 import type { EditorType } from "../editor/editor";
 import type { ProjectType } from "../editor/types";
 import type { PixelPainterMethods, Vec2 } from "../pixelPainter/types";
@@ -14,9 +14,6 @@ export type ProjectConfigStorage = {
 
 export type ProjectConfigContextType = {
 	projectName: Accessor<string>;
-	setProjectName: Setter<string>;
-	setProjectGridSize: Setter<Vec2>;
-	getProjectGridSize: Accessor<Vec2>;
 	createNewProject: (project: ProjectType & Partial<LoadedProject>) => void;
 	deleteProject: (projectName: string) => Promise<void>;
 	pixel: Accessor<PixelPainterMethods>;

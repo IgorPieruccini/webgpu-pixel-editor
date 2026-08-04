@@ -67,10 +67,11 @@ export const saveProject = (projectContext: ProjectConfigContextType) => {
 	const layers = projectContext.pixel().layer.getList();
 	const buffers = projectContext.pixel().layer.buffers;
 	const colorPalette = projectContext.pixel().colorPalette.getColorPalette();
+	const projectConfig = projectContext.pixel().projectConfig;
 
 	const serializeProject = serialization.project.serialize(
-		projectContext.projectName(),
-		projectContext.getProjectGridSize(),
+		projectConfig.getProjectName(),
+		projectConfig.getSize(),
 		layers,
 		buffers,
 		colorPalette,

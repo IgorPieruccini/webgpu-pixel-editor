@@ -1,5 +1,4 @@
 import { createContext, type JSX, onMount, useContext } from "solid-js";
-import { DEFAULT_GRID_SIZE } from "../constants";
 import { editorContext } from "../editor/editortContext";
 import { INITIAL_PIXEL_PAINTER } from "../pixelPainter/constants";
 import { storageDB } from "../storageDB";
@@ -15,9 +14,6 @@ const notImplemented = () => {
 const initialProjectConfig: ProjectConfigContextType = {
 	pixel: () => INITIAL_PIXEL_PAINTER,
 	projectName: () => "new-project",
-	setProjectName: notImplemented,
-	setProjectGridSize: () => undefined,
-	getProjectGridSize: () => DEFAULT_GRID_SIZE,
 	createNewProject: notImplemented,
 	deleteProject: async () => undefined,
 	getActiveProject: () => null,
@@ -58,9 +54,6 @@ export const ProjectConfigProvider = (props: ProjectConfigProviderProps) => {
 			value={{
 				pixel: controller.pixel,
 				projectName: controller.projectName,
-				setProjectName: controller.setProjectName,
-				setProjectGridSize: controller.setProjectGridSize,
-				getProjectGridSize: controller.getProjectGridSize,
 				createNewProject: controller.createNewProject,
 				deleteProject: controller.deleteProject,
 				getActiveProject: controller.getActiveProject,
