@@ -104,10 +104,16 @@ const getTool = () => {
 	return () => context.pixel().tool;
 };
 
+const getProjectConfig = () => {
+	const context = useContext(ProjectConfigContext);
+	return () => context.pixel().projectConfig;
+};
+
 export const API = {
 	layers: getLayers,
 	brush: getBrush,
 	export: getExport,
 	colorPalette: getColorPalette,
 	tool: getTool,
+	projectConfig: getProjectConfig,
 };
