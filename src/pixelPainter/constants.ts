@@ -97,5 +97,7 @@ export const INITIAL_PIXEL_PAINTER: PixelPainterMethods = {
 	projectConfig: {
 		setSize: () => {},
 		getSize: () => ({ x: 128, y: 128 }),
+		getProjectName: () => "project not initialized",
+		setProjectName: () => {},
 	},
 };

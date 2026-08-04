@@ -19,7 +19,10 @@ export const pixelPainter = async (
 	canvasSize: Vec2,
 	canvas: HTMLCanvasElement,
 ) => {
-	const projectConfigHandler = createProjectConfigHandler(gridSize);
+	const projectConfigHandler = createProjectConfigHandler(
+		gridSize,
+		projectName,
+	);
 
 	const layerHandler = await createLayerHandler(
 		projectName,
@@ -183,6 +186,8 @@ export const pixelPainter = async (
 		projectConfig: {
 			setSize: middlewareHandler.setGridSize,
 			getSize: projectConfigHandler.getSize,
+			getProjectName: projectConfigHandler.getProjectName,
+			setProjectName: projectConfigHandler.setProjectName,
 		},
 	};
 };

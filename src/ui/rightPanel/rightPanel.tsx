@@ -1,5 +1,6 @@
 import { RiArrowsExpandDiagonalSFill } from "solid-icons/ri";
-import { useProjectConfig } from "../../projectConfig/projectConfigProvider";
+import { createMemo } from "solid-js";
+import { API } from "../../projectConfig/projectConfigProvider";
 import { useMenu } from "../menuPanels/menuProvider";
 import { SquareButton } from "../shared/squareButton";
 import { OPENED_OPTIONS } from "../topBar/constants";
@@ -8,25 +9,26 @@ import { Layers } from "./Layers/Layers";
 import styles from "./RightPanel.module.css";
 
 export const RightPanel = () => {
-	const projectConfig = useProjectConfig();
+	const projectConfig = API.projectConfig();
 	const menu = useMenu();
 
-	if (!projectConfig.projectName()) {
-		return null;
-	}
+	const name = createMemo(() => projectConfig().getProjectName());
+
+	const size = createMemo(() => {
+		return projectConfig().getSize();
+	});
 
 	const openResizePanel = () => {
-		console.log("jey");
 		menu.openOption(OPENED_OPTIONS.RESIZE);
 	};
 
 	return (
 		<div class={styles.rightPanel}>
 			<div class={styles.projectTitle}>
-				<span>{projectConfig.projectName()}</span>
+				<span>{name()}</span>
 				<span class={styles.meta}>
 					<span class={styles.resize}>
-						{`${projectConfig.getProjectGridSize().x} x ${projectConfig.getProjectGridSize().y}`}
+						{`${size().x} x ${size().y}`}
 						<SquareButton size="sm" onClick={openResizePanel}>
 							<RiArrowsExpandDiagonalSFill />
 						</SquareButton>
