@@ -1,3 +1,5 @@
+import { storageLocal } from "../../storageLocal";
+import { calculateZoomFromGridAndCanvasSize } from "../../utils";
 import type { LayerPreviewHandler } from "../layerPreview";
 import type { TiledLayerBuffer } from "../tiledLayer";
 import type { Layers, Vec2 } from "../types";
@@ -9,6 +11,7 @@ import type { RenderHandler } from "./renderHandler";
 import type { UniformBufferHandler } from "./uniformBuffersHandler";
 
 export const createMiddlewareHandler = (
+	canvas: HTMLCanvasElement,
 	brushHandler: BrushHandler,
 	uniformBufferHandler: UniformBufferHandler,
 	renderHandler: RenderHandler,
@@ -98,6 +101,40 @@ export const createMiddlewareHandler = (
 		projectConfigHandler.setSize(gridSize);
 		uniformBufferHandler.refreshSize();
 		layerPreview.refreshSize();
+
+		const viewport = {
+			width: canvas.clientWidth,
+			height: canvas.clientHeight,
+		};
+
+		const zoom = calculateZoomFromGridAndCanvasSize(gridSize, {
+			x: viewport.width,
+			y: viewport.height,
+		});
+
+		uniformBufferHandler.updateZoom(zoom - zoom * 0.3);
+		uniformBufferHandler.updatePan({
+			x: 0,
+			y: 0,
+		});
+
+		const activeProject = storageLocal.getActiveProject();
+		if (!activeProject) {
+			return;
+		}
+
+		activeProject.gridSize = gridSize;
+		storageLocal.setActiveProject(activeProject);
+
+		const projects = storageLocal.getProjects();
+		const updatedProjects = projects.map((project) => {
+			if (project.name === activeProject.name) {
+				return activeProject;
+			}
+			return project;
+		});
+
+		storageLocal.setProjects(updatedProjects);
 	};
 
 	return {
