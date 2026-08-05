@@ -1,9 +1,5 @@
 import { createSignal } from "solid-js";
-import {
-	BYTES_PER_PIXEL,
-	DEFAULT_GRID_SIZE,
-	ZOOM_SENSITIVITY,
-} from "../constants";
+import { BYTES_PER_PIXEL, ZOOM_SENSITIVITY } from "../constants";
 import { INITIAL_PIXEL_PAINTER } from "../pixelPainter/constants";
 import { pixelPainter } from "../pixelPainter/pixelPainter";
 import type { PixelPainterMethods, Vec2 } from "../pixelPainter/types";
@@ -39,7 +35,6 @@ export const initializeEditor = async (
 	let lastMoveLayerCell: Vec2 | null = null;
 
 	let pixel: PixelPainterMethods = INITIAL_PIXEL_PAINTER;
-	let gridSize: Vec2 = DEFAULT_GRID_SIZE;
 
 	const [activeTool, _setActiveTool] = createSignal(ACTIVATE_TOOL.PAINT);
 
@@ -77,19 +72,16 @@ export const initializeEditor = async (
 
 	const createNewPainter = async (
 		name: string,
-		grid: Vec2,
+		initialGridSize: Vec2,
 	): Promise<PixelPainterMethods> => {
-		// TODO: THIS GRID NEEDS TO BE UPDATED AS WELL
-		gridSize = grid;
-
-		const zoom = calculateZoomFromGridAndCanvasSize(gridSize, {
+		const zoom = calculateZoomFromGridAndCanvasSize(initialGridSize, {
 			x: viewport.width,
 			y: viewport.height,
 		});
 
 		pixel = await pixelPainter(
 			name,
-			gridSize,
+			initialGridSize,
 			{
 				x: viewport.width,
 				y: viewport.height,
@@ -98,234 +90,242 @@ export const initializeEditor = async (
 		);
 
 		pixel.render.setZoom(zoom - zoom * 0.3);
+		createEventListeners(pixel);
 
 		return pixel;
 	};
 
-	canvas.addEventListener("mousemove", (e) => {
-		const aspectRatio = viewport.width / viewport.height;
-		const gridRatio = gridSize.x / gridSize.y;
+	const createEventListeners = (pixel: PixelPainterMethods) => {
+		canvas.addEventListener("mousemove", (e) => {
+			const aspectRatio = viewport.width / viewport.height;
 
-		const cell = pickCell(
-			{ x: e.clientX, y: e.clientY },
-			{ x: canvas.offsetLeft, y: canvas.offsetTop },
-		);
+			const gridSize = pixel.projectConfig.getSize();
+			const gridRatio = gridSize.x / gridSize.y;
 
-		pixel.render.setCellPos({ x: cell.x, y: cell.y });
+			const cell = pickCell(
+				{ x: e.clientX, y: e.clientY },
+				{ x: canvas.offsetLeft, y: canvas.offsetTop },
+			);
 
-		if (pressingSpace) {
-			const pan = pixel.render.getPan();
-			pixel.render.setPan({
-				x: pan.x + e.movementX * aspectRatio,
-				y: pan.y - e.movementY / gridRatio,
-			});
-			pan.x += e.movementX * aspectRatio;
-		}
+			pixel.render.setCellPos({ x: cell.x, y: cell.y });
 
-		if (isLeftMouseDown && !pressingSpace) {
-			if (activeTool() === ACTIVATE_TOOL.PAINT) {
+			if (pressingSpace) {
+				const pan = pixel.render.getPan();
+				pixel.render.setPan({
+					x: pan.x + e.movementX * aspectRatio,
+					y: pan.y - e.movementY / gridRatio,
+				});
+				pan.x += e.movementX * aspectRatio;
+			}
+
+			if (isLeftMouseDown && !pressingSpace) {
+				if (activeTool() === ACTIVATE_TOOL.PAINT) {
+					pixel.brush.paint({
+						x: cell.x * BYTES_PER_PIXEL,
+						y: cell.y * BYTES_PER_PIXEL,
+					});
+				}
+
+				if (activeTool() === ACTIVATE_TOOL.DELETE) {
+					pixel.brush.erase({
+						x: cell.x * BYTES_PER_PIXEL,
+						y: cell.y * BYTES_PER_PIXEL,
+					});
+				}
+
+				if (
+					activeTool() === ACTIVATE_TOOL.MOVE_LAYER &&
+					lastMoveLayerCell !== null
+				) {
+					const delta = {
+						x: cell.x - lastMoveLayerCell.x,
+						y: cell.y - lastMoveLayerCell.y,
+					};
+
+					if (delta.x !== 0 || delta.y !== 0) {
+						pixel.layer.move(pixel.layer.getActive().id, delta);
+						lastMoveLayerCell = cell;
+					}
+				}
+			}
+
+			if (activeTool() === ACTIVATE_TOOL.PAINT_SELECTION && isLeftMouseDown) {
+				pixel.render.setSelectedCellsSize({ x: cell.x, y: cell.y });
+			}
+		});
+
+		canvas.addEventListener("mousedown", (e) => {
+			const currentTool = activeTool();
+
+			const cell = pickCell(
+				{ x: e.clientX, y: e.clientY },
+				{ x: canvas.offsetLeft, y: canvas.offsetTop },
+			);
+
+			if (currentTool === ACTIVATE_TOOL.PAINT) {
 				pixel.brush.paint({
 					x: cell.x * BYTES_PER_PIXEL,
 					y: cell.y * BYTES_PER_PIXEL,
 				});
 			}
 
-			if (activeTool() === ACTIVATE_TOOL.DELETE) {
+			if (currentTool === ACTIVATE_TOOL.DELETE) {
 				pixel.brush.erase({
 					x: cell.x * BYTES_PER_PIXEL,
 					y: cell.y * BYTES_PER_PIXEL,
 				});
 			}
 
-			if (
-				activeTool() === ACTIVATE_TOOL.MOVE_LAYER &&
-				lastMoveLayerCell !== null
-			) {
-				const delta = {
-					x: cell.x - lastMoveLayerCell.x,
-					y: cell.y - lastMoveLayerCell.y,
-				};
+			isLeftMouseDown = true;
 
-				if (delta.x !== 0 || delta.y !== 0) {
-					pixel.layer.move(pixel.layer.getActive().id, delta);
-					lastMoveLayerCell = cell;
-				}
-			}
-		}
-
-		if (activeTool() === ACTIVATE_TOOL.PAINT_SELECTION && isLeftMouseDown) {
-			pixel.render.setSelectedCellsSize({ x: cell.x, y: cell.y });
-		}
-	});
-
-	canvas.addEventListener("mousedown", (e) => {
-		const currentTool = activeTool();
-
-		const cell = pickCell(
-			{ x: e.clientX, y: e.clientY },
-			{ x: canvas.offsetLeft, y: canvas.offsetTop },
-		);
-
-		if (currentTool === ACTIVATE_TOOL.PAINT) {
-			pixel.brush.paint({
-				x: cell.x * BYTES_PER_PIXEL,
-				y: cell.y * BYTES_PER_PIXEL,
-			});
-		}
-
-		if (currentTool === ACTIVATE_TOOL.DELETE) {
-			pixel.brush.erase({
-				x: cell.x * BYTES_PER_PIXEL,
-				y: cell.y * BYTES_PER_PIXEL,
-			});
-		}
-
-		isLeftMouseDown = true;
-
-		if (currentTool === ACTIVATE_TOOL.LINE) {
-			pixel.line.setLineStartPosition(cell);
-		}
-
-		if (currentTool === ACTIVATE_TOOL.PAINT_SELECTION) {
-			const cell = pickCell(
-				{ x: e.clientX, y: e.clientY },
-				{ x: canvas.offsetLeft, y: canvas.offsetTop },
-			);
-
-			pixel.render.setSelectedCellsPosition({ x: cell.x, y: cell.y });
-			pixel.render.setSelectedCellsSize({ x: cell.x, y: cell.y });
-		}
-
-		if (currentTool === ACTIVATE_TOOL.BUCKET_PAINT) {
-			pixel.bucketPaint.paint(cell);
-		}
-
-		if (activeTool() === ACTIVATE_TOOL.EYE_DROPPER) {
-			pixel.eyeDropper.eyeDropAtCell(cell);
-		}
-
-		if (currentTool === ACTIVATE_TOOL.MOVE_LAYER) {
-			lastMoveLayerCell = cell;
-		}
-	});
-
-	canvas.addEventListener("mouseup", (e) => {
-		isLeftMouseDown = false;
-		lastMoveLayerCell = null;
-
-		if (activeTool() === ACTIVATE_TOOL.LINE) {
-			const cell = pickCell(
-				{ x: e.clientX, y: e.clientY },
-				{ x: canvas.offsetLeft, y: canvas.offsetTop },
-			);
-
-			pixel.line.draw(cell);
-			pixel.line.resetLineStartPosition();
-		}
-
-		if (activeTool() === ACTIVATE_TOOL.PAINT_SELECTION) {
-			const selectedCells = pixel.render.getSelectedCellsRect();
-			const selection = {
-				x: Math.min(selectedCells.x, selectedCells.w),
-				y: Math.min(selectedCells.y, selectedCells.h),
-				w: Math.max(selectedCells.x, selectedCells.w),
-				h: Math.max(selectedCells.y, selectedCells.h),
-			};
-			for (let x = selection.x; x <= selection.w; x++) {
-				for (let y = selection.y; y <= selection.h; y++) {
-					pixel.brush.paint(
-						{
-							x: x * BYTES_PER_PIXEL,
-							y: y * BYTES_PER_PIXEL,
-						},
-						1,
-					);
-				}
+			if (currentTool === ACTIVATE_TOOL.LINE) {
+				pixel.line.setLineStartPosition(cell);
 			}
 
-			pixel.render.setSelectedCellsSize({ x: -1, y: -1 });
-			pixel.render.setSelectedCellsPosition({ x: -1, y: -1 });
-		}
-	});
+			if (currentTool === ACTIVATE_TOOL.PAINT_SELECTION) {
+				const cell = pickCell(
+					{ x: e.clientX, y: e.clientY },
+					{ x: canvas.offsetLeft, y: canvas.offsetTop },
+				);
 
-	window.addEventListener("keydown", (e) => {
-		if (e.code === "Space" && !pressingSpace) {
-			pressingSpace = true;
-		}
+				pixel.render.setSelectedCellsPosition({ x: cell.x, y: cell.y });
+				pixel.render.setSelectedCellsSize({ x: cell.x, y: cell.y });
+			}
 
-		if ((e.ctrlKey || e.metaKey) && e.key === "z") {
-			e.preventDefault();
-			pixel.history.undo();
-		}
+			if (currentTool === ACTIVATE_TOOL.BUCKET_PAINT) {
+				pixel.bucketPaint.paint(cell);
+			}
 
-		if ((e.ctrlKey || e.metaKey) && e.key === "Z") {
-			e.preventDefault();
-			pixel.history.redo();
-		}
-	});
+			if (activeTool() === ACTIVATE_TOOL.EYE_DROPPER) {
+				pixel.eyeDropper.eyeDropAtCell(cell);
+			}
 
-	window.addEventListener("keyup", (e) => {
-		if (e.code === "Space") {
-			pressingSpace = false;
-			pixel.render.setSelectedCellsSize({ x: -1, y: -1 });
-			pixel.render.setSelectedCellsPosition({ x: -1, y: -1 });
-		}
-	});
-
-	function pickCell(
-		mouse: { x: number; y: number },
-		canvasOffset: { x: number; y: number },
-	) {
-		const zoom = pixel.render.getZoom();
-		const pan = pixel.render.getPan();
-		const aspectRatio = viewport.width / viewport.height;
-		const gridRatio = gridSize.x / gridSize.y;
-		const gap = (-viewport.width * aspectRatio) / 2 + viewport.width / 2;
-
-		// 1. screen → clip space (-1..1)
-		const mx =
-			(((mouse.x - canvasOffset.x) * aspectRatio - pan.x + gap) /
-				viewport.width) *
-				2 -
-			1;
-
-		const my =
-			((mouse.y - canvasOffset.y + pan.y * gridRatio) / viewport.height) * -2 +
-			1; // y flips because screen origin is top-left
-
-		// 2. clip space → world space (undo shader transform)
-		const worldX = mx / zoom;
-		const worldY = (my / zoom) * gridRatio;
-
-		// 3. world space (-1..1) → normalized 0..1 → grid index
-		const cellX = Math.floor((worldX + 1) * 0.5 * gridSize.x);
-		const cellY = Math.floor((worldY + 1) * 0.5 * gridSize.y);
-
-		return { x: cellX, y: gridSize.y - 1 - cellY };
-	}
-
-	const wheelHandler = (e: WheelEvent) => {
-		e.preventDefault();
-		const aspectRatio = viewport.width / viewport.height;
-		const pan = pixel.render.getPan();
-		const oldZoom = pixel.render.getZoom();
-		const mouseX = e.clientX - viewport.left - viewport.width / 2;
-		const mouseY = -(e.clientY - viewport.top - viewport.height / 2);
-		const delta = normalizeWheelDelta(e);
-		const zoomFactor = Math.exp(-delta * ZOOM_SENSITIVITY);
-		const newZoom = oldZoom * zoomFactor;
-
-		pixel.render.setZoom(newZoom);
-
-		// Adjust pan so zoom centers on mouse
-		const gridRatio = gridSize.x / gridSize.y;
-		pixel.render.setPan({
-			x: (pan.x - mouseX * aspectRatio) * zoomFactor + mouseX * aspectRatio,
-			y: (pan.y - mouseY / gridRatio) * zoomFactor + mouseY / gridRatio,
+			if (currentTool === ACTIVATE_TOOL.MOVE_LAYER) {
+				lastMoveLayerCell = cell;
+			}
 		});
-	};
 
-	canvas.addEventListener("wheel", wheelHandler, { passive: false });
+		canvas.addEventListener("mouseup", (e) => {
+			isLeftMouseDown = false;
+			lastMoveLayerCell = null;
+
+			if (activeTool() === ACTIVATE_TOOL.LINE) {
+				const cell = pickCell(
+					{ x: e.clientX, y: e.clientY },
+					{ x: canvas.offsetLeft, y: canvas.offsetTop },
+				);
+
+				pixel.line.draw(cell);
+				pixel.line.resetLineStartPosition();
+			}
+
+			if (activeTool() === ACTIVATE_TOOL.PAINT_SELECTION) {
+				const selectedCells = pixel.render.getSelectedCellsRect();
+				const selection = {
+					x: Math.min(selectedCells.x, selectedCells.w),
+					y: Math.min(selectedCells.y, selectedCells.h),
+					w: Math.max(selectedCells.x, selectedCells.w),
+					h: Math.max(selectedCells.y, selectedCells.h),
+				};
+				for (let x = selection.x; x <= selection.w; x++) {
+					for (let y = selection.y; y <= selection.h; y++) {
+						pixel.brush.paint(
+							{
+								x: x * BYTES_PER_PIXEL,
+								y: y * BYTES_PER_PIXEL,
+							},
+							1,
+						);
+					}
+				}
+
+				pixel.render.setSelectedCellsSize({ x: -1, y: -1 });
+				pixel.render.setSelectedCellsPosition({ x: -1, y: -1 });
+			}
+		});
+
+		window.addEventListener("keydown", (e) => {
+			if (e.code === "Space" && !pressingSpace) {
+				pressingSpace = true;
+			}
+
+			if ((e.ctrlKey || e.metaKey) && e.key === "z") {
+				e.preventDefault();
+				pixel.history.undo();
+			}
+
+			if ((e.ctrlKey || e.metaKey) && e.key === "Z") {
+				e.preventDefault();
+				pixel.history.redo();
+			}
+		});
+
+		window.addEventListener("keyup", (e) => {
+			if (e.code === "Space") {
+				pressingSpace = false;
+				pixel.render.setSelectedCellsSize({ x: -1, y: -1 });
+				pixel.render.setSelectedCellsPosition({ x: -1, y: -1 });
+			}
+		});
+
+		function pickCell(
+			mouse: { x: number; y: number },
+			canvasOffset: { x: number; y: number },
+		) {
+			const zoom = pixel.render.getZoom();
+			const pan = pixel.render.getPan();
+			const gridSize = pixel.projectConfig.getSize();
+			const aspectRatio = viewport.width / viewport.height;
+			const gridRatio = gridSize.x / gridSize.y;
+			const gap = (-viewport.width * aspectRatio) / 2 + viewport.width / 2;
+
+			// 1. screen → clip space (-1..1)
+			const mx =
+				(((mouse.x - canvasOffset.x) * aspectRatio - pan.x + gap) /
+					viewport.width) *
+					2 -
+				1;
+
+			const my =
+				((mouse.y - canvasOffset.y + pan.y * gridRatio) / viewport.height) *
+					-2 +
+				1; // y flips because screen origin is top-left
+
+			// 2. clip space → world space (undo shader transform)
+			const worldX = mx / zoom;
+			const worldY = (my / zoom) * gridRatio;
+
+			// 3. world space (-1..1) → normalized 0..1 → grid index
+			const cellX = Math.floor((worldX + 1) * 0.5 * gridSize.x);
+			const cellY = Math.floor((worldY + 1) * 0.5 * gridSize.y);
+
+			return { x: cellX, y: gridSize.y - 1 - cellY };
+		}
+
+		const wheelHandler = (e: WheelEvent) => {
+			e.preventDefault();
+			const aspectRatio = viewport.width / viewport.height;
+			const pan = pixel.render.getPan();
+			const oldZoom = pixel.render.getZoom();
+			const gridSize = pixel.projectConfig.getSize();
+			const mouseX = e.clientX - viewport.left - viewport.width / 2;
+			const mouseY = -(e.clientY - viewport.top - viewport.height / 2);
+			const delta = normalizeWheelDelta(e);
+			const zoomFactor = Math.exp(-delta * ZOOM_SENSITIVITY);
+			const newZoom = oldZoom * zoomFactor;
+
+			pixel.render.setZoom(newZoom);
+
+			// Adjust pan so zoom centers on mouse
+			const gridRatio = gridSize.x / gridSize.y;
+			pixel.render.setPan({
+				x: (pan.x - mouseX * aspectRatio) * zoomFactor + mouseX * aspectRatio,
+				y: (pan.y - mouseY / gridRatio) * zoomFactor + mouseY / gridRatio,
+			});
+		};
+
+		canvas.addEventListener("wheel", wheelHandler, { passive: false });
+	};
 
 	const loop = () => {
 		pixel?.render.draw();
