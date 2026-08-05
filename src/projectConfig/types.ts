@@ -13,7 +13,6 @@ export type ProjectConfigStorage = {
 };
 
 export type ProjectConfigContextType = {
-	projectName: Accessor<string>;
 	createNewProject: (project: ProjectType & Partial<LoadedProject>) => void;
 	deleteProject: (projectName: string) => Promise<void>;
 	pixel: Accessor<PixelPainterMethods>;

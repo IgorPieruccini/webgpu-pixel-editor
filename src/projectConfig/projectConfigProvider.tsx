@@ -13,7 +13,6 @@ const notImplemented = () => {
 
 const initialProjectConfig: ProjectConfigContextType = {
 	pixel: () => INITIAL_PIXEL_PAINTER,
-	projectName: () => "new-project",
 	createNewProject: notImplemented,
 	deleteProject: async () => undefined,
 	getActiveProject: () => null,
@@ -53,7 +52,6 @@ export const ProjectConfigProvider = (props: ProjectConfigProviderProps) => {
 		<ProjectConfigContext.Provider
 			value={{
 				pixel: controller.pixel,
-				projectName: controller.projectName,
 				createNewProject: controller.createNewProject,
 				deleteProject: controller.deleteProject,
 				getActiveProject: controller.getActiveProject,

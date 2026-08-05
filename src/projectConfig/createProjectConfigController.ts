@@ -18,12 +18,6 @@ import type {
 export const createProjectConfigController = (
 	options: CreateProjectConfigControllerOptions = {},
 ): ProjectConfigController => {
-	const [projectName, setProjectName] = createSignal(
-		options.initialProjectName ?? "new-project",
-	);
-	const [getProjectGridSize, setProjectGridSize] = createSignal(
-		options.initialGridSize ?? DEFAULT_GRID_SIZE,
-	);
 	const [activeProject, setActiveProject] = createSignal<ProjectType | null>(
 		options.storage?.getActiveProject() ?? null,
 	);
@@ -53,8 +47,8 @@ export const createProjectConfigController = (
 				setPixel(value);
 				options.onProjectOpened?.();
 
-				setProjectName(name);
-				setProjectGridSize(gridSize);
+				value.projectConfig.setProjectName(name);
+				value.projectConfig.setSize(gridSize);
 				options.storage?.setActiveProject({ name, gridSize });
 				options.storage?.addProject({ name, gridSize });
 				setActiveProject({ name, gridSize });
@@ -66,6 +60,7 @@ export const createProjectConfigController = (
 	};
 
 	const deleteProject = async (projectName: string) => {
+		const projectConfig = pixel().projectConfig;
 		options.storage?.deleteProject(projectName);
 		const nextProjects = options.storage?.getProjects() ?? [];
 		const storedActiveProject = options.storage?.getActiveProject() ?? null;
@@ -78,14 +73,16 @@ export const createProjectConfigController = (
 		if (nextProject) {
 			createOrOpenProject(nextProject);
 		} else {
-			setProjectName(options.initialProjectName ?? "new-project");
-			setProjectGridSize(options.initialGridSize ?? DEFAULT_GRID_SIZE);
+			projectConfig.setProjectName(options.initialProjectName ?? "new-project");
+			projectConfig.setSize(options.initialGridSize ?? DEFAULT_GRID_SIZE);
 		}
 
 		await options.storageDB?.delete(projectName);
 	};
 
 	const mount = async () => {
+		const projectConfig = pixel().projectConfig;
+
 		const result = await initializeEditor(initializeEditorOptions);
 		setProject(result);
 		setActiveProject(options.storage?.getActiveProject() ?? null);
@@ -106,7 +103,7 @@ export const createProjectConfigController = (
 			);
 		}
 
-		setProjectName(storedActiveProject.name);
+		projectConfig.setProjectName(storedActiveProject.name);
 		createOrOpenProject(storedActiveProject);
 	};
 
@@ -120,10 +117,6 @@ export const createProjectConfigController = (
 
 	return {
 		pixel,
-		projectName,
-		setProjectName,
-		setProjectGridSize,
-		getProjectGridSize,
 		createNewProject: createOrOpenProject,
 		deleteProject,
 		project,
