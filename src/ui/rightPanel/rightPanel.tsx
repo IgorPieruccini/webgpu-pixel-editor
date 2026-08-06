@@ -22,10 +22,17 @@ export const RightPanel = () => {
 		menu.openOption(OPENED_OPTIONS.RESIZE);
 	};
 
+	const abbreviatedName = createMemo(() => {
+		if (name().length > 23) {
+			return `${name().slice(0, 20)}...`;
+		}
+		return name();
+	});
+
 	return (
 		<div class={styles.rightPanel}>
 			<div class={styles.projectTitle}>
-				<span>{name()}</span>
+				<span>{abbreviatedName()}</span>
 				<span class={styles.meta}>
 					<span class={styles.resize}>
 						{`${size().x} x ${size().y}`}
