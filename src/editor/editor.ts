@@ -8,14 +8,7 @@ import { ACTIVATE_TOOL } from "./constant";
 
 export type EditorType = Awaited<ReturnType<typeof initializeEditor>>;
 
-export type InitializeEditorOptions = {
-	canvas?: HTMLCanvasElement;
-	canvasId?: string;
-};
-
-export const initializeEditor = async (
-	options: InitializeEditorOptions = {},
-) => {
+export const initializeEditor = async () => {
 	const normalizeWheelDelta = (event: WheelEvent) => {
 		const LINE_HEIGHT = 16;
 		const PAGE_HEIGHT = window.innerHeight;
@@ -55,9 +48,7 @@ export const initializeEditor = async (
 		}
 	};
 
-	const canvas =
-		options.canvas ??
-		document.getElementById(options.canvasId ?? "main-canvas");
+	const canvas = document.getElementById("main-canvas");
 
 	if (!(canvas instanceof HTMLCanvasElement)) {
 		throw new Error("Canvas element not found");

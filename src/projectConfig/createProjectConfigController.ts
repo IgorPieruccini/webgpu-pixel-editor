@@ -1,11 +1,6 @@
 import { createSignal } from "solid-js";
-import { DEFAULT_GRID_SIZE } from "../constants";
 import { INITIAL_EDITOR } from "../editor/constant";
-import {
-	type EditorType,
-	type InitializeEditorOptions,
-	initializeEditor,
-} from "../editor/editor";
+import { type EditorType, initializeEditor } from "../editor/editor";
 import type { ProjectType } from "../editor/types";
 import { INITIAL_PIXEL_PAINTER } from "../pixelPainter/constants";
 import type { PixelPainterMethods } from "../pixelPainter/types";
@@ -29,11 +24,6 @@ export const createProjectConfigController = (
 		INITIAL_PIXEL_PAINTER,
 	);
 
-	const initializeEditorOptions: InitializeEditorOptions = {
-		canvas: options.canvas,
-		canvasId: options.canvasId,
-	};
-
 	const createOrOpenProject = ({
 		name,
 		gridSize,
@@ -47,10 +37,6 @@ export const createProjectConfigController = (
 				setPixel(value);
 				options.onProjectOpened?.();
 
-				value.projectConfig.setProjectName(name);
-				value.projectConfig.setSize(gridSize);
-				options.storage?.setActiveProject({ name, gridSize });
-				options.storage?.addProject({ name, gridSize });
 				setActiveProject({ name, gridSize });
 				setProjects(options.storage?.getProjects() ?? []);
 				value.colorPalette.loadColorPalette(colorPalette);
@@ -60,7 +46,6 @@ export const createProjectConfigController = (
 	};
 
 	const deleteProject = async (projectName: string) => {
-		const projectConfig = pixel().projectConfig;
 		options.storage?.deleteProject(projectName);
 		const nextProjects = options.storage?.getProjects() ?? [];
 		const storedActiveProject = options.storage?.getActiveProject() ?? null;
@@ -72,10 +57,10 @@ export const createProjectConfigController = (
 
 		if (nextProject) {
 			createOrOpenProject(nextProject);
-		} else {
-			projectConfig.setProjectName(options.initialProjectName ?? "new-project");
-			projectConfig.setSize(options.initialGridSize ?? DEFAULT_GRID_SIZE);
 		}
+
+		// TODO: WHEN THE LAST PROJECT IS DELETED WE SHOW THE EMPTY STATE
+		// WE DON'T HAVE THAT YET
 
 		await options.storageDB?.delete(projectName);
 	};
@@ -83,7 +68,7 @@ export const createProjectConfigController = (
 	const mount = async () => {
 		const projectConfig = pixel().projectConfig;
 
-		const result = await initializeEditor(initializeEditorOptions);
+		const result = await initializeEditor();
 		setProject(result);
 		setActiveProject(options.storage?.getActiveProject() ?? null);
 		setProjects(options.storage?.getProjects() ?? []);

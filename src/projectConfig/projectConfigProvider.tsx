@@ -23,23 +23,15 @@ const ProjectConfigContext = createContext(initialProjectConfig);
 
 type ProjectConfigProviderProps = {
 	children?: JSX.Element;
-	canvas?: HTMLCanvasElement;
-	canvasId?: string;
-	storage?: ProjectConfigStorage;
-	autoLoadActiveProject?: boolean;
-	onProjectOpened?: () => void;
 };
 
 export const ProjectConfigProvider = (props: ProjectConfigProviderProps) => {
 	const menu = useMenu();
 	const controller = createProjectConfigController({
-		canvas: props.canvas,
-		canvasId: props.canvasId,
-		storage: props.storage ?? storageLocal,
+		storage: storageLocal,
 		storageDB,
-		autoLoadActiveProject: props.autoLoadActiveProject ?? true,
+		autoLoadActiveProject: true,
 		onProjectOpened: () => {
-			props.onProjectOpened?.();
 			menu.openOption(-1);
 		},
 	});
