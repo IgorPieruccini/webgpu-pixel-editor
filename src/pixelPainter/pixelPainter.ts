@@ -60,7 +60,6 @@ export const pixelPainter = async (
 		historyChangeHandler,
 		colorPaletteHandler,
 		projectConfigHandler,
-		canvas,
 	);
 
 	const eyeDropperHandler = createEyeDropperHandler(
@@ -116,7 +115,7 @@ export const pixelPainter = async (
 			select: layerHandler.select,
 			setOpacity: middlewareHandler.setOpacity,
 			setOffset: layerHandler.setOffset,
-			move: layerHandler.move,
+			move: middlewareHandler.moveLayer,
 			getList: layerHandler.getList,
 			getActive: layerHandler.getActive,
 			getBufferById: layerHandler.getBufferById,

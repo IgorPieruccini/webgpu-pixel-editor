@@ -1,5 +1,6 @@
 import { createSignal } from "solid-js";
 import { BYTES_PER_PIXEL } from "../../constants";
+import { debounce } from "../../utils";
 import { getPixelAtLocal, setPixelAtLocal } from "../tiledLayer";
 import type { Vec2 } from "../types";
 import { alphaComposite, numberToRGBA, rgbaToHex } from "../utils";
@@ -15,17 +16,17 @@ export const createBrushHandler = (
 	historyChangeHandler: HistoryChangeHandler,
 	colorPalette: ColorPaletteHandler,
 	projectConfigHandler: ProjectConfigHandler,
-	canvas: HTMLCanvasElement,
 ) => {
 	const currentPaintedPixels = new Set<number>();
-	canvas.addEventListener("mouseup", () => {
+
+	const debounceFinishPainting = debounce(() => {
 		if (currentPaintedPixels.size > 0) {
 			layerHandler.saveCurrentBuffer();
 			historyChangeHandler.addAction({ paintedPixels: currentPaintedPixels });
 			colorPalette.calculateColorPalette();
 			clearCurrentPaintedPixels();
 		}
-	});
+	}, 100);
 
 	// Default color: magenta RGB (0xff00ff), will be converted to ABGR when set
 	const [_getSelectedColor, _setSelectedColor] = createSignal(0x000000);
@@ -145,6 +146,11 @@ export const createBrushHandler = (
 		}
 
 		layerHandler.makeCurrentLayerDirty();
+
+		// This is adding an action while the user in painting but stop dragged for more than 100 milliseconds
+		// but is still holding the right mouse button to painting, might not be so efficient,
+		// but I'm leaving this for now, because it seems to help while painting.
+		debounceFinishPainting();
 		return hasAppliedPaint;
 	};
 

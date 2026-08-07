@@ -1,5 +1,5 @@
 import { storageLocal } from "../../storageLocal";
-import { calculateZoomFromGridAndCanvasSize } from "../../utils";
+import { calculateZoomFromGridAndCanvasSize, debounce } from "../../utils";
 import type { LayerPreviewHandler } from "../layerPreview";
 import type { TiledLayerBuffer } from "../tiledLayer";
 import type { Layers, Vec2 } from "../types";
@@ -20,6 +20,11 @@ export const createMiddlewareHandler = (
 	layerPreview: LayerPreviewHandler,
 	projectConfigHandler: ProjectConfigHandler,
 ) => {
+	const debounceAddAction = debounce(
+		() => historyChangeHandler.addAction(),
+		100,
+	);
+
 	const loadTextureLayers = (layers?: Layers) => {
 		const curLayers = layers ?? layerHandler.getList();
 
@@ -137,6 +142,11 @@ export const createMiddlewareHandler = (
 		storageLocal.setProjects(updatedProjects);
 	};
 
+	const moveLayer = (layerId: string, offset: Vec2) => {
+		layerHandler.move(layerId, offset);
+		debounceAddAction();
+	};
+
 	return {
 		loadTextureLayers,
 		addLayer,
@@ -149,5 +159,6 @@ export const createMiddlewareHandler = (
 		draw,
 		loadLayers,
 		setGridSize,
+		moveLayer,
 	};
 };
