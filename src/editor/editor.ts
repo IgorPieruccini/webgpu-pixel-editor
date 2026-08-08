@@ -5,26 +5,25 @@ import { pixelPainter } from "../pixelPainter/pixelPainter";
 import type { PixelPainterMethods, Vec2 } from "../pixelPainter/types";
 import { calculateZoomFromGridAndCanvasSize } from "../utils";
 import { ACTIVATE_TOOL } from "./constant";
+import { createEventHandler, type EditorEventType } from "./eventHandler";
 
 export type EditorType = Awaited<ReturnType<typeof initializeEditor>>;
 
 export const initializeEditor = async () => {
-	const normalizeWheelDelta = (event: WheelEvent) => {
+	const normalizeWheelDelta = (event: EditorEventType["wheel"]) => {
 		const LINE_HEIGHT = 16;
 		const PAGE_HEIGHT = window.innerHeight;
 
 		switch (event.deltaMode) {
 			case WheelEvent.DOM_DELTA_LINE:
-				return event.deltaY * LINE_HEIGHT;
+				return event.delta.x * LINE_HEIGHT;
 			case WheelEvent.DOM_DELTA_PAGE:
-				return event.deltaY * PAGE_HEIGHT;
+				return event.delta.y * PAGE_HEIGHT;
 			default:
-				return event.deltaY;
+				return event.delta.y;
 		}
 	};
 
-	let pressingSpace = false;
-	let isLeftMouseDown = false;
 	let lastMoveLayerCell: Vec2 | null = null;
 
 	let pixel: PixelPainterMethods = INITIAL_PIXEL_PAINTER;
@@ -54,6 +53,8 @@ export const initializeEditor = async () => {
 		throw new Error("Canvas element not found");
 	}
 
+	const eventHandler = createEventHandler(canvas);
+
 	const viewport = {
 		left: canvas.offsetLeft,
 		top: canvas.offsetTop,
@@ -81,245 +82,249 @@ export const initializeEditor = async () => {
 		);
 
 		pixel.render.setZoom(zoom - zoom * 0.3);
-		createEventListeners(pixel);
+		createEventListeners();
 
 		return pixel;
 	};
 
-	const createEventListeners = (pixel: PixelPainterMethods) => {
-		canvas.addEventListener("mousemove", (e) => {
-			const aspectRatio = viewport.width / viewport.height;
+	function pickCell(
+		mouse: { x: number; y: number },
+		canvasOffset: { x: number; y: number },
+	) {
+		const zoom = pixel.render.getZoom();
+		const pan = pixel.render.getPan();
+		const gridSize = pixel.projectConfig.getSize();
+		const aspectRatio = viewport.width / viewport.height;
+		const gridRatio = gridSize.x / gridSize.y;
+		const gap = (-viewport.width * aspectRatio) / 2 + viewport.width / 2;
 
-			const gridSize = pixel.projectConfig.getSize();
-			const gridRatio = gridSize.x / gridSize.y;
+		// 1. screen → clip space (-1..1)
+		const mx =
+			(((mouse.x - canvasOffset.x) * aspectRatio - pan.x + gap) /
+				viewport.width) *
+				2 -
+			1;
 
-			const cell = pickCell(
-				{ x: e.clientX, y: e.clientY },
-				{ x: canvas.offsetLeft, y: canvas.offsetTop },
-			);
+		const my =
+			((mouse.y - canvasOffset.y + pan.y * gridRatio) / viewport.height) * -2 +
+			1; // y flips because screen origin is top-left
 
-			pixel.render.setCellPos({ x: cell.x, y: cell.y });
+		// 2. clip space → world space (undo shader transform)
+		const worldX = mx / zoom;
+		const worldY = (my / zoom) * gridRatio;
 
-			if (pressingSpace) {
-				const pan = pixel.render.getPan();
-				pixel.render.setPan({
-					x: pan.x + e.movementX * aspectRatio,
-					y: pan.y - e.movementY / gridRatio,
-				});
-				pan.x += e.movementX * aspectRatio;
-			}
+		// 3. world space (-1..1) → normalized 0..1 → grid index
+		const cellX = Math.floor((worldX + 1) * 0.5 * gridSize.x);
+		const cellY = Math.floor((worldY + 1) * 0.5 * gridSize.y);
 
-			if (isLeftMouseDown && !pressingSpace) {
-				if (activeTool() === ACTIVATE_TOOL.PAINT) {
-					pixel.brush.paint({
-						x: cell.x * BYTES_PER_PIXEL,
-						y: cell.y * BYTES_PER_PIXEL,
-					});
-				}
+		return { x: cellX, y: gridSize.y - 1 - cellY };
+	}
 
-				if (activeTool() === ACTIVATE_TOOL.DELETE) {
-					pixel.brush.erase({
-						x: cell.x * BYTES_PER_PIXEL,
-						y: cell.y * BYTES_PER_PIXEL,
-					});
-				}
+	const onMouseMove = (e: EditorEventType) => {
+		const aspectRatio = viewport.width / viewport.height;
 
-				if (
-					activeTool() === ACTIVATE_TOOL.MOVE_LAYER &&
-					lastMoveLayerCell !== null
-				) {
-					const delta = {
-						x: cell.x - lastMoveLayerCell.x,
-						y: cell.y - lastMoveLayerCell.y,
-					};
+		const gridSize = pixel.projectConfig.getSize();
+		const gridRatio = gridSize.x / gridSize.y;
 
-					if (delta.x !== 0 || delta.y !== 0) {
-						pixel.layer.move(pixel.layer.getActive().id, delta);
-						lastMoveLayerCell = cell;
-					}
-				}
-			}
+		const cell = pickCell(
+			{ x: e.mouse.position.x, y: e.mouse.position.y },
+			{ x: canvas.offsetLeft, y: canvas.offsetTop },
+		);
 
-			if (activeTool() === ACTIVATE_TOOL.PAINT_SELECTION && isLeftMouseDown) {
-				pixel.render.setSelectedCellsSize({ x: cell.x, y: cell.y });
-			}
-		});
+		pixel.render.setCellPos({ x: cell.x, y: cell.y });
 
-		canvas.addEventListener("mousedown", (e) => {
-			const currentTool = activeTool();
+		const isPressingSpace = e.keyboard.isPressingKey("Space");
 
-			const cell = pickCell(
-				{ x: e.clientX, y: e.clientY },
-				{ x: canvas.offsetLeft, y: canvas.offsetTop },
-			);
+		if (isPressingSpace) {
+			const pan = pixel.render.getPan();
+			pixel.render.setPan({
+				x: pan.x + e.mouse.movement.x * aspectRatio,
+				y: pan.y - e.mouse.movement.y / gridRatio,
+			});
+			pan.x += e.mouse.movement.x * aspectRatio;
+		}
 
-			if (currentTool === ACTIVATE_TOOL.PAINT) {
+		if (e.mouse.isLeftButtonDown && !isPressingSpace) {
+			if (activeTool() === ACTIVATE_TOOL.PAINT) {
 				pixel.brush.paint({
 					x: cell.x * BYTES_PER_PIXEL,
 					y: cell.y * BYTES_PER_PIXEL,
 				});
 			}
 
-			if (currentTool === ACTIVATE_TOOL.DELETE) {
+			if (activeTool() === ACTIVATE_TOOL.DELETE) {
 				pixel.brush.erase({
 					x: cell.x * BYTES_PER_PIXEL,
 					y: cell.y * BYTES_PER_PIXEL,
 				});
 			}
 
-			isLeftMouseDown = true;
-
-			if (currentTool === ACTIVATE_TOOL.LINE) {
-				pixel.line.setLineStartPosition(cell);
-			}
-
-			if (currentTool === ACTIVATE_TOOL.PAINT_SELECTION) {
-				const cell = pickCell(
-					{ x: e.clientX, y: e.clientY },
-					{ x: canvas.offsetLeft, y: canvas.offsetTop },
-				);
-
-				pixel.render.setSelectedCellsPosition({ x: cell.x, y: cell.y });
-				pixel.render.setSelectedCellsSize({ x: cell.x, y: cell.y });
-			}
-
-			if (currentTool === ACTIVATE_TOOL.BUCKET_PAINT) {
-				pixel.bucketPaint.paint(cell);
-			}
-
-			if (activeTool() === ACTIVATE_TOOL.EYE_DROPPER) {
-				pixel.eyeDropper.eyeDropAtCell(cell);
-			}
-
-			if (currentTool === ACTIVATE_TOOL.MOVE_LAYER) {
-				lastMoveLayerCell = cell;
-			}
-		});
-
-		canvas.addEventListener("mouseup", (e) => {
-			isLeftMouseDown = false;
-			lastMoveLayerCell = null;
-
-			if (activeTool() === ACTIVATE_TOOL.LINE) {
-				const cell = pickCell(
-					{ x: e.clientX, y: e.clientY },
-					{ x: canvas.offsetLeft, y: canvas.offsetTop },
-				);
-
-				pixel.line.draw(cell);
-				pixel.line.resetLineStartPosition();
-			}
-
-			if (activeTool() === ACTIVATE_TOOL.PAINT_SELECTION) {
-				const selectedCells = pixel.render.getSelectedCellsRect();
-				const selection = {
-					x: Math.min(selectedCells.x, selectedCells.w),
-					y: Math.min(selectedCells.y, selectedCells.h),
-					w: Math.max(selectedCells.x, selectedCells.w),
-					h: Math.max(selectedCells.y, selectedCells.h),
+			if (
+				activeTool() === ACTIVATE_TOOL.MOVE_LAYER &&
+				lastMoveLayerCell !== null
+			) {
+				const delta = {
+					x: cell.x - lastMoveLayerCell.x,
+					y: cell.y - lastMoveLayerCell.y,
 				};
-				for (let x = selection.x; x <= selection.w; x++) {
-					for (let y = selection.y; y <= selection.h; y++) {
-						pixel.brush.paint(
-							{
-								x: x * BYTES_PER_PIXEL,
-								y: y * BYTES_PER_PIXEL,
-							},
-							1,
-						);
-					}
+
+				if (delta.x !== 0 || delta.y !== 0) {
+					pixel.layer.move(pixel.layer.getActive().id, delta);
+					lastMoveLayerCell = cell;
 				}
-
-				pixel.render.setSelectedCellsSize({ x: -1, y: -1 });
-				pixel.render.setSelectedCellsPosition({ x: -1, y: -1 });
 			}
-		});
-
-		window.addEventListener("keydown", (e) => {
-			if (e.code === "Space" && !pressingSpace) {
-				pressingSpace = true;
-			}
-
-			if ((e.ctrlKey || e.metaKey) && e.key === "z") {
-				e.preventDefault();
-				pixel.history.undo();
-			}
-
-			if ((e.ctrlKey || e.metaKey) && e.key === "Z") {
-				e.preventDefault();
-				pixel.history.redo();
-			}
-		});
-
-		window.addEventListener("keyup", (e) => {
-			if (e.code === "Space") {
-				pressingSpace = false;
-				pixel.render.setSelectedCellsSize({ x: -1, y: -1 });
-				pixel.render.setSelectedCellsPosition({ x: -1, y: -1 });
-			}
-		});
-
-		function pickCell(
-			mouse: { x: number; y: number },
-			canvasOffset: { x: number; y: number },
-		) {
-			const zoom = pixel.render.getZoom();
-			const pan = pixel.render.getPan();
-			const gridSize = pixel.projectConfig.getSize();
-			const aspectRatio = viewport.width / viewport.height;
-			const gridRatio = gridSize.x / gridSize.y;
-			const gap = (-viewport.width * aspectRatio) / 2 + viewport.width / 2;
-
-			// 1. screen → clip space (-1..1)
-			const mx =
-				(((mouse.x - canvasOffset.x) * aspectRatio - pan.x + gap) /
-					viewport.width) *
-					2 -
-				1;
-
-			const my =
-				((mouse.y - canvasOffset.y + pan.y * gridRatio) / viewport.height) *
-					-2 +
-				1; // y flips because screen origin is top-left
-
-			// 2. clip space → world space (undo shader transform)
-			const worldX = mx / zoom;
-			const worldY = (my / zoom) * gridRatio;
-
-			// 3. world space (-1..1) → normalized 0..1 → grid index
-			const cellX = Math.floor((worldX + 1) * 0.5 * gridSize.x);
-			const cellY = Math.floor((worldY + 1) * 0.5 * gridSize.y);
-
-			return { x: cellX, y: gridSize.y - 1 - cellY };
 		}
 
-		const wheelHandler = (e: WheelEvent) => {
-			e.preventDefault();
-			const aspectRatio = viewport.width / viewport.height;
-			const pan = pixel.render.getPan();
-			const oldZoom = pixel.render.getZoom();
-			const gridSize = pixel.projectConfig.getSize();
-			const mouseX = e.clientX - viewport.left - viewport.width / 2;
-			const mouseY = -(e.clientY - viewport.top - viewport.height / 2);
-			const delta = normalizeWheelDelta(e);
-			const zoomFactor = Math.exp(-delta * ZOOM_SENSITIVITY);
-			const newZoom = oldZoom * zoomFactor;
+		if (
+			activeTool() === ACTIVATE_TOOL.PAINT_SELECTION &&
+			e.mouse.isLeftButtonDown
+		) {
+			pixel.render.setSelectedCellsSize({ x: cell.x, y: cell.y });
+		}
+	};
 
-			pixel.render.setZoom(newZoom);
+	const onMouseDown = (e: EditorEventType) => {
+		const currentTool = activeTool();
 
-			// Adjust pan so zoom centers on mouse
-			const gridRatio = gridSize.x / gridSize.y;
-			pixel.render.setPan({
-				x: (pan.x - mouseX * aspectRatio) * zoomFactor + mouseX * aspectRatio,
-				y: (pan.y - mouseY / gridRatio) * zoomFactor + mouseY / gridRatio,
+		const cell = pickCell(
+			{ x: e.mouse.position.x, y: e.mouse.position.y },
+			{ x: canvas.offsetLeft, y: canvas.offsetTop },
+		);
+
+		if (currentTool === ACTIVATE_TOOL.PAINT) {
+			pixel.brush.paint({
+				x: cell.x * BYTES_PER_PIXEL,
+				y: cell.y * BYTES_PER_PIXEL,
 			});
-		};
+		}
 
-		canvas.addEventListener("wheel", wheelHandler, { passive: false });
+		if (currentTool === ACTIVATE_TOOL.DELETE) {
+			pixel.brush.erase({
+				x: cell.x * BYTES_PER_PIXEL,
+				y: cell.y * BYTES_PER_PIXEL,
+			});
+		}
+
+		if (currentTool === ACTIVATE_TOOL.LINE) {
+			pixel.line.setLineStartPosition(cell);
+		}
+
+		if (currentTool === ACTIVATE_TOOL.PAINT_SELECTION) {
+			const cell = pickCell(
+				{ x: e.mouse.position.x, y: e.mouse.position.y },
+				{ x: canvas.offsetLeft, y: canvas.offsetTop },
+			);
+
+			pixel.render.setSelectedCellsPosition({ x: cell.x, y: cell.y });
+			pixel.render.setSelectedCellsSize({ x: cell.x, y: cell.y });
+		}
+
+		if (currentTool === ACTIVATE_TOOL.BUCKET_PAINT) {
+			pixel.bucketPaint.paint(cell);
+		}
+
+		if (activeTool() === ACTIVATE_TOOL.EYE_DROPPER) {
+			pixel.eyeDropper.eyeDropAtCell(cell);
+		}
+
+		if (currentTool === ACTIVATE_TOOL.MOVE_LAYER) {
+			lastMoveLayerCell = cell;
+		}
+	};
+
+	const onMouseUp = (e: EditorEventType) => {
+		lastMoveLayerCell = null;
+
+		if (activeTool() === ACTIVATE_TOOL.LINE) {
+			const cell = pickCell(
+				{ x: e.mouse.position.x, y: e.mouse.position.y },
+				{ x: canvas.offsetLeft, y: canvas.offsetTop },
+			);
+
+			pixel.line.draw(cell);
+			pixel.line.resetLineStartPosition();
+		}
+
+		if (activeTool() === ACTIVATE_TOOL.PAINT_SELECTION) {
+			const selectedCells = pixel.render.getSelectedCellsRect();
+			const selection = {
+				x: Math.min(selectedCells.x, selectedCells.w),
+				y: Math.min(selectedCells.y, selectedCells.h),
+				w: Math.max(selectedCells.x, selectedCells.w),
+				h: Math.max(selectedCells.y, selectedCells.h),
+			};
+			for (let x = selection.x; x <= selection.w; x++) {
+				for (let y = selection.y; y <= selection.h; y++) {
+					pixel.brush.paint(
+						{
+							x: x * BYTES_PER_PIXEL,
+							y: y * BYTES_PER_PIXEL,
+						},
+						1,
+					);
+				}
+			}
+
+			pixel.render.setSelectedCellsSize({ x: -1, y: -1 });
+			pixel.render.setSelectedCellsPosition({ x: -1, y: -1 });
+		}
+	};
+
+	const onKeyDown = (e: EditorEventType) => {
+		if (e.keyboard.isPressingCtrl && e.keyboard.isPressingKey("KeyZ")) {
+			pixel.history.undo();
+		}
+
+		if (
+			e.keyboard.isPressingCtrl &&
+			e.keyboard.isPressingShift &&
+			e.keyboard.isPressingKey("KeyZ")
+		) {
+			pixel.history.redo();
+		}
+	};
+
+	const onKeyUp = (e: EditorEventType) => {
+		if (e.keyboard.isPressingKey("Space")) {
+			pixel.render.setSelectedCellsSize({ x: -1, y: -1 });
+			pixel.render.setSelectedCellsPosition({ x: -1, y: -1 });
+		}
+	};
+
+	const onWheel = (e: EditorEventType) => {
+		const aspectRatio = viewport.width / viewport.height;
+		const pan = pixel.render.getPan();
+		const oldZoom = pixel.render.getZoom();
+		const gridSize = pixel.projectConfig.getSize();
+		const mouseX = e.mouse.position.x - viewport.left - viewport.width / 2;
+		const mouseY = -(e.mouse.position.y - viewport.top - viewport.height / 2);
+		const delta = normalizeWheelDelta(e.wheel);
+		const zoomFactor = Math.exp(-delta * ZOOM_SENSITIVITY);
+		const newZoom = oldZoom * zoomFactor;
+
+		pixel.render.setZoom(newZoom);
+
+		// Adjust pan so zoom centers on mouse
+		const gridRatio = gridSize.x / gridSize.y;
+		pixel.render.setPan({
+			x: (pan.x - mouseX * aspectRatio) * zoomFactor + mouseX * aspectRatio,
+			y: (pan.y - mouseY / gridRatio) * zoomFactor + mouseY / gridRatio,
+		});
+	};
+
+	const createEventListeners = () => {
+		eventHandler.subscribe.mouseMove(onMouseMove);
+		eventHandler.subscribe.mouseDown(onMouseDown);
+		eventHandler.subscribe.mouseUp(onMouseUp);
+		eventHandler.subscribe.keyDown(onKeyDown);
+		eventHandler.subscribe.keyUp(onKeyUp);
+		eventHandler.subscribe.mouseWheel(onWheel);
+		eventHandler.startListening();
 	};
 
 	const loop = () => {
 		pixel?.render.draw();
+		eventHandler.tick();
 		requestAnimationFrame(loop);
 	};
 
