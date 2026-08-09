@@ -85,7 +85,7 @@ export const initializeEditor = async () => {
 
 	return {
 		createNewPainter,
-		activeTool: getActiveTool,
+		getActiveTool,
 		setActiveTool,
 		canvas,
 	};

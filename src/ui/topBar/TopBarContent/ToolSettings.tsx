@@ -16,7 +16,7 @@ export const ToolSettings = () => {
 	const menu = useMenu();
 
 	const showThickness = (): boolean => {
-		const activeTool = project?.().activeTool();
+		const activeTool = project?.().getActiveTool();
 
 		return (
 			typeof TOP_BAR_CONFIG.thickness.find((tool) => activeTool === tool) ===
@@ -25,7 +25,7 @@ export const ToolSettings = () => {
 	};
 
 	const showOpacity = (): boolean => {
-		const activeTool = project().activeTool();
+		const activeTool = project().getActiveTool();
 		return (
 			typeof TOP_BAR_CONFIG.opacity.find((tool) => activeTool === tool) ===
 			"number"

@@ -23,8 +23,8 @@ import styles from "./Tools.module.css";
 export const Tools = () => {
 	const project = useEditor();
 
-	const activeTool = createMemo(() => {
-		return project().activeTool();
+	const getActiveTool = createMemo(() => {
+		return project().getActiveTool();
 	});
 
 	const { isActiveTool } = createActiveObjectGuard();
@@ -36,7 +36,7 @@ export const Tools = () => {
 		) {
 			project().canvas.style.cursor = "default";
 		}
-	}, project().activeTool());
+	}, project().getActiveTool());
 
 	return (
 		<div class={styles.tools}>
@@ -63,7 +63,7 @@ export const Tools = () => {
 						project().setActiveTool(ACTIVATE_TOOL.PAINT_SELECTION);
 					}}
 				>
-					{activeTool() === ACTIVATE_TOOL.PAINT_SELECTION ? (
+					{getActiveTool() === ACTIVATE_TOOL.PAINT_SELECTION ? (
 						<BiSolidBrush />
 					) : (
 						<BiRegularBrush />
