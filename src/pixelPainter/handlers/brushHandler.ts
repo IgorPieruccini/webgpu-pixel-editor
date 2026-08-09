@@ -228,6 +228,7 @@ export const createBrushHandler = (
 			}
 		}
 		layerHandler.makeCurrentLayerDirty();
+		clearCurrentPaintedPixels();
 	};
 
 	function getSelectedColor(): number;
