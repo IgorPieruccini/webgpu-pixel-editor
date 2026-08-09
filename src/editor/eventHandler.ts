@@ -159,7 +159,6 @@ export const createEventHandler = (canvas: HTMLCanvasElement) => {
 	};
 
 	const onKeyDown = (e: KeyboardEvent) => {
-		e.preventDefault();
 		isPressingCtrl = e.ctrlKey || e.metaKey;
 		keysDown.add(e.code);
 		isPressingShift = e.code === "ShiftLeft" || e.code === "ShiftRight";
@@ -178,8 +177,6 @@ export const createEventHandler = (canvas: HTMLCanvasElement) => {
 		if (isPressingShift) {
 			isPressingShift = e.code === "ShiftLeft" || e.code === "ShiftRight";
 		}
-
-		tickEvents.onKeyDown = true;
 
 		tickEvents.onKeyUp = true;
 	};
