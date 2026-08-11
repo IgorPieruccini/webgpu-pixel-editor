@@ -32,7 +32,7 @@ const Color = ({ color }: { color: string }) => {
 
 	const isActive = createMemo(() => {
 		const selectedColor = brush().getSelectedColor();
-		return selectedColor === hexToNumber(color);
+		return numberToHex(selectedColor).toLowerCase() === color.toLowerCase();
 	});
 
 	return (

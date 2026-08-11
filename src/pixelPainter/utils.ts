@@ -1,20 +1,23 @@
 import type { RGBA } from "./types";
 
+const RGBA_NUMBER_MARKER = 0x1_0000_0000;
+
 export const uintToRGBA = ([r, g, b, a]: Array<number>): RGBA => {
 	return { r, g, b, a: a / 255 };
 };
 
 export const numberToRGBA = (argb: number): RGBA => {
-	const hasAlpha = argb.toString(16).length > 6;
+	const hasAlpha = argb > 0xffffff;
+	const packed = argb >= RGBA_NUMBER_MARKER ? argb - RGBA_NUMBER_MARKER : argb;
 
 	if (hasAlpha) {
 		return {
 			// low byte is alpha (0-255) -> normalize to 0-1
-			a: (argb & 0xff) / 255,
+			a: (packed & 0xff) / 255,
 			// high bytes are R, G, B
-			r: (argb >>> 24) & 0xff,
-			g: (argb >>> 16) & 0xff,
-			b: (argb >>> 8) & 0xff,
+			r: (packed >>> 24) & 0xff,
+			g: (packed >>> 16) & 0xff,
+			b: (packed >>> 8) & 0xff,
 		};
 	}
 
@@ -42,15 +45,23 @@ export const rgbaToHex = ({ r, g, b, a }: RGBA): string => {
 };
 
 export const numberToHex = (value: number): string => {
-	const unsignedValue = value >>> 0;
+	const hasMarkedAlpha = value >= RGBA_NUMBER_MARKER;
+	const unsignedValue = hasMarkedAlpha
+		? value - RGBA_NUMBER_MARKER
+		: value >>> 0;
 	const rgbValue =
-		unsignedValue > 0xffffff ? unsignedValue >>> 8 : unsignedValue;
+		hasMarkedAlpha || unsignedValue > 0xffffff
+			? unsignedValue >>> 8
+			: unsignedValue;
 
 	return `#${rgbValue.toString(16).padStart(6, "0").slice(-6)}`;
 };
 
 export const hexToNumber = (hex: string): number => {
-	return Number.parseInt(hex.replace(/^#/, ""), 16) >>> 0;
+	const digits = hex.replace(/^#/, "");
+	const value = Number.parseInt(digits, 16) >>> 0;
+
+	return digits.length === 8 ? RGBA_NUMBER_MARKER + value : value;
 };
 
 export const alphaComposite = (src: RGBA, dst: RGBA) => {

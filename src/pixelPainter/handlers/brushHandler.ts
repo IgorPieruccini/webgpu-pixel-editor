@@ -3,7 +3,13 @@ import { BYTES_PER_PIXEL } from "../../constants";
 import { debounce } from "../../utils";
 import { getPixelAtLocal, setPixelAtLocal } from "../tiledLayer";
 import type { Vec2 } from "../types";
-import { alphaComposite, hexToNumber, numberToRGBA, rgbaToHex } from "../utils";
+import {
+	alphaComposite,
+	hexToNumber,
+	numberToHex,
+	numberToRGBA,
+	rgbaToHex,
+} from "../utils";
 import type { ColorPaletteHandler } from "./colorPaletteHandler";
 import type { HistoryChangeHandler } from "./historyChangeHandler";
 import type { LayerHandler } from "./layerHandler";
@@ -42,7 +48,7 @@ export const createBrushHandler = (
 
 		// Keep packed colors unsigned; values with a red byte >= 0x80
 		// otherwise become negative when used in bitwise operations.
-		_setSelectedColor(color >>> 0);
+		_setSelectedColor(color > 0xffff_ffff ? color : color >>> 0);
 	};
 
 	const getColor = (pos: Vec2, format: "number" | "string" = "number") => {
@@ -233,7 +239,10 @@ export const createBrushHandler = (
 	function getSelectedColor(format: "string"): string;
 	function getSelectedColor(format: "number" | "string" = "number") {
 		if (format === "string") {
-			return `#${_getSelectedColor().toString(16).padStart(6, "0")}`;
+			const color = _getSelectedColor();
+			return color > 0xffffff
+				? rgbaToHex(numberToRGBA(color))
+				: numberToHex(color);
 		}
 
 		return _getSelectedColor();
