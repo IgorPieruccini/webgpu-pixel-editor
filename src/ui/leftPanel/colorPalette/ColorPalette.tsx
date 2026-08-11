@@ -32,7 +32,7 @@ const Color = ({ color }: { color: string }) => {
 
 	const isActive = createMemo(() => {
 		const selectedColor = brush().getSelectedColor();
-		return selectedColor === hexToNumber(color);
+		return numberToHex(selectedColor).toLowerCase() === color.toLowerCase();
 	});
 
 	return (
@@ -64,7 +64,8 @@ export const ColorPalette = () => {
 
 	const onAddColor = () => {
 		const color = brush().getSelectedColor();
-		colorPalette().addColor(numberToHex(color));
+		const hex = numberToHex(color);
+		colorPalette().addColor(hex);
 	};
 
 	const onDragEnd = (event: DragEvent) => {

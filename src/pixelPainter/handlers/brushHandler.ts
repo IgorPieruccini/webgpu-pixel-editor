@@ -3,7 +3,13 @@ import { BYTES_PER_PIXEL } from "../../constants";
 import { debounce } from "../../utils";
 import { getPixelAtLocal, setPixelAtLocal } from "../tiledLayer";
 import type { Vec2 } from "../types";
-import { alphaComposite, numberToRGBA, rgbaToHex } from "../utils";
+import {
+	alphaComposite,
+	hexToNumber,
+	numberToHex,
+	numberToRGBA,
+	rgbaToHex,
+} from "../utils";
 import type { ColorPaletteHandler } from "./colorPaletteHandler";
 import type { HistoryChangeHandler } from "./historyChangeHandler";
 import type { LayerHandler } from "./layerHandler";
@@ -38,14 +44,11 @@ export const createBrushHandler = (
 	};
 
 	const setColor = (_color: number | string) => {
-		if (typeof _color === "string") {
-			const hex = parseInt(_color.replace("#", ""), 16);
-			_setSelectedColor(hex);
-		}
+		const color = typeof _color === "string" ? hexToNumber(_color) : _color;
 
-		if (typeof _color === "number") {
-			_setSelectedColor(_color);
-		}
+		// Keep packed colors unsigned; values with a red byte >= 0x80
+		// otherwise become negative when used in bitwise operations.
+		_setSelectedColor(color > 0xffff_ffff ? color : color >>> 0);
 	};
 
 	const getColor = (pos: Vec2, format: "number" | "string" = "number") => {
@@ -92,7 +95,7 @@ export const createBrushHandler = (
 
 		const blendedRGBA = alphaComposite(sourceRGBA, destRGBA);
 
-		const rgba = rgbaToHex(blendedRGBA);
+		const rgba = hexToNumber(rgbaToHex(blendedRGBA));
 
 		const r = (rgba >>> 24) & 0xff;
 		const g = (rgba >>> 16) & 0xff;
@@ -216,7 +219,7 @@ export const createBrushHandler = (
 						continue;
 					}
 
-					const blendedHex = rgbaToHex(resultRGBA);
+					const blendedHex = hexToNumber(rgbaToHex(resultRGBA));
 					setPixelAtLocal(currentBuffer, localX, localY, {
 						r: (blendedHex >>> 24) & 0xff,
 						g: (blendedHex >>> 16) & 0xff,
@@ -236,7 +239,10 @@ export const createBrushHandler = (
 	function getSelectedColor(format: "string"): string;
 	function getSelectedColor(format: "number" | "string" = "number") {
 		if (format === "string") {
-			return `#${_getSelectedColor().toString(16).padStart(6, "0")}`;
+			const color = _getSelectedColor();
+			return color > 0xffffff
+				? rgbaToHex(numberToRGBA(color))
+				: numberToHex(color);
 		}
 
 		return _getSelectedColor();
