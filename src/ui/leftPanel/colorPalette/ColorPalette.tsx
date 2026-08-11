@@ -64,7 +64,8 @@ export const ColorPalette = () => {
 
 	const onAddColor = () => {
 		const color = brush().getSelectedColor();
-		colorPalette().addColor(numberToHex(color));
+		const hex = numberToHex(color);
+		colorPalette().addColor(hex);
 	};
 
 	const onDragEnd = (event: DragEvent) => {
