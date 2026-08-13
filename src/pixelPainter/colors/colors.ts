@@ -33,7 +33,7 @@ const hexToNumber = (hex: HEX): number => {
 };
 
 const numberToHex = (value: number): HEX => {
-	return `#${value.toString(16).toUpperCase()}`;
+	return `#${value.toString(16).padStart(8, "0").toUpperCase()}`;
 };
 
 /** ____ END OF CONVERSION METHODS ____ */
