@@ -1,5 +1,5 @@
+import { createColor } from "../colors/colors";
 import type { Vec2 } from "../types";
-import { numberToRGBA } from ".././utils";
 import type { ProjectConfigHandler } from "./projectConfigHandler";
 
 export type UniformBufferHandler = ReturnType<
@@ -91,17 +91,13 @@ export const createUniformBufferHandler = (
 		selectionToolEnabled = value;
 	};
 
-	const updateSelectedColor = (color: number | string) => {
-		const normalizedColor =
-			typeof color === "string" ? parseInt(color.replace("#", ""), 16) : color;
-		const rgba = numberToRGBA(normalizedColor);
+	const updateSelectedColor = (color: number) => {
+		const colorCreator = createColor(color);
+		const rgba = colorCreator.getARGB();
 		uiUniforms[8] = rgba.r / 255;
 		uiUniforms[9] = rgba.g / 255;
 		uiUniforms[10] = rgba.b / 255;
-	};
-
-	const updateBrushOpacity = (opacity: number) => {
-		uiUniforms[11] = opacity / 100;
+		uiUniforms[11] = rgba.a / 255;
 	};
 
 	const setLineStartPosition = (cell: Vec2) => {
@@ -153,7 +149,6 @@ export const createUniformBufferHandler = (
 		updateBrushThickness,
 		setSelectionTool,
 		updateSelectedColor,
-		updateBrushOpacity,
 		isSelectionToolEnabled: () => selectionToolEnabled,
 		setLineStartPosition,
 		resetStartLinePosition,

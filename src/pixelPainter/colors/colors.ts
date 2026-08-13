@@ -10,7 +10,7 @@ const RGBAToNumber = (argb: RGBA): number => {
 	const _r = (r & 0xff) << 24;
 	const _g = (g & 0xff) << 16;
 	const _b = (b & 0xff) << 8;
-	const _a = (a & 0xff) * 0xff;
+	const _a = a & 0xff;
 
 	return (_r | _g | _b | _a) >>> 0;
 };
@@ -19,7 +19,7 @@ const numberToRGBA = (value: number): RGBA => {
 	const r = (value >>> 24) & 0xff;
 	const g = (value >>> 16) & 0xff;
 	const b = (value >>> 8) & 0xff;
-	const a = (value & 0xff) / 0xff;
+	const a = value & 0xff;
 
 	return { a, r, g, b };
 };
@@ -82,6 +82,32 @@ export const createColor = (color: Color) => {
 		colorValue = RGBAToNumber(color);
 	};
 
+	const alphaComposite = (dst: RGBA) => {
+		const src = getARGB();
+		const srcA = src.a / 255;
+		const dstA = dst.a / 255;
+
+		if (srcA === 0) {
+			return { ...dst };
+		}
+
+		if (srcA === 1) {
+			return { ...src };
+		}
+
+		const outA = srcA + dstA * (1 - srcA);
+
+		if (outA === 0) {
+			return { r: 0, g: 0, b: 0, a: 0 };
+		}
+
+		const outR = (src.r * srcA + dst.r * dstA * (1 - srcA)) / outA;
+		const outG = (src.g * srcA + dst.g * dstA * (1 - srcA)) / outA;
+		const outB = (src.b * srcA + dst.b * dstA * (1 - srcA)) / outA;
+
+		return { r: outR, g: outG, b: outB, a: outA * 255 };
+	};
+
 	/** ----- END OF THE EXPOSED METHODS ----- */
 
 	// Set the initial color value based on the provided color
@@ -92,5 +118,6 @@ export const createColor = (color: Color) => {
 		getColor,
 		getARGB,
 		getHex,
+		alphaComposite,
 	};
 };

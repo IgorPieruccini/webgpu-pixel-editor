@@ -1,8 +1,9 @@
 import { storageLocal } from "../../storageLocal";
 import { calculateZoomFromGridAndCanvasSize, debounce } from "../../utils";
+import { createColor } from "../colors/colors";
 import type { LayerPreviewHandler } from "../layerPreview";
 import type { TiledLayerBuffer } from "../tiledLayer";
-import type { Layers, Vec2 } from "../types";
+import type { Layers, RGBA, Vec2 } from "../types";
 import type { BrushHandler } from "./brushHandler";
 import type { HistoryChangeHandler } from "./historyChangeHandler";
 import type { LayerHandler } from "./layerHandler";
@@ -59,14 +60,18 @@ export const createMiddlewareHandler = (
 		uniformBufferHandler.updateBrushThickness(value);
 	};
 
-	const setBrushColor = (color: number | string) => {
+	const setBrushColor = (color: number | string | RGBA) => {
 		brushHandler.setColor(color);
 		uniformBufferHandler.updateSelectedColor(brushHandler.getSelectedColor());
 	};
 
 	const setBrushOpacity = (opacity: number) => {
-		brushHandler.setOpacity(opacity);
-		uniformBufferHandler.updateBrushOpacity(brushHandler.getOpacity());
+		const color = brushHandler.getSelectedColor();
+		const colorCreator = createColor(color);
+		const rgba = colorCreator.getARGB();
+		const newrgba = { r: rgba.r, g: rgba.g, b: rgba.b, a: opacity };
+		brushHandler.setColor(newrgba);
+		uniformBufferHandler.updateSelectedColor(brushHandler.getSelectedColor());
 	};
 
 	const setOpacity = (

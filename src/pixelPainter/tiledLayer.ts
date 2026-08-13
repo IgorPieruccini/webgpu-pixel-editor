@@ -125,12 +125,14 @@ export const getPixelAtLocal = (
 	const tileOffsetY = getLocalOffset(localY, buffer.tileSize);
 	const index = getTileIndex(tileOffsetX, tileOffsetY, buffer.tileSize);
 
-	return {
+	const rgba = {
 		r: tile[index + RGBA_OFFSET.RED],
 		g: tile[index + RGBA_OFFSET.GREEN],
 		b: tile[index + RGBA_OFFSET.BLUE],
 		a: tile[index + RGBA_OFFSET.ALPHA],
 	};
+
+	return rgba;
 };
 
 export const setPixelAtLocal = (

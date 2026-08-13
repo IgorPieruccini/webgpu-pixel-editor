@@ -1,13 +1,21 @@
 import type { createTiledLayerBuffer } from "./tiledLayer";
-import type { PixelPainterMethods } from "./types";
+import type { PixelPainterMethods, RGBA } from "./types";
 
 function getSelectedColor(): number;
 function getSelectedColor(format: "number"): number;
+function getSelectedColor(format: "rgba"): RGBA;
 function getSelectedColor(format: "string"): string;
 function getSelectedColor(
-	format: "number" | "string" = "number",
-): number | string {
-	return format === "string" ? "#000000" : 0;
+	format: "number" | "string" | "rgba" = "number",
+): number | string | RGBA {
+	if (format === "string") {
+		return "#ffffffff";
+	}
+
+	if (format === "rgba") {
+		return { r: 255, g: 255, b: 244, a: 1 };
+	}
+	return 0xffffffff;
 }
 
 export const INITIAL_PIXEL_PAINTER: PixelPainterMethods = {
@@ -38,7 +46,6 @@ export const INITIAL_PIXEL_PAINTER: PixelPainterMethods = {
 	},
 	brush: {
 		setColor: () => {},
-		getColor: () => 0,
 		paint: () => false,
 		erase: () => {},
 		getOpacity: () => 1,

@@ -1,7 +1,7 @@
 import { BYTES_PER_PIXEL } from "../../../constants";
+import { createColor } from "../../colors/colors";
 import { getPixelAtLocal, setPixelAtLocal } from "../../tiledLayer";
 import type { Vec2 } from "../../types";
-import { numberToRGBA } from "../../utils";
 import type { BrushHandler } from "../brushHandler";
 import type { HistoryChangeHandler } from "../historyChangeHandler";
 import type { LayerHandler } from "../layerHandler";
@@ -33,7 +33,8 @@ export const createBucketPaintHandler = (
 		const targetColor = [target.r, target.g, target.b, target.a];
 
 		const currentColor = brushHandler.getSelectedColor();
-		const { r, g, b, a } = numberToRGBA(currentColor);
+		const colorCreator = createColor(currentColor);
+		const { r, g, b, a } = colorCreator.getARGB();
 
 		if (
 			targetColor[0] === r &&

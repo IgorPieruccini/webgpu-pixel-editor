@@ -4,13 +4,6 @@ import { debounce } from "../../utils";
 import { createColor } from "../colors/colors";
 import { getPixelAtLocal, setPixelAtLocal } from "../tiledLayer";
 import type { RGBA, Vec2 } from "../types";
-import {
-	alphaComposite,
-	hexToNumber,
-	numberToHex,
-	numberToRGBA,
-	rgbaToHex,
-} from "../utils";
 import type { ColorPaletteHandler } from "./colorPaletteHandler";
 import type { HistoryChangeHandler } from "./historyChangeHandler";
 import type { LayerHandler } from "./layerHandler";
@@ -35,11 +28,10 @@ export const createBrushHandler = (
 		}
 	}, 100);
 
-	const color = createColor(0x00000000);
+	const colorCreator = createColor(0x000000ff);
 
 	// Default color: magenta RGB (0xff00ff), will be converted to ABGR when set
-	const [_getSelectedColor, _setSelectedColor] = createSignal(0x000000);
-	const [getOpacity, setOpacity] = createSignal(100);
+	const [_getSelectedColor, _setSelectedColor] = createSignal(0x000000ff);
 	const [getThickness, setThickness] = createSignal(1);
 
 	const clearCurrentPaintedPixels = () => {
@@ -47,28 +39,14 @@ export const createBrushHandler = (
 	};
 
 	const setColor = (_color: number | string | RGBA) => {
-		color.setColor(_color);
-		_setSelectedColor(color.getColor());
+		colorCreator.setColor(_color);
+		_setSelectedColor(colorCreator.getColor());
 	};
 
-	const getColor = (pos: Vec2, format: "number" | "string" = "number") => {
-		const currentLayer = layerHandler.getActive();
-		const buffer = layerHandler.getBufferById(currentLayer.id);
-		if (!buffer) {
-			throw new Error(`Buffer for layer ${currentLayer.id} not found`);
-		}
-
-		const color = getPixelAtLocal(
-			buffer,
-			pos.x - currentLayer.offset.x,
-			pos.y - currentLayer.offset.y,
-		);
-
-		const packed = (color.r << 24) | (color.g << 16) | (color.b << 8) | color.a;
-		if (format === "string") {
-			return `#${(packed >>> 8).toString(16).padStart(6, "0")}`;
-		}
-		return packed >>> 0;
+	const getOpacity = () => {
+		const colorCreator = createColor(_getSelectedColor());
+		const rgba = colorCreator.getARGB();
+		return rgba.a;
 	};
 
 	const composeColors = (worldPos: Vec2) => {
@@ -83,26 +61,11 @@ export const createBrushHandler = (
 		const localY = worldPos.y - currentLayer.offset.y;
 		const destColor = getPixelAtLocal(currentBuffer, localX, localY);
 
-		const destRGBA = {
-			r: destColor.r,
-			g: destColor.g,
-			b: destColor.b,
-			a: destColor.a / 255,
-		};
+		const colorCreator = createColor(_getSelectedColor());
+		const blendedRGBA = colorCreator.alphaComposite(destColor);
+		// const blendedRGBA = alphaComposite(sourceRGBA, destColor);
 
-		const sourceRGBA = numberToRGBA(_getSelectedColor());
-		sourceRGBA.a = getOpacity() / 100;
-
-		const blendedRGBA = alphaComposite(sourceRGBA, destRGBA);
-
-		const rgba = hexToNumber(rgbaToHex(blendedRGBA));
-
-		const r = (rgba >>> 24) & 0xff;
-		const g = (rgba >>> 16) & 0xff;
-		const b = (rgba >>> 8) & 0xff;
-		const a = rgba & 0xff;
-
-		setPixelAtLocal(currentBuffer, localX, localY, { r, g, b, a });
+		setPixelAtLocal(currentBuffer, localX, localY, blendedRGBA);
 		currentPaintedPixels.add(
 			(worldPos.y * gridSize.x + worldPos.x) * BYTES_PER_PIXEL,
 		);
@@ -205,7 +168,7 @@ export const createBrushHandler = (
 						continue;
 					}
 
-					const opacity = destRGBA.a - Math.fround(getOpacity() / 100);
+					const opacity = destRGBA.a - getOpacity();
 					const resultRGBA = { ...destRGBA, a: opacity >= 0 ? opacity : 0 };
 
 					if (resultRGBA.a === 0) {
@@ -219,13 +182,7 @@ export const createBrushHandler = (
 						continue;
 					}
 
-					const blendedHex = hexToNumber(rgbaToHex(resultRGBA));
-					setPixelAtLocal(currentBuffer, localX, localY, {
-						r: (blendedHex >>> 24) & 0xff,
-						g: (blendedHex >>> 16) & 0xff,
-						b: (blendedHex >>> 8) & 0xff,
-						a: blendedHex & 0xff,
-					});
+					setPixelAtLocal(currentBuffer, localX, localY, resultRGBA);
 					currentPaintedPixels.add(index);
 				}
 			}
@@ -237,24 +194,27 @@ export const createBrushHandler = (
 	function getSelectedColor(): number;
 	function getSelectedColor(format: "number"): number;
 	function getSelectedColor(format: "string"): string;
-	function getSelectedColor(format: "number" | "string" = "number") {
+	function getSelectedColor(format: "rgba"): RGBA;
+	function getSelectedColor(format: "number" | "string" | "rgba" = "number") {
+		const color = _getSelectedColor();
+		const colorCreator = createColor(color);
+
 		if (format === "string") {
-			const color = _getSelectedColor();
-			return color > 0xffffff
-				? rgbaToHex(numberToRGBA(color))
-				: numberToHex(color);
+			return colorCreator.getHex();
 		}
 
-		return _getSelectedColor();
+		if (format === "rgba") {
+			return colorCreator.getARGB();
+		}
+
+		return colorCreator.getColor();
 	}
 
 	return {
 		setColor,
-		getColor,
 		paint,
 		erase,
 		getOpacity,
-		setOpacity,
 		getSelectedColor,
 		getThickness,
 		setThickness,

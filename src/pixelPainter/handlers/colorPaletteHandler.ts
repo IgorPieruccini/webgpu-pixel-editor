@@ -8,7 +8,12 @@ import type { LayerHandler } from "./layerHandler";
 
 export type ColorPaletteHandler = ReturnType<typeof createColorPaletteHandler>;
 
-const DEFAULT_PALETTE: string[] = ["#D17428", "#28D1D1", "#3F5A8A", "#AD1D41"];
+const DEFAULT_PALETTE: string[] = [
+	"#D17428FF",
+	"#28D1D1FF",
+	"#3F5A8AFF",
+	"#AD1D41FF",
+];
 
 export const createColorPaletteHandler = (layerHandler: LayerHandler) => {
 	const [getIsLoading, setIsLoading] = createSignal(false);

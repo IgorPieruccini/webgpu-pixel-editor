@@ -1,19 +1,29 @@
 import { type ColorResult, SketchPicker } from "solid-color";
 import { createMemo } from "solid-js";
-import { numberToRGBA } from "../../pixelPainter/utils";
+import { createColor } from "../../pixelPainter/colors/colors";
 import { API } from "../../projectConfig/projectConfigProvider";
 import styles from "./ColorPicker.module.css";
 
 export const ColorPicker = () => {
 	const brush = API.brush();
 	const onChange = (color: ColorResult) => {
-		brush().setColor(color.hex);
+		const rgba = {
+			...color.rgb,
+			a: color.rgb.a ? color.rgb.a * 255 : 255,
+		};
+		brush().setColor(rgba);
 	};
 
 	const selectedColor = createMemo(() => {
 		const color = brush().getSelectedColor();
-		const rgba = numberToRGBA(color);
-		return rgba;
+		const colorCreator = createColor(color);
+		const rgba = colorCreator.getARGB();
+		return {
+			r: rgba.r,
+			g: rgba.g,
+			b: rgba.b,
+			a: rgba.a / 255,
+		};
 	});
 
 	return (

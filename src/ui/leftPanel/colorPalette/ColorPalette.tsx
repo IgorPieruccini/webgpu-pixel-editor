@@ -10,7 +10,7 @@ import {
 import { AiOutlineDelete, AiOutlinePlus } from "solid-icons/ai";
 import { createMemo, For } from "solid-js";
 import { API } from "../../../lib";
-import { hexToNumber, numberToHex } from "../../../pixelPainter/utils";
+import { createColor } from "../../../pixelPainter/colors/colors";
 import { SquareButton } from "../../shared/squareButton";
 import styles from "./colorPalette.module.css";
 
@@ -27,12 +27,13 @@ const Color = ({ color }: { color: string }) => {
 	};
 
 	const onColorClick = () => {
-		brush().setColor(hexToNumber(color));
+		brush().setColor(color);
 	};
 
 	const isActive = createMemo(() => {
 		const selectedColor = brush().getSelectedColor();
-		return numberToHex(selectedColor).toLowerCase() === color.toLowerCase();
+		const colorCreator = createColor(selectedColor);
+		return colorCreator.getHex() === color.toUpperCase();
 	});
 
 	return (
@@ -64,8 +65,8 @@ export const ColorPalette = () => {
 
 	const onAddColor = () => {
 		const color = brush().getSelectedColor();
-		const hex = numberToHex(color);
-		colorPalette().addColor(hex);
+		const colorCreator = createColor(color);
+		colorPalette().addColor(colorCreator.getHex());
 	};
 
 	const onDragEnd = (event: DragEvent) => {

@@ -126,7 +126,6 @@ export const pixelPainter = async (
 		},
 		brush: {
 			setColor: middlewareHandler.setBrushColor,
-			getColor: brushHandler.getColor,
 			paint: brushHandler.paint,
 			erase: brushHandler.erase,
 			getOpacity: brushHandler.getOpacity,
