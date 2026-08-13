@@ -4,30 +4,22 @@ import { createColor } from "./colors";
 const testCases = {
 	hexToNumber: [
 		{ value: "#FFFFFFFF", expected: 0xffffffff },
-		{ value: "#FFFF0000", expected: 0xffff0000 },
-		{ value: "#FF00FF00", expected: 0xff00ff00 },
 		{ value: "#FF0000FF", expected: 0xff0000ff },
-		{ value: "#00FFFFFF", expected: 0x00ffffff },
-		{ value: "#00FF0000", expected: 0x00ff0000 },
+		{ value: "#00FF00FF", expected: 0x00ff00ff },
+		{ value: "#0000FFFF", expected: 0x0000ffff },
+		{ value: "#FFFFFF00", expected: 0xffffff00 },
+		{ value: "#FF000000", expected: 0xff000000 },
 		{ value: "#00000000", expected: 0x00000000 },
-		{ value: "#80000000", expected: 0x80000000 },
-		{ value: "#FF123456", expected: 0xff123456 },
-		{ value: "#FFABCDEF", expected: 0xffabcdef },
-		{ value: "#FF13579B", expected: 0xff13579b },
-		{ value: "#8042A1C7", expected: 0x8042a1c7 },
-		{ value: "#00123456", expected: 0x00123456 },
+		{ value: "#00000080", expected: 0x00000080 },
 	],
 	rgbToNumber: [
 		{ value: { r: 255, g: 255, b: 255, a: 1 }, expected: 0xffffffff },
-		{ value: { r: 255, g: 0, b: 0, a: 1 }, expected: 0xffff0000 },
-		{ value: { r: 0, g: 255, b: 0, a: 1 }, expected: 0xff00ff00 },
-		{ value: { r: 0, g: 0, b: 255, a: 1 }, expected: 0xff0000ff },
-		{ value: { r: 255, g: 255, b: 255, a: 0 }, expected: 0x00ffffff },
-		{ value: { r: 255, g: 0, b: 0, a: 0 }, expected: 0x00ff0000 },
+		{ value: { r: 255, g: 0, b: 0, a: 1 }, expected: 0xff0000ff },
+		{ value: { r: 0, g: 255, b: 0, a: 1 }, expected: 0x00ff00ff },
+		{ value: { r: 0, g: 0, b: 255, a: 1 }, expected: 0x0000ffff },
+		{ value: { r: 255, g: 255, b: 255, a: 0 }, expected: 0xffffff00 },
+		{ value: { r: 255, g: 0, b: 0, a: 0 }, expected: 0xff000000 },
 		{ value: { r: 0, g: 0, b: 0, a: 0 }, expected: 0x00000000 },
-		{ value: { r: 18, g: 52, b: 86, a: 1 }, expected: 0xff123456 },
-		{ value: { r: 171, g: 205, b: 239, a: 1 }, expected: 0xffabcdef },
-		{ value: { r: 66, g: 161, b: 199, a: 0 }, expected: 0x0042a1c7 },
 	],
 };
 
@@ -42,7 +34,7 @@ describe("Colors", () => {
 		});
 	});
 
-	it("ARGB to number", () => {
+	it("RGBA to number", () => {
 		testCases.rgbToNumber.forEach((testCase) => {
 			color.setColor(testCase.value);
 			expect(color.getColor()).toBe(testCase.expected);

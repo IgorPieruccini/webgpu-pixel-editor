@@ -1,25 +1,25 @@
-type ARGB = { a: number; r: number; g: number; b: number };
+type RGBA = { a: number; r: number; g: number; b: number };
 /** Expected format: #AARRGGBB */
 type HEX = string;
-type Color = number | HEX | ARGB;
+type Color = number | HEX | RGBA;
 
 /** ---- START OF CONVERSION METHODS ---- */
-const ARGBToNumber = (argb: ARGB): number => {
+const RGBAToNumber = (argb: RGBA): number => {
 	const { a, r, g, b } = argb;
 
-	const _a = ((a & 0xff) << 24) * 0xff;
-	const _r = (r & 0xff) << 16;
-	const _g = (g & 0xff) << 8;
-	const _b = b & 0xff;
+	const _r = (r & 0xff) << 24;
+	const _g = (g & 0xff) << 16;
+	const _b = (b & 0xff) << 8;
+	const _a = (a & 0xff) * 0xff;
 
-	return (_a | _r | _g | _b) >>> 0;
+	return (_r | _g | _b | _a) >>> 0;
 };
 
-const numberToARGB = (value: number): ARGB => {
-	const a = ((value >>> 24) & 0xff) / 0xff;
-	const r = (value >>> 16) & 0xff;
-	const g = (value >>> 8) & 0xff;
-	const b = value & 0xff;
+const numberToRGBA = (value: number): RGBA => {
+	const r = (value >>> 24) & 0xff;
+	const g = (value >>> 16) & 0xff;
+	const b = (value >>> 8) & 0xff;
+	const a = (value & 0xff) / 0xff;
 
 	return { a, r, g, b };
 };
@@ -40,7 +40,7 @@ const numberToHex = (value: number): HEX => {
 
 export const createColor = (color: Color) => {
 	// The color is saved only in number format
-	let colorValue: number = 0xff00000000;
+	let colorValue: number = 0x000000ff;
 
 	/** ----- START OF THE EXPOSED METHODS ----- */
 
@@ -55,7 +55,7 @@ export const createColor = (color: Color) => {
 	 * Get the color in ARGB format
 	 */
 	const getARGB = () => {
-		return numberToARGB(colorValue);
+		return numberToRGBA(colorValue);
 	};
 
 	/**
@@ -79,7 +79,7 @@ export const createColor = (color: Color) => {
 			return;
 		}
 
-		colorValue = ARGBToNumber(color);
+		colorValue = RGBAToNumber(color);
 	};
 
 	/** ----- END OF THE EXPOSED METHODS ----- */

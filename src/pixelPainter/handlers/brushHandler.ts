@@ -1,8 +1,9 @@
 import { createSignal } from "solid-js";
 import { BYTES_PER_PIXEL } from "../../constants";
 import { debounce } from "../../utils";
+import { createColor } from "../colors/colors";
 import { getPixelAtLocal, setPixelAtLocal } from "../tiledLayer";
-import type { Vec2 } from "../types";
+import type { RGBA, Vec2 } from "../types";
 import {
 	alphaComposite,
 	hexToNumber,
@@ -34,6 +35,8 @@ export const createBrushHandler = (
 		}
 	}, 100);
 
+	const color = createColor(0x00000000);
+
 	// Default color: magenta RGB (0xff00ff), will be converted to ABGR when set
 	const [_getSelectedColor, _setSelectedColor] = createSignal(0x000000);
 	const [getOpacity, setOpacity] = createSignal(100);
@@ -43,12 +46,9 @@ export const createBrushHandler = (
 		currentPaintedPixels.clear();
 	};
 
-	const setColor = (_color: number | string) => {
-		const color = typeof _color === "string" ? hexToNumber(_color) : _color;
-
-		// Keep packed colors unsigned; values with a red byte >= 0x80
-		// otherwise become negative when used in bitwise operations.
-		_setSelectedColor(color > 0xffff_ffff ? color : color >>> 0);
+	const setColor = (_color: number | string | RGBA) => {
+		color.setColor(_color);
+		_setSelectedColor(color.getColor());
 	};
 
 	const getColor = (pos: Vec2, format: "number" | "string" = "number") => {
