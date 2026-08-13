@@ -4,11 +4,10 @@ type HEX = string;
 type Color = number | HEX | ARGB;
 
 /** ---- START OF CONVERSION METHODS ---- */
-
 const ARGBToNumber = (argb: ARGB): number => {
 	const { a, r, g, b } = argb;
 
-	const _a = (a & 0xff) << 24;
+	const _a = ((a & 0xff) << 24) * 0xff;
 	const _r = (r & 0xff) << 16;
 	const _g = (g & 0xff) << 8;
 	const _b = b & 0xff;
@@ -17,7 +16,7 @@ const ARGBToNumber = (argb: ARGB): number => {
 };
 
 const numberToARGB = (value: number): ARGB => {
-	const a = (value >>> 24) & 0xff;
+	const a = ((value >>> 24) & 0xff) / 0xff;
 	const r = (value >>> 16) & 0xff;
 	const g = (value >>> 8) & 0xff;
 	const b = value & 0xff;
@@ -76,7 +75,7 @@ export const createColor = (color: Color) => {
 		}
 
 		if (typeof color === "string") {
-			hexToNumber(color);
+			colorValue = hexToNumber(color);
 			return;
 		}
 
