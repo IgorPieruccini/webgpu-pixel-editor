@@ -26,7 +26,7 @@ export const createBrushHandler = (
 			colorPalette.calculateColorPalette();
 			clearCurrentPaintedPixels();
 		}
-	}, 100);
+	}, 200);
 
 	const colorCreator = createColor(0x000000ff);
 
@@ -63,7 +63,6 @@ export const createBrushHandler = (
 
 		const colorCreator = createColor(_getSelectedColor());
 		const blendedRGBA = colorCreator.alphaComposite(destColor);
-		// const blendedRGBA = alphaComposite(sourceRGBA, destColor);
 
 		setPixelAtLocal(currentBuffer, localX, localY, blendedRGBA);
 		currentPaintedPixels.add(
