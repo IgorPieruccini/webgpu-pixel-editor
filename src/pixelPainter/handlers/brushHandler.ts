@@ -161,7 +161,7 @@ export const createBrushHandler = (
 						r: destColor.r,
 						g: destColor.g,
 						b: destColor.b,
-						a: destColor.a / 255,
+						a: destColor.a,
 					};
 
 					if (destRGBA.a === 0) {
@@ -188,7 +188,7 @@ export const createBrushHandler = (
 			}
 		}
 		layerHandler.makeCurrentLayerDirty();
-		clearCurrentPaintedPixels();
+		debounceFinishPainting();
 	};
 
 	function getSelectedColor(): number;
