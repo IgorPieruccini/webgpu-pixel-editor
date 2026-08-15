@@ -1,11 +1,11 @@
 import { createSignal } from "solid-js";
 import { INITIAL_PIXEL_PAINTER } from "../pixelPainter/constants";
+import type { EventHandler } from "../pixelPainter/handlers/eventHandler";
 import { pixelPainter } from "../pixelPainter/pixelPainter";
 import type { PixelPainterMethods, Vec2 } from "../pixelPainter/types";
 import { calculateZoomFromGridAndCanvasSize } from "../utils";
 import { ACTIVATE_TOOL } from "./constant";
 import { createEditorEvents } from "./createEditorEvents";
-import { createEventHandler } from "./eventHandler";
 
 export type EditorType = Awaited<ReturnType<typeof initializeEditor>>;
 
@@ -46,6 +46,18 @@ export const initializeEditor = async () => {
 			y: canvas.clientHeight,
 		});
 
+		// if the project is already open, return the existing pixel painter instance
+		// TODO: instead of checking for project name, we should check for project ID, but first we need to support it
+		if (pixel && pixel.projectConfig.getProjectName() === name) {
+			return pixel;
+		}
+
+		if (pixel) {
+			// Stop listening and unsubscribe all events before creating new ones to avoid duplicate event handling
+			pixel.eventHandler.stopListening();
+			pixel.eventHandler.unsubscribeAll();
+		}
+
 		pixel = await pixelPainter(
 			name,
 			initialGridSize,
@@ -57,18 +69,12 @@ export const initializeEditor = async () => {
 		);
 
 		pixel.render.setZoom(zoom - zoom * 0.3);
-		createEventListeners();
+		createEventListeners(pixel.eventHandler);
 
 		return pixel;
 	};
 
-	const eventHandler = createEventHandler(canvas);
-
-	const createEventListeners = () => {
-		// Stop listening and unsubscribe all events before creating new ones to avoid duplicate event handling
-		eventHandler.stopListening();
-		eventHandler.unsubscribeAll();
-
+	const createEventListeners = (eventHandler: EventHandler) => {
 		const events = createEditorEvents({ pixel, canvas, getActiveTool });
 		eventHandler.subscribe.mouseMove(events.onMouseMove);
 		eventHandler.subscribe.mouseDown(events.onMouseDown);
@@ -81,7 +87,6 @@ export const initializeEditor = async () => {
 
 	const loop = () => {
 		pixel?.render.draw();
-		eventHandler.tick();
 		requestAnimationFrame(loop);
 	};
 

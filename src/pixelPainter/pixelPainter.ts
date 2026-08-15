@@ -1,6 +1,7 @@
 import { createBrushHandler } from "./handlers/brushHandler";
 import { createColorPaletteHandler } from "./handlers/colorPaletteHandler";
 import { createEyeDropperHandler } from "./handlers/EyeDropperHandler";
+import { createEventHandler } from "./handlers/eventHandler";
 import { createExportHandler } from "./handlers/exportHandler";
 import { createHistoryChangeHandler } from "./handlers/historyChangeHandler/historyChangeHandler";
 import { createLayerHandler } from "./handlers/layerHandler";
@@ -23,6 +24,8 @@ export const pixelPainter = async (
 		gridSize,
 		projectName,
 	);
+
+	const eventHandler = createEventHandler(canvas);
 
 	const layerHandler = await createLayerHandler(
 		projectName,
@@ -92,6 +95,7 @@ export const pixelPainter = async (
 		historyChangeHandler,
 		layerPreview,
 		projectConfigHandler,
+		eventHandler,
 	);
 
 	const exportHandler = createExportHandler(
@@ -188,5 +192,6 @@ export const pixelPainter = async (
 			getProjectName: projectConfigHandler.getProjectName,
 			setProjectName: projectConfigHandler.setProjectName,
 		},
+		eventHandler,
 	};
 };

@@ -1,5 +1,5 @@
-import type { Vec2 } from "../pixelPainter/types";
-import { generateUUID } from "../utils";
+import { generateUUID } from "../../utils";
+import type { Vec2 } from "../types";
 
 type WheelType = {
 	deltaMode: number;
@@ -40,6 +40,8 @@ export const INITIAL_TICK_EVENTS: TickEvents = {
 	onKeyUp: false,
 	onWheel: false,
 };
+
+export type EventHandler = ReturnType<typeof createEventHandler>;
 
 export const createEventHandler = (canvas: HTMLCanvasElement) => {
 	const mousePosition: Vec2 = { x: 0, y: 0 };

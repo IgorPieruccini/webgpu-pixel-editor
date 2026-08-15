@@ -5,6 +5,7 @@ import type { LayerPreviewHandler } from "../layerPreview";
 import type { TiledLayerBuffer } from "../tiledLayer";
 import type { Layers, RGBA, Vec2 } from "../types";
 import type { BrushHandler } from "./brushHandler";
+import type { EventHandler } from "./eventHandler";
 import type { HistoryChangeHandler } from "./historyChangeHandler";
 import type { LayerHandler } from "./layerHandler";
 import type { ProjectConfigHandler } from "./projectConfigHandler";
@@ -20,6 +21,7 @@ export const createMiddlewareHandler = (
 	historyChangeHandler: HistoryChangeHandler,
 	layerPreview: LayerPreviewHandler,
 	projectConfigHandler: ProjectConfigHandler,
+	eventHandler: EventHandler,
 ) => {
 	const debounceAddAction = debounce(
 		() => historyChangeHandler.addAction(),
@@ -97,6 +99,7 @@ export const createMiddlewareHandler = (
 			}
 		}
 		renderHandler.draw();
+		eventHandler.tick();
 	};
 
 	const loadLayers = (

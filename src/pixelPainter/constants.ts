@@ -107,4 +107,18 @@ export const INITIAL_PIXEL_PAINTER: PixelPainterMethods = {
 		getProjectName: () => "project not initialized",
 		setProjectName: () => {},
 	},
+	eventHandler: {
+		tick: () => {},
+		startListening: () => {},
+		stopListening: () => {},
+		unsubscribeAll: () => {},
+		subscribe: {
+			mouseDown: () => () => {},
+			mouseUp: () => () => {},
+			mouseMove: () => () => {},
+			mouseWheel: () => () => {},
+			keyDown: () => () => {},
+			keyUp: () => () => {},
+		},
+	},
 };

@@ -1,8 +1,8 @@
 import type { Accessor } from "solid-js";
 import { BYTES_PER_PIXEL, ZOOM_SENSITIVITY } from "../constants";
+import type { EditorEventType } from "../pixelPainter/handlers/eventHandler";
 import type { PixelPainterMethods, Vec2 } from "../pixelPainter/types";
 import { ACTIVATE_TOOL } from "./constant";
-import type { EditorEventType } from "./eventHandler";
 
 const normalizeWheelDelta = (event: EditorEventType["wheel"]) => {
 	const LINE_HEIGHT = 16;
