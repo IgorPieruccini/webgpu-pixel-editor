@@ -65,6 +65,10 @@ export const initializeEditor = async () => {
 	const eventHandler = createEventHandler(canvas);
 
 	const createEventListeners = () => {
+		// Stop listening and unsubscribe all events before creating new ones to avoid duplicate event handling
+		eventHandler.stopListening();
+		eventHandler.unsubscribeAll();
+
 		const events = createEditorEvents({ pixel, canvas, getActiveTool });
 		eventHandler.subscribe.mouseMove(events.onMouseMove);
 		eventHandler.subscribe.mouseDown(events.onMouseDown);

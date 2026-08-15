@@ -249,10 +249,20 @@ export const createEventHandler = (canvas: HTMLCanvasElement) => {
 		window.removeEventListener("keyup", onKeyUp);
 	};
 
+	const unsubscribeAll = () => {
+		mouseDownSubscriptions.clear();
+		mouseUpSubscriptions.clear();
+		mouseMoveSubscriptions.clear();
+		mouseWheelSubscriptions.clear();
+		keyDownSubscriptions.clear();
+		keyUpSubscriptions.clear();
+	};
+
 	return {
 		tick,
 		startListening,
 		stopListening,
+		unsubscribeAll,
 		subscribe: {
 			mouseDown: subscribeToMouseDown,
 			mouseUp: subscribeToMouseUp,
