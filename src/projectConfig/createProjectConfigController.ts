@@ -38,6 +38,7 @@ export const createProjectConfigController = (
 				options.onProjectOpened?.();
 
 				setActiveProject({ name, gridSize });
+				options.storage?.addProject({ name, gridSize });
 				setProjects(options.storage?.getProjects() ?? []);
 				value.colorPalette.loadColorPalette(colorPalette);
 
