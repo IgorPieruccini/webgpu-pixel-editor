@@ -40,7 +40,7 @@ export const createBucketPaintHandler = (
 			targetColor[0] === r &&
 			targetColor[1] === g &&
 			targetColor[2] === b &&
-			targetColor[3] === a * 255
+			targetColor[3] === a
 		) {
 			return;
 		}
@@ -78,7 +78,7 @@ export const createBucketPaintHandler = (
 				r,
 				g,
 				b,
-				a: a * 255,
+				a,
 			});
 
 			paintedPixels.add(i);

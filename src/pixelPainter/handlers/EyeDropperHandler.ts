@@ -37,7 +37,7 @@ export const createEyeDropperHandler = (
 				pos.y - layer.offset.y,
 			);
 
-			const alpha = pixel.a * Math.max(0, Math.min(1, layer.opacity));
+			const alpha = pixel.a * Math.max(0, Math.min(255, layer.opacity));
 
 			if (alpha <= 0) {
 				continue;
