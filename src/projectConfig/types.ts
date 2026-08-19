@@ -33,7 +33,6 @@ export type CreateProjectConfigControllerOptions = {
 		delete: (projectName: string) => Promise<void>;
 	};
 	onProjectOpened?: () => void;
-	autoLoadActiveProject?: boolean;
 	initialProjectName?: string;
 	initialGridSize?: Vec2;
 };

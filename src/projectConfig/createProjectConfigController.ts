@@ -75,7 +75,7 @@ export const createProjectConfigController = (
 		setActiveProject(options.storage?.getActiveProject() ?? null);
 		setProjects(options.storage?.getProjects() ?? []);
 
-		if (!options.autoLoadActiveProject || !options.storage) {
+		if (!options.storage) {
 			return;
 		}
 
