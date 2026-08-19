@@ -38,6 +38,7 @@ export const initializeEditor = async () => {
 	}
 
 	const createNewPainter = async (
+		id: string,
 		name: string,
 		initialGridSize: Vec2,
 	): Promise<PixelPainterMethods> => {
@@ -47,8 +48,7 @@ export const initializeEditor = async () => {
 		});
 
 		// if the project is already open, return the existing pixel painter instance
-		// TODO: instead of checking for project name, we should check for project ID, but first we need to support it
-		if (pixel && pixel.projectConfig.getProjectName() === name) {
+		if (pixel && pixel.projectConfig.getId() === id) {
 			return pixel;
 		}
 
@@ -59,6 +59,7 @@ export const initializeEditor = async () => {
 		}
 
 		pixel = await pixelPainter(
+			id,
 			name,
 			initialGridSize,
 			{

@@ -14,7 +14,7 @@ export type ProjectConfigStorage = {
 
 export type ProjectConfigContextType = {
 	createNewProject: (project: ProjectType & Partial<LoadedProject>) => void;
-	deleteProject: (projectName: string) => Promise<void>;
+	deleteProject: (id: string) => Promise<void>;
 	pixel: Accessor<PixelPainterMethods>;
 	getActiveProject: () => ProjectType | null;
 	getProjects: () => ProjectType[];

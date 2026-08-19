@@ -9,14 +9,14 @@ import {
 import type { Vec2 } from "./pixelPainter/types";
 import { serialization } from "./serialization";
 
-function openDB(name: string): Promise<IDBDatabase> {
+function openDB(id: string): Promise<IDBDatabase> {
 	return new Promise((resolve, reject) => {
-		const request = indexedDB.open(name, 1);
+		const request = indexedDB.open(id, 1);
 
 		// version change
 		request.onupgradeneeded = (event) => {
 			const db = (event.target as IDBOpenDBRequest).result;
-			if (!db.objectStoreNames.contains(`${name}`)) {
+			if (!db.objectStoreNames.contains(`${id}`)) {
 				db.createObjectStore(`layers`);
 			}
 		};
@@ -35,25 +35,25 @@ function openDB(name: string): Promise<IDBDatabase> {
 	});
 }
 
-function deleteDB(name: string): Promise<void> {
+function deleteDB(id: string): Promise<void> {
 	return new Promise((resolve, reject) => {
-		const request = indexedDB.deleteDatabase(name);
+		const request = indexedDB.deleteDatabase(id);
 
 		request.onsuccess = () => resolve();
 		request.onerror = (event) => {
 			reject((event.target as IDBOpenDBRequest).error);
 		};
 		request.onblocked = () => {
-			reject(new Error(`Deletion of IndexedDB database "${name}" is blocked`));
+			reject(new Error(`Deletion of IndexedDB database "${id}" is blocked`));
 		};
 	});
 }
 
 export const localDataBase = async (
-	name: string,
+	id: string,
 	projectConfigHandler: ProjectConfigHandler,
 ) => {
-	const db = await openDB(name);
+	const db = await openDB(id);
 
 	async function save(
 		buffer: TiledLayerBuffer,

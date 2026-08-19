@@ -15,22 +15,21 @@ import { createLayerPreview } from "./layerPreview";
 import type { Vec2 } from "./types";
 
 export const pixelPainter = async (
+	id: string,
 	projectName: string,
 	gridSize: Vec2,
 	canvasSize: Vec2,
 	canvas: HTMLCanvasElement,
 ) => {
 	const projectConfigHandler = createProjectConfigHandler(
+		id,
 		gridSize,
 		projectName,
 	);
 
 	const eventHandler = createEventHandler(canvas);
 
-	const layerHandler = await createLayerHandler(
-		projectName,
-		projectConfigHandler,
-	);
+	const layerHandler = await createLayerHandler(projectConfigHandler);
 
 	const colorPaletteHandler = createColorPaletteHandler(layerHandler);
 
@@ -54,7 +53,6 @@ export const pixelPainter = async (
 		layerHandler,
 		renderHandler,
 		colorPaletteHandler,
-		projectName,
 		projectConfigHandler,
 	);
 
@@ -187,6 +185,8 @@ export const pixelPainter = async (
 			eyeDropAtCell: eyeDropperHandler.eyeDropAtCell,
 		},
 		projectConfig: {
+			getId: projectConfigHandler.getId,
+			setId: projectConfigHandler.setId,
 			setSize: middlewareHandler.setGridSize,
 			getSize: projectConfigHandler.getSize,
 			getProjectName: projectConfigHandler.getProjectName,

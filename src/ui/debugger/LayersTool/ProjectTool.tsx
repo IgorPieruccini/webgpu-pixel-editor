@@ -19,6 +19,7 @@ export const ProjectTool = () => {
 
 	const onDownloadProject = () => {
 		const serializeProject = serialization.project.serialize(
+			projectConfig().getId(),
 			projectConfig().getProjectName(),
 			projectConfig().getSize(),
 			layerAPI().getList(),
@@ -47,7 +48,7 @@ export const ProjectTool = () => {
 		input.click();
 	};
 
-	const importImage = () => {
+	const importImageAsProject = () => {
 		// Create a file input element
 		const input = document.createElement("input");
 		input.type = "file";
@@ -60,10 +61,11 @@ export const ProjectTool = () => {
 
 			const { buffer, width, height } = await parseBlobToUint8Array(file);
 
+			const layerId = generateUUID();
 			const id = generateUUID();
 
 			const layer: Layer = {
-				id,
+				id: layerId,
 				name: "imported Image",
 				display: true,
 				opacity: 1,
@@ -71,11 +73,15 @@ export const ProjectTool = () => {
 			};
 
 			project.createNewProject({
+				id,
 				name,
 				gridSize: { x: width, y: height },
 				layers: [layer],
 				buffers: {
-					[id]: createTiledLayerBufferFromFlat(buffer, { x: width, y: height }),
+					[layerId]: createTiledLayerBufferFromFlat(buffer, {
+						x: width,
+						y: height,
+					}),
 				},
 			});
 		};
@@ -94,7 +100,7 @@ export const ProjectTool = () => {
 				<button onClick={importProject}>
 					<FiFilePlus />
 				</button>
-				<button onClick={importImage}>Import image</button>
+				<button onClick={importImageAsProject}>Import image as project</button>
 			</div>
 		</div>
 	);

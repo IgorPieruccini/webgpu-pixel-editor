@@ -9,19 +9,19 @@ const normalizeLayer = (layer: Layer | Omit<Layer, "offset">): Layer => {
 	};
 };
 
-const getLayers = (projectName: string) => {
-	return window.localStorage.getItem(`${projectName}-layers`);
+const getLayers = (id: string) => {
+	return window.localStorage.getItem(`${id}-layers`);
 };
 
-const saveLayers = (projectName: string, layers: string | Layers) => {
+const saveLayers = (id: string, layers: string | Layers) => {
 	if (typeof layers !== "string") {
 		layers = JSON.stringify(layers);
 	}
-	window.localStorage.setItem(`${projectName}-layers`, layers);
+	window.localStorage.setItem(`${id}-layers`, layers);
 };
 
-const createLayers = (projectName: string): Layers => {
-	let stringLayers = getLayers(projectName);
+const createLayers = (id: string): Layers => {
+	let stringLayers = getLayers(id);
 	if (!stringLayers) {
 		const layer: Layers = [
 			{
@@ -33,7 +33,7 @@ const createLayers = (projectName: string): Layers => {
 			},
 		];
 		stringLayers = JSON.stringify(layer);
-		saveLayers(projectName, stringLayers);
+		saveLayers(id, stringLayers);
 	}
 
 	return JSON.parse(stringLayers).map(normalizeLayer);
@@ -68,7 +68,7 @@ const setProjects = (projects: ProjectType[] | string) => {
 const addProject = (project: ProjectType) => {
 	const projects = getProjects();
 	const projectAlreadyExist = projects.find(
-		(_project) => _project.name === project.name,
+		(_project) => _project.id === project.id,
 	);
 
 	if (!projectAlreadyExist) {
@@ -76,19 +76,17 @@ const addProject = (project: ProjectType) => {
 	}
 };
 
-const deleteProject = (projectName: string) => {
-	const projects = getProjects().filter(
-		(project) => project.name !== projectName,
-	);
+const deleteProject = (id: string) => {
+	const projects = getProjects().filter((project) => project.id !== id);
 	setProjects(projects);
-	window.localStorage.removeItem(`${projectName}-layers`);
+	window.localStorage.removeItem(`${id}-layers`);
 
 	const activeProject = getActiveProject();
 	if (!activeProject) {
 		return;
 	}
 
-	if (activeProject.name === projectName) {
+	if (activeProject.id === id) {
 		clearActiveProject();
 	}
 };
@@ -100,7 +98,7 @@ const setProjectColorPalette = (colors: Array<string>) => {
 		throw new Error("Active project not defined");
 	}
 
-	const key = `${project.name}-color-palette`;
+	const key = `${project.id}-color-palette`;
 
 	const stringfiedColors = JSON.stringify(colors);
 
@@ -113,7 +111,7 @@ const getProjectColorPalette = (): Array<string> | null => {
 		throw new Error("Active project not defined");
 	}
 
-	const key = `${project.name}-color-palette`;
+	const key = `${project.id}-color-palette`;
 
 	const stringfiedColors = window.localStorage.getItem(key);
 	if (!stringfiedColors) {

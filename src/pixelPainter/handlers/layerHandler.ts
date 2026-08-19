@@ -18,12 +18,10 @@ const normalizeLayer = (layer: Layer): Layer => ({
 });
 
 export const createLayerHandler = async (
-	projectName: string,
 	projectConfigHandler: ProjectConfigHandler,
 ) => {
-	const stringLayers = storageLocal
-		.createLayers(projectName)
-		.map(normalizeLayer);
+	const id = projectConfigHandler.getId();
+	const stringLayers = storageLocal.createLayers(id).map(normalizeLayer);
 
 	const [getList, setList] = createSignal<Layers>(stringLayers);
 	const dirtyStatus: Set<string> = new Set(
@@ -40,7 +38,7 @@ export const createLayerHandler = async (
 	const [getActive, setActive] = createSignal<Layer>(firstLayer);
 
 	const buffers: Map<string, TiledLayerBuffer> = new Map();
-	const db = await localDataBase(projectName, projectConfigHandler);
+	const db = await localDataBase(id, projectConfigHandler);
 
 	for (const layer of getList()) {
 		try {
@@ -75,7 +73,8 @@ export const createLayerHandler = async (
 
 	const saveLayers = (layers: Layers) => {
 		const normalized = layers.map(normalizeLayer);
-		storageLocal.saveLayers(projectName, normalized);
+		const id = projectConfigHandler.getId();
+		storageLocal.saveLayers(id, normalized);
 	};
 
 	const add = (): string => {

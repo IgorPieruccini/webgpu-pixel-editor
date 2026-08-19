@@ -42,7 +42,6 @@ export const createHistoryChangeHandler = (
 	layerHandler: LayerHandler,
 	renderHandler: RenderHandler,
 	colorPaletteHandler: ColorPaletteHandler,
-	projectName: string,
 	projectConfigHandler: ProjectConfigHandler,
 ) => {
 	const history: HistorySnapshot[] = [];
@@ -53,8 +52,12 @@ export const createHistoryChangeHandler = (
 		const colorPalette = colorPaletteHandler.getColorPalette();
 		const gridSize = projectConfigHandler.getSize();
 
+		const id = projectConfigHandler.getId();
+		const projectName = projectConfigHandler.getProjectName();
+
 		return {
 			project: serialization.project.serialize(
+				id,
 				projectName,
 				gridSize,
 				layerHandler.getList(),
@@ -90,7 +93,8 @@ export const createHistoryChangeHandler = (
 			}
 		}
 
-		storageLocal.saveLayers(projectName, snapshot.project.layers);
+		const id = projectConfigHandler.getId();
+		storageLocal.saveLayers(id, snapshot.project.layers);
 	};
 
 	const addSnapshot = () => {

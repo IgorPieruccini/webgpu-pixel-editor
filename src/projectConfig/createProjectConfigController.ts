@@ -25,6 +25,7 @@ export const createProjectConfigController = (
 	);
 
 	const createOrOpenProject = ({
+		id,
 		name,
 		gridSize,
 		layers,
@@ -32,13 +33,13 @@ export const createProjectConfigController = (
 		colorPalette,
 	}: ProjectType & Partial<LoadedProject>): void => {
 		project()
-			.createNewPainter(name, gridSize)
+			.createNewPainter(id, name, gridSize)
 			.then((value) => {
 				setPixel(value);
 				options.onProjectOpened?.();
 
-				setActiveProject({ name, gridSize });
-				options.storage?.addProject({ name, gridSize });
+				setActiveProject({ id, name, gridSize });
+				options.storage?.addProject({ id, name, gridSize });
 				setProjects(options.storage?.getProjects() ?? []);
 				value.colorPalette.loadColorPalette(colorPalette);
 
@@ -46,8 +47,8 @@ export const createProjectConfigController = (
 			});
 	};
 
-	const deleteProject = async (projectName: string) => {
-		options.storage?.deleteProject(projectName);
+	const deleteProject = async (id: string) => {
+		options.storage?.deleteProject(id);
 		const nextProjects = options.storage?.getProjects() ?? [];
 		const storedActiveProject = options.storage?.getActiveProject() ?? null;
 
@@ -63,7 +64,7 @@ export const createProjectConfigController = (
 		// TODO: WHEN THE LAST PROJECT IS DELETED WE SHOW THE EMPTY STATE
 		// WE DON'T HAVE THAT YET
 
-		await options.storageDB?.delete(projectName);
+		await options.storageDB?.delete(id);
 	};
 
 	const mount = async () => {
@@ -83,13 +84,20 @@ export const createProjectConfigController = (
 			return;
 		}
 
-		if (!storedActiveProject.name || !storedActiveProject.gridSize) {
+		if (
+			!storedActiveProject.name ||
+			!storedActiveProject.gridSize ||
+			!storedActiveProject.id
+		) {
 			throw new Error(
 				"Could not initialize project, data is corrupt, please open project manually",
 			);
 		}
 
+		//TODO: DO WE NEED THIS?
 		projectConfig.setProjectName(storedActiveProject.name);
+		projectConfig.setId(storedActiveProject.id);
+		projectConfig.setSize(storedActiveProject.gridSize);
 		createOrOpenProject(storedActiveProject);
 	};
 

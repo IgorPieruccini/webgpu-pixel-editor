@@ -39,10 +39,11 @@ export const createProjectFromImage = (
 
 		const { buffer, width, height } = await parseBlobToUint8Array(file);
 
+		const layerId = generateUUID();
 		const id = generateUUID();
 
 		const layer: Layer = {
-			id,
+			id: layerId,
 			name: "imported Image",
 			display: true,
 			opacity: 1,
@@ -50,11 +51,15 @@ export const createProjectFromImage = (
 		};
 
 		projectContext.createNewProject({
+			id,
 			name,
 			gridSize: { x: width, y: height },
 			layers: [layer],
 			buffers: {
-				[id]: createTiledLayerBufferFromFlat(buffer, { x: width, y: height }),
+				[layerId]: createTiledLayerBufferFromFlat(buffer, {
+					x: width,
+					y: height,
+				}),
 			},
 		});
 	};
@@ -70,6 +75,7 @@ export const saveProject = (projectContext: ProjectConfigContextType) => {
 	const projectConfig = projectContext.pixel().projectConfig;
 
 	const serializeProject = serialization.project.serialize(
+		projectConfig.getId(),
 		projectConfig.getProjectName(),
 		projectConfig.getSize(),
 		layers,

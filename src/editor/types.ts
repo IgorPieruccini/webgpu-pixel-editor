@@ -1,3 +1,3 @@
 import type { Vec2 } from "../pixelPainter/types";
 
-export type ProjectType = { name: string; gridSize: Vec2 };
+export type ProjectType = { id: string; name: string; gridSize: Vec2 };

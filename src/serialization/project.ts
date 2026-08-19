@@ -4,6 +4,7 @@ import { serialization } from ".";
 import { layer } from "./layer";
 
 export type SerializedProject = {
+	id: string;
 	name: string;
 	gridSize: Vec2;
 	layers: Layers;
@@ -37,6 +38,7 @@ export const getSerializedBuffers = (
 };
 
 export const serialize = (
+	id: string,
 	name: string,
 	gridSize: Vec2,
 	layers: Layers,
@@ -51,6 +53,7 @@ export const serialize = (
 	const copyLayer = normalizeLayers(JSON.parse(JSON.stringify(layers)));
 
 	const project: SerializedProject = {
+		id,
 		name,
 		gridSize,
 		layers: copyLayer,
@@ -64,6 +67,7 @@ export const serialize = (
 
 function deserializeProject(data: SerializedProject): SerializedProject {
 	return {
+		id: data.id,
 		name: data.name,
 		gridSize: data.gridSize,
 		layers: normalizeLayers(data.layers),

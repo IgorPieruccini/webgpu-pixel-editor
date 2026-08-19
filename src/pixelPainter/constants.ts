@@ -102,6 +102,8 @@ export const INITIAL_PIXEL_PAINTER: PixelPainterMethods = {
 		eyeDropAtCell: () => {},
 	},
 	projectConfig: {
+		getId: () => "",
+		setId: () => {},
 		setSize: () => {},
 		getSize: () => ({ x: 128, y: 128 }),
 		getProjectName: () => "project not initialized",
