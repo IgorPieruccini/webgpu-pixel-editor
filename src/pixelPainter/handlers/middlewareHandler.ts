@@ -141,7 +141,7 @@ export const createMiddlewareHandler = (
 
 		const projects = storageLocal.getProjects();
 		const updatedProjects = projects.map((project) => {
-			if (project.name === activeProject.name) {
+			if (project.id === activeProject.id) {
 				return activeProject;
 			}
 			return project;

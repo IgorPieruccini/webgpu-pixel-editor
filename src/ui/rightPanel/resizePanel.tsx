@@ -13,6 +13,10 @@ export const ResizePanel = () => {
 	const [getHeight, setHeight] = createSignal(gridSize.y);
 
 	const closePanel = () => {
+		menu.openOption(-1);
+	};
+
+	const onChangeSize = () => {
 		projectConfig().setSize({ x: getWidth(), y: getHeight() });
 		menu.openOption(-1);
 	};
@@ -52,7 +56,7 @@ export const ResizePanel = () => {
 					/>
 				</label>
 			</div>
-			<button type="button" onClick={closePanel}>
+			<button type="button" onClick={onChangeSize}>
 				done
 			</button>
 		</div>

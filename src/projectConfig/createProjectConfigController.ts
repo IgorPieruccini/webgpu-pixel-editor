@@ -94,10 +94,8 @@ export const createProjectConfigController = (
 			);
 		}
 
-		//TODO: DO WE NEED THIS?
 		projectConfig.setProjectName(storedActiveProject.name);
 		projectConfig.setId(storedActiveProject.id);
-		projectConfig.setSize(storedActiveProject.gridSize);
 		createOrOpenProject(storedActiveProject);
 	};
 
