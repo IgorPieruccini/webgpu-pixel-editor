@@ -1,5 +1,5 @@
 import { FILE_FORMAT } from "../constants";
-import type { Layer } from "../lib";
+import type { Layer, ProjectType } from "../lib";
 import { createTiledLayerBufferFromFlat } from "../pixelPainter/tiledLayer";
 import { parseBlobToUint8Array } from "../pixelPainter/utils";
 import { serialization } from "../serialization";
@@ -22,6 +22,16 @@ export const loadProject = (projectContext: ProjectConfigContextType) => {
 
 	// Trigger the file dialog
 	input.click();
+};
+
+export const getUniqueName = (name: string, projects: ProjectType[]) => {
+	const isRepeatingNameTimes = projects.filter((project) =>
+		project.name.startsWith(name),
+	).length;
+
+	const uniqueName =
+		isRepeatingNameTimes === 0 ? name : `${name} (${isRepeatingNameTimes})`;
+	return uniqueName;
 };
 
 export const createProjectFromImage = (
@@ -50,9 +60,11 @@ export const createProjectFromImage = (
 			offset: { x: 0, y: 0 },
 		};
 
+		const uniqueName = getUniqueName(name, projectContext.getProjects());
+
 		projectContext.createNewProject({
 			id,
-			name,
+			name: uniqueName,
 			gridSize: { x: width, y: height },
 			layers: [layer],
 			buffers: {

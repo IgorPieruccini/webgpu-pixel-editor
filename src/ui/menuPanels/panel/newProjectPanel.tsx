@@ -7,6 +7,7 @@ import {
 } from "../../../constants";
 import type { Vec2 } from "../../../pixelPainter/types";
 import { useProjectConfig } from "../../../projectConfig/projectConfigProvider";
+import { getUniqueName } from "../../../projectConfig/projectUtils";
 import { generateUUID } from "../../../utils";
 import { SquareButton } from "../../shared/squareButton";
 import { useMenu } from "../menuProvider";
@@ -20,9 +21,12 @@ export const NewProjectPanel = () => {
 
 	const onCreate = () => {
 		const id = generateUUID();
+		const name = getProjectName();
+		const uniqueName = getUniqueName(name, projectConfig.getProjects());
+
 		projectConfig.createNewProject({
 			id,
-			name: getProjectName(),
+			name: uniqueName,
 			gridSize: getGridSize(),
 		});
 	};

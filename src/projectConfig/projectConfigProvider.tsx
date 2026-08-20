@@ -30,8 +30,6 @@ export const ProjectConfigProvider = (props: ProjectConfigProviderProps) => {
 	const controller = createProjectConfigController({
 		storage: storageLocal,
 		storageDB,
-		// TODO: DO WE NEED THIS?
-		autoLoadActiveProject: true,
 		onProjectOpened: () => {
 			menu.openOption(-1);
 		},
