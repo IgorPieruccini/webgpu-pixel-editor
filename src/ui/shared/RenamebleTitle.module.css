@@ -1,0 +1,10 @@
+.title {
+	font-size: 12px;
+	max-width: 150px;
+	color: inherit;
+}
+
+span.title {
+	display: flex;
+	align-items: center;
+}
