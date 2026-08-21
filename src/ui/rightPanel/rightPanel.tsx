@@ -2,6 +2,7 @@ import { RiArrowsExpandDiagonalSFill } from "solid-icons/ri";
 import { createMemo } from "solid-js";
 import { API } from "../../projectConfig/projectConfigProvider";
 import { useMenu } from "../menuPanels/menuProvider";
+import { RenamebleTitle } from "../shared/RenamebleTitle";
 import { SquareButton } from "../shared/squareButton";
 import { OPENED_OPTIONS } from "../topBar/constants";
 import { LayerOpacity } from "./LayerOpacity/LayerOpacity";
@@ -12,8 +13,6 @@ export const RightPanel = () => {
 	const projectConfig = API.projectConfig();
 	const menu = useMenu();
 
-	const name = createMemo(() => projectConfig().getProjectName());
-
 	const size = createMemo(() => {
 		return projectConfig().getSize();
 	});
@@ -22,17 +21,17 @@ export const RightPanel = () => {
 		menu.openOption(OPENED_OPTIONS.RESIZE);
 	};
 
-	const abbreviatedName = createMemo(() => {
-		if (name().length > 23) {
-			return `${name().slice(0, 20)}...`;
-		}
-		return name();
-	});
+	const onTitleEdited = (title: string) => {
+		projectConfig().setProjectName(title);
+	};
 
 	return (
 		<div class={styles.rightPanel}>
 			<div class={styles.projectTitle}>
-				<span>{abbreviatedName()}</span>
+				<RenamebleTitle
+					title={projectConfig().getProjectName()}
+					onEdited={onTitleEdited}
+				/>
 				<span class={styles.meta}>
 					<span class={styles.resize}>
 						{`${size().x} x ${size().y}`}

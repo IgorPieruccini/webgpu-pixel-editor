@@ -1,4 +1,4 @@
-import { createSignal } from "solid-js";
+import { createEffect, createSignal } from "solid-js";
 import styles from "./RenamebleTitle.module.css";
 
 type RenableTitleProps = {
@@ -8,9 +8,13 @@ type RenableTitleProps = {
 
 const MAX_LAYER_NAME_LENGTH = 25;
 
-export const RenamebleTitle = ({ title, onEdited }: RenableTitleProps) => {
-	const [getTitle, setTitle] = createSignal<string>(title);
+export const RenamebleTitle = (props: RenableTitleProps) => {
+	const [getTitle, setTitle] = createSignal<string>(props.title);
 	const [isEditing, setIsEditing] = createSignal<boolean>(false);
+
+	createEffect(() => {
+		setTitle(props.title);
+	});
 
 	const onTypeTitle = (e: { target: HTMLInputElement }) => {
 		setTitle(e.target.value);
@@ -40,7 +44,7 @@ export const RenamebleTitle = ({ title, onEdited }: RenableTitleProps) => {
 	};
 
 	const finishEditing = () => {
-		onEdited(getTitle());
+		props.onEdited(getTitle());
 		setIsEditing(false);
 	};
 
@@ -56,6 +60,7 @@ export const RenamebleTitle = ({ title, onEdited }: RenableTitleProps) => {
 		<>
 			{isEditing() ? (
 				<input
+					name="title"
 					ref={autoFocus}
 					class={styles.title}
 					type="text"
