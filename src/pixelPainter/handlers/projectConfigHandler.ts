@@ -6,6 +6,12 @@ export type ProjectConfigHandler = Awaited<
 	ReturnType<typeof createProjectConfigHandler>
 >;
 
+type UpdateConfigType = {
+	id?: string;
+	gridSize?: Vec2;
+	name?: string;
+};
+
 export const createProjectConfigHandler = (
 	id: string,
 	gridSize: Vec2,
@@ -15,17 +21,30 @@ export const createProjectConfigHandler = (
 	const [getSize, setSize] = createSignal<Vec2>(gridSize);
 	const [getProjectName, setProjectName] = createSignal<string>(projectName);
 
-	const currentProject = { id, name: projectName, gridSize };
-	storageLocal.setActiveProject(currentProject);
+	const updateProjectConfig = ({
+		id = getId(),
+		name = getProjectName(),
+		gridSize = getSize(),
+	}: UpdateConfigType) => {
+		const currentProject = { id, name, gridSize };
 
-	const updatedProjects = storageLocal.getProjects().map((project) => {
-		if (project.id === id) {
-			return currentProject;
-		}
-		return project;
-	});
+		storageLocal.setActiveProject(currentProject);
+		const updatedProjects = storageLocal.getProjects().map((project) => {
+			if (project.id === id) {
+				return currentProject;
+			}
+			return project;
+		});
 
-	storageLocal.setProjects(updatedProjects);
+		storageLocal.setProjects(updatedProjects);
+	};
+
+	const setName = (name: string) => {
+		updateProjectConfig({ name });
+		setProjectName(name);
+	};
+
+	updateProjectConfig({ id, name: projectName, gridSize });
 
 	return {
 		getId,
@@ -33,6 +52,6 @@ export const createProjectConfigHandler = (
 		getSize,
 		setSize,
 		getProjectName,
-		setProjectName,
+		setProjectName: setName,
 	};
 };
