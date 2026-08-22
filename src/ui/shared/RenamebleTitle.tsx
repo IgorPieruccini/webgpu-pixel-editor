@@ -35,7 +35,6 @@ export const RenamebleTitle = (props: RenableTitleProps) => {
 	const onEnterPress = (e: KeyboardEvent) => {
 		if (e.key == "Enter") {
 			finishEditing();
-			window.removeEventListener("keydown", onEnterPress);
 		}
 	};
 
@@ -44,8 +43,16 @@ export const RenamebleTitle = (props: RenableTitleProps) => {
 	};
 
 	const finishEditing = () => {
+		const title = getTitle();
+
+		// If has less than 4 character don't confirm
+		if (title.length <= 3) {
+			return;
+		}
+
 		props.onEdited(getTitle());
 		setIsEditing(false);
+		window.removeEventListener("keydown", onEnterPress);
 	};
 
 	const getShortenName = () => {
