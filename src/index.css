@@ -188,6 +188,39 @@ input[type="color"]::-webkit-color-swatch {
 	border-radius: 10px;
 }
 
+input[type="checkbox"] {
+	appearance: none;
+	width: 18px;
+	height: 18px;
+	min-height: 18px;
+	margin: 0;
+	padding: 0;
+	border: 1px solid var(--border);
+	border-radius: 6px;
+	background: var(--surface);
+	box-shadow: inset 0 1px 0
+		color-mix(in srgb, var(--text-primary) 3%, var(--transparent));
+	cursor: pointer;
+	transition:
+		border-color 0.2s ease,
+		background-color 0.2s ease,
+		box-shadow 0.2s ease;
+}
+
+input[type="checkbox"]:hover {
+	border-color: var(--primary-color-highlight);
+	background-color: var(--surface-strong);
+}
+
+input[type="checkbox"]:checked {
+	border-color: var(--primary-color-highlight);
+	background-color: var(--primary-color);
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m3 8 3 3 7-7' fill='none' stroke='%23e6e6e6' stroke-linecap='round' stroke-linejoin='round' stroke-width='2'/%3E%3C/svg%3E");
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: 14px;
+}
+
 * {
 	scrollbar-width: thin;
 	scrollbar-color: color-mix(

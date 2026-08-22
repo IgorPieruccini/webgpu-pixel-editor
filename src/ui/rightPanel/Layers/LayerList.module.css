@@ -1,0 +1,40 @@
+.layerButton {
+	display: flex;
+	justify-content: space-between;
+	width: 100%;
+	min-height: 42px;
+	padding: 0 10px;
+	border-radius: 14px;
+	align-items: center;
+	gap: 10px;
+}
+
+.active {
+	background: var(--primary-color);
+	border-color: color-mix(in srgb, var(--highlight) 65%, var(--transparent));
+}
+
+.dragging {
+	opacity: 50%;
+}
+
+.layerOptions {
+	display: flex;
+	background: none;
+	gap: 4px;
+}
+
+.layerSlider {
+	display: flex;
+	flex-direction: column;
+	justify-content: start;
+	gap: 8px;
+	overflow-y: auto;
+	padding-right: 4px;
+}
+
+.mergeLayerRow {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+}
